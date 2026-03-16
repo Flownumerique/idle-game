@@ -1,0 +1,856 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "description": "Idle Realms — Quêtes (principales, de métier, journalières pool)"
+  },
+  "mainQuests": [
+    {
+      "id": "mq_01",
+      "name": "Un Nouveau Départ",
+      "act": 1,
+      "order": 1,
+      "description": "Vous arrivez dans un village presque abandonné. Le forgeron a besoin de bois pour ranimer la forge.",
+      "objectives": [
+        {
+          "type": "gather",
+          "skillId": "woodcutting",
+          "actionId": "cut_common",
+          "qty": 50,
+          "label": "Couper 50 bûches"
+        }
+      ],
+      "rewards": {
+        "gold": 30,
+        "xp": {
+          "woodcutting": 200
+        },
+        "items": [
+          {
+            "itemId": "tool_axe_iron",
+            "qty": 1
+          }
+        ]
+      },
+      "unlocks": [
+        "mq_02"
+      ],
+      "lore": "Le village de Valcrest n'est plus que l'ombre de lui-même. Mais peut-être que vous pouvez y changer quelque chose."
+    },
+    {
+      "id": "mq_02",
+      "name": "La Forge Éteinte",
+      "act": 1,
+      "order": 2,
+      "description": "Ranimer la forge du village requiert du charbon et du minerai de cuivre.",
+      "objectives": [
+        {
+          "type": "gather",
+          "skillId": "mining",
+          "actionId": "mine_copper",
+          "qty": 30,
+          "label": "Extraire 30 minerais de cuivre"
+        },
+        {
+          "type": "craft",
+          "recipeId": "smelt_copper",
+          "qty": 5,
+          "label": "Fondre 5 lingots de cuivre"
+        }
+      ],
+      "rewards": {
+        "gold": 60,
+        "xp": {
+          "smithing": 300
+        },
+        "items": [
+          {
+            "itemId": "tool_pickaxe_iron",
+            "qty": 1
+          }
+        ]
+      },
+      "unlocks": [
+        "mq_03"
+      ],
+      "lore": "Aldric le forgeron retrouve ses marques. Il vous promet de vous apprendre les bases de la forge."
+    },
+    {
+      "id": "mq_03",
+      "name": "Premières Armes",
+      "act": 1,
+      "order": 3,
+      "description": "Forgez une épée de fer et un bouclier pour défendre le village.",
+      "objectives": [
+        {
+          "type": "craft",
+          "recipeId": "forge_sword_iron",
+          "qty": 1,
+          "label": "Forger une Épée de Fer"
+        },
+        {
+          "type": "craft",
+          "recipeId": "forge_shield_iron",
+          "qty": 1,
+          "label": "Forger un Bouclier de Fer"
+        }
+      ],
+      "rewards": {
+        "gold": 100,
+        "xp": {
+          "smithing": 500,
+          "combat": 200
+        },
+        "items": [
+          {
+            "itemId": "sword_iron",
+            "qty": 1
+          }
+        ]
+      },
+      "unlocks": [
+        "mq_04"
+      ],
+      "lore": "Armé de pied en cap, vous vous sentez prêt à affronter ce qui rôde dans les plaines."
+    },
+    {
+      "id": "mq_04",
+      "name": "Les Plaines Infestées",
+      "act": 1,
+      "order": 4,
+      "description": "Des rats géants et des slimes terrorisent les fermiers. Éliminez-en quelques-uns.",
+      "objectives": [
+        {
+          "type": "kill",
+          "monsterId": "rat",
+          "qty": 20,
+          "label": "Tuer 20 Rats Géants"
+        },
+        {
+          "type": "kill",
+          "monsterId": "slime_green",
+          "qty": 10,
+          "label": "Tuer 10 Slimes Verts"
+        }
+      ],
+      "rewards": {
+        "gold": 120,
+        "xp": {
+          "combat": 400
+        },
+        "items": [
+          {
+            "itemId": "chest_common",
+            "qty": 2
+          }
+        ]
+      },
+      "unlocks": [
+        "mq_05"
+      ],
+      "lore": "Les fermiers vous accueillent chaleureusement. L'un d'eux mentionne avoir vu des gobelins à la lisière de la forêt."
+    },
+    {
+      "id": "mq_05",
+      "name": "Le Marché Renaît",
+      "act": 1,
+      "order": 5,
+      "description": "Le vieux marchand a besoin de ressources pour rouvrir son échoppe.",
+      "objectives": [
+        {
+          "type": "deliver",
+          "itemId": "wood_oak",
+          "qty": 20,
+          "label": "Livrer 20 Bois de Chêne"
+        },
+        {
+          "type": "deliver",
+          "itemId": "bar_iron",
+          "qty": 10,
+          "label": "Livrer 10 Lingots de Fer"
+        },
+        {
+          "type": "sell",
+          "goldAmount": 200,
+          "label": "Vendre pour 200 or au marché"
+        }
+      ],
+      "rewards": {
+        "gold": 200,
+        "xp": {},
+        "unlockFeature": "market_advanced",
+        "items": [
+          {
+            "itemId": "scroll_xp",
+            "qty": 2
+          }
+        ]
+      },
+      "unlocks": [
+        "mq_06"
+      ],
+      "lore": "Le marché est de nouveau animé. Vous pouvez maintenant acheter des recettes et des graines."
+    },
+    {
+      "id": "mq_06",
+      "name": "Le Chef de Clan",
+      "act": 1,
+      "order": 6,
+      "description": "Un chef gobelin a été aperçu dans les plaines. Battez-le pour sécuriser les environs.",
+      "objectives": [
+        {
+          "type": "kill",
+          "monsterId": "goblin_chieftain_small",
+          "qty": 1,
+          "label": "Vaincre le Chef de Clan Gobelin"
+        }
+      ],
+      "rewards": {
+        "gold": 300,
+        "xp": {
+          "combat": 800
+        },
+        "items": [
+          {
+            "itemId": "helm_iron",
+            "qty": 1
+          },
+          {
+            "itemId": "chest_rare",
+            "qty": 1
+          }
+        ]
+      },
+      "unlocks": [
+        "mq_07"
+      ],
+      "lore": "La couronne rouillée du chef trône désormais dans la mairie. Le village vous considère comme son protecteur."
+    },
+    {
+      "id": "mq_07",
+      "name": "La Rivière et le Filet",
+      "act": 1,
+      "order": 7,
+      "description": "L'apothicaire a besoin de poissons et d'herbes pour ses préparations.",
+      "objectives": [
+        {
+          "type": "reach_level",
+          "skillId": "fishing",
+          "level": 10,
+          "label": "Atteindre Pêche niveau 10"
+        },
+        {
+          "type": "craft",
+          "recipeId": "brew_potion_minor",
+          "qty": 5,
+          "label": "Créer 5 Potions de Soin Mineures"
+        }
+      ],
+      "rewards": {
+        "gold": 250,
+        "xp": {
+          "alchemy": 400,
+          "fishing": 500
+        },
+        "unlockSkill": "alchemy",
+        "items": [
+          {
+            "itemId": "potion_healing",
+            "qty": 3
+          }
+        ]
+      },
+      "unlocks": [
+        "mq_08"
+      ],
+      "lore": "L'apothicaire vous initie aux bases de l'alchimie. Un savoir précieux en territoire hostile."
+    },
+    {
+      "id": "mq_08",
+      "name": "Première Récolte",
+      "act": 1,
+      "order": 8,
+      "description": "Cultivez des herbes dans le jardin récupéré du village.",
+      "objectives": [
+        {
+          "type": "harvest",
+          "farmActionId": "grow_healing",
+          "qty": 3,
+          "label": "Récolter 3 fois de l'Herbe Guérisseuse"
+        },
+        {
+          "type": "harvest",
+          "farmActionId": "grow_golden",
+          "qty": 1,
+          "label": "Récolter une Rose Dorée"
+        }
+      ],
+      "rewards": {
+        "gold": 180,
+        "xp": {
+          "farming": 600
+        },
+        "items": [
+          {
+            "itemId": "seed_golden",
+            "qty": 5
+          },
+          {
+            "itemId": "seed_night",
+            "qty": 2
+          }
+        ]
+      },
+      "unlocks": [
+        "mq_09"
+      ],
+      "lore": "Le jardin du village commence à refleurir. Une vieille femme vous confie que des plantes rares poussent dans les marécages..."
+    },
+    {
+      "id": "mq_09",
+      "name": "Le Roi des Gobelins",
+      "act": 1,
+      "order": 9,
+      "description": "Pénétrez dans la Forêt des Gobelins et affrontez leur Roi.",
+      "objectives": [
+        {
+          "type": "kill",
+          "monsterId": "goblin_king",
+          "qty": 1,
+          "label": "Vaincre le Roi Gobelin"
+        }
+      ],
+      "rewards": {
+        "gold": 600,
+        "xp": {
+          "combat": 2000
+        },
+        "items": [
+          {
+            "itemId": "chest_rare",
+            "qty": 2
+          },
+          {
+            "itemId": "ring_silver",
+            "qty": 1
+          }
+        ]
+      },
+      "unlocks": [
+        "mq_10"
+      ],
+      "lore": "Le Roi Gobelin vaincu, la forêt reprend son souffle. Mais dans son repaire, vous avez trouvé un parchemin mentionnant des « mines profondes » et des trésors enfouis..."
+    },
+    {
+      "id": "mq_10",
+      "name": "Fondations Solides",
+      "act": 1,
+      "order": 10,
+      "description": "Avant d'explorer plus loin, consolidez vos fondations.",
+      "objectives": [
+        {
+          "type": "reach_level",
+          "skillId": "woodcutting",
+          "level": 20,
+          "label": "Bûcheronnage niv. 20"
+        },
+        {
+          "type": "reach_level",
+          "skillId": "mining",
+          "level": 20,
+          "label": "Minage niv. 20"
+        },
+        {
+          "type": "reach_level",
+          "skillId": "smithing",
+          "level": 15,
+          "label": "Forge niv. 15"
+        },
+        {
+          "type": "craft",
+          "recipeId": "upgrade_warehouse_1",
+          "qty": 1,
+          "label": "Construire l'Entrepôt Étendu"
+        }
+      ],
+      "rewards": {
+        "gold": 800,
+        "xp": {
+          "woodcutting": 1000,
+          "mining": 1000
+        },
+        "items": [
+          {
+            "itemId": "scroll_xp",
+            "qty": 3
+          }
+        ],
+        "unlockAct": 2
+      },
+      "unlocks": [
+        "mq_11"
+      ],
+      "lore": "Le village de Valcrest est rebâti. Mais une ombre s'étend depuis les profondeurs. L'Acte 2 commence..."
+    }
+  ],
+  "skillQuests": {
+    "woodcutting": [
+      {
+        "id": "sq_wc_01",
+        "name": "Apprenti Bûcheron",
+        "reqLevel": 1,
+        "objectives": [
+          {
+            "type": "gather",
+            "skillId": "woodcutting",
+            "actionId": "cut_common",
+            "qty": 100
+          }
+        ],
+        "rewards": {
+          "xp": {
+            "woodcutting": 500
+          },
+          "items": [
+            {
+              "itemId": "charcoal",
+              "qty": 20
+            }
+          ]
+        }
+      },
+      {
+        "id": "sq_wc_03",
+        "name": "L'If Précieux",
+        "reqLevel": 25,
+        "objectives": [
+          {
+            "type": "gather",
+            "skillId": "woodcutting",
+            "actionId": "cut_yew",
+            "qty": 50
+          }
+        ],
+        "rewards": {
+          "xp": {
+            "woodcutting": 3000
+          },
+          "items": [
+            {
+              "itemId": "tool_axe_steel",
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "sq_wc_05",
+        "name": "Branche de l'Érable",
+        "reqLevel": 60,
+        "objectives": [
+          {
+            "type": "gather",
+            "skillId": "woodcutting",
+            "actionId": "cut_maple",
+            "qty": 30
+          },
+          {
+            "type": "deliver",
+            "itemId": "resin_maple",
+            "qty": 10
+          }
+        ],
+        "rewards": {
+          "xp": {
+            "woodcutting": 15000
+          },
+          "items": [
+            {
+              "itemId": "staff_maple",
+              "qty": 1
+            }
+          ]
+        }
+      }
+    ],
+    "mining": [
+      {
+        "id": "sq_mn_01",
+        "name": "Apprenti Mineur",
+        "reqLevel": 1,
+        "objectives": [
+          {
+            "type": "gather",
+            "skillId": "mining",
+            "actionId": "mine_copper",
+            "qty": 100
+          }
+        ],
+        "rewards": {
+          "xp": {
+            "mining": 600
+          },
+          "items": [
+            {
+              "itemId": "bar_copper",
+              "qty": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "sq_mn_02",
+        "name": "La Veine d'Argent",
+        "reqLevel": 20,
+        "objectives": [
+          {
+            "type": "gather",
+            "skillId": "mining",
+            "actionId": "mine_silver",
+            "qty": 30
+          }
+        ],
+        "rewards": {
+          "xp": {
+            "mining": 2000
+          },
+          "unlockRecipe": "forge_sword_steel",
+          "items": [
+            {
+              "itemId": "bar_silver",
+              "qty": 5
+            }
+          ]
+        }
+      },
+      {
+        "id": "sq_mn_04",
+        "name": "Livraison au Forgeron",
+        "reqLevel": 30,
+        "objectives": [
+          {
+            "type": "deliver",
+            "itemId": "bar_iron",
+            "qty": 50
+          }
+        ],
+        "rewards": {
+          "xp": {
+            "mining": 4000,
+            "smithing": 2000
+          },
+          "effect": "smithingSlotBonus",
+          "items": []
+        }
+      },
+      {
+        "id": "sq_mn_05",
+        "name": "Découverte d'une Géode",
+        "reqLevel": 40,
+        "objectives": [
+          {
+            "type": "find_rare",
+            "itemId": "gem_ruby",
+            "qty": 3
+          }
+        ],
+        "rewards": {
+          "xp": {
+            "mining": 8000
+          },
+          "items": [
+            {
+              "itemId": "amulet_miner",
+              "qty": 1
+            }
+          ]
+        }
+      }
+    ],
+    "combat": [
+      {
+        "id": "sq_cb_01",
+        "name": "Premier Sang",
+        "reqLevel": 1,
+        "objectives": [
+          {
+            "type": "kill",
+            "zoneId": "plains_start",
+            "qty": 50,
+            "label": "Tuer 50 monstres"
+          }
+        ],
+        "rewards": {
+          "xp": {
+            "combat": 500
+          },
+          "items": [
+            {
+              "itemId": "food_sardine_cooked",
+              "qty": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "sq_cb_03",
+        "name": "Chasseur de Gobelins",
+        "reqLevel": 10,
+        "objectives": [
+          {
+            "type": "kill",
+            "monsterId": "goblin_warrior",
+            "qty": 100
+          }
+        ],
+        "rewards": {
+          "xp": {
+            "combat": 3000
+          },
+          "items": [
+            {
+              "itemId": "ring_silver",
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "sq_cb_05",
+        "name": "Golem Vaincu",
+        "reqLevel": 35,
+        "objectives": [
+          {
+            "type": "kill",
+            "monsterId": "stone_golem_king",
+            "qty": 1
+          }
+        ],
+        "rewards": {
+          "xp": {
+            "combat": 10000
+          },
+          "items": [
+            {
+              "itemId": "core_golem",
+              "qty": 1
+            },
+            {
+              "itemId": "ring_gold",
+              "qty": 1
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "dailyQuestPool": [
+    {
+      "id": "dq_fish_30",
+      "type": "gather",
+      "skillId": "fishing",
+      "qty": 30,
+      "label": "Pêcher 30 poissons",
+      "rewards": {
+        "gold": 80,
+        "xp": {
+          "fishing": 300
+        }
+      }
+    },
+    {
+      "id": "dq_sell_200",
+      "type": "sell",
+      "goldAmount": 200,
+      "label": "Vendre pour 200 or",
+      "rewards": {
+        "gold": 50,
+        "items": [
+          {
+            "itemId": "scroll_xp",
+            "qty": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "dq_kill_10",
+      "type": "kill",
+      "zoneId": "any",
+      "qty": 10,
+      "label": "Tuer 10 monstres",
+      "rewards": {
+        "gold": 60,
+        "xp": {
+          "combat": 200
+        }
+      }
+    },
+    {
+      "id": "dq_mine_50",
+      "type": "gather",
+      "skillId": "mining",
+      "qty": 50,
+      "label": "Extraire 50 minerais",
+      "rewards": {
+        "gold": 70,
+        "xp": {
+          "mining": 400
+        }
+      }
+    },
+    {
+      "id": "dq_chop_100",
+      "type": "gather",
+      "skillId": "woodcutting",
+      "qty": 100,
+      "label": "Couper 100 bûches",
+      "rewards": {
+        "gold": 65,
+        "xp": {
+          "woodcutting": 500
+        }
+      }
+    },
+    {
+      "id": "dq_craft_5",
+      "type": "craft",
+      "skillId": "any",
+      "qty": 5,
+      "label": "Crafter 5 objets",
+      "rewards": {
+        "gold": 75,
+        "xp": {}
+      }
+    },
+    {
+      "id": "dq_harvest_3",
+      "type": "harvest",
+      "skillId": "farming",
+      "qty": 3,
+      "label": "Récolter 3 plantes",
+      "rewards": {
+        "gold": 55,
+        "items": [
+          {
+            "itemId": "seed_golden",
+            "qty": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "dq_potion_3",
+      "type": "craft",
+      "skillId": "alchemy",
+      "qty": 3,
+      "label": "Brasser 3 potions",
+      "rewards": {
+        "gold": 90,
+        "xp": {
+          "alchemy": 300
+        }
+      }
+    },
+    {
+      "id": "dq_boss_1",
+      "type": "kill_boss",
+      "zoneId": "any",
+      "qty": 1,
+      "label": "Vaincre 1 boss",
+      "rewards": {
+        "gold": 200,
+        "items": [
+          {
+            "itemId": "chest_rare",
+            "qty": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "dq_smelt_10",
+      "type": "craft",
+      "skillId": "smithing",
+      "qty": 10,
+      "label": "Fondre 10 lingots",
+      "rewards": {
+        "gold": 85,
+        "xp": {
+          "smithing": 400
+        }
+      }
+    }
+  ],
+  "weeklyQuests": [
+    {
+      "id": "wq_level_up",
+      "name": "Maîtrise",
+      "objective": {
+        "type": "gain_levels",
+        "qty": 2
+      },
+      "rewards": {
+        "gold": 500,
+        "items": [
+          {
+            "itemId": "chest_rare",
+            "qty": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "wq_craft_epic",
+      "name": "Artisan",
+      "objective": {
+        "type": "craft_rarity",
+        "rarity": "rare",
+        "qty": 3
+      },
+      "rewards": {
+        "gold": 600,
+        "items": [
+          {
+            "itemId": "rune_power",
+            "qty": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "wq_kill_100",
+      "name": "Carnage",
+      "objective": {
+        "type": "kill",
+        "zoneId": "any",
+        "qty": 100
+      },
+      "rewards": {
+        "gold": 700,
+        "items": [
+          {
+            "itemId": "scroll_xp",
+            "qty": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "wq_sell_1000",
+      "name": "Marchand",
+      "objective": {
+        "type": "sell",
+        "goldAmount": 1000
+      },
+      "rewards": {
+        "gold": 400,
+        "items": [
+          {
+            "itemId": "gem_sapphire",
+            "qty": 2
+          }
+        ]
+      }
+    }
+  ]
+}

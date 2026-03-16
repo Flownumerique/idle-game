@@ -1,0 +1,788 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "description": "Idle Realms — Skills / Métiers",
+    "xpFormula": "XP requis pour niveau N = floor(N * 83 + 100 * (1.1 ^ N - 1) / 0.1)",
+    "maxLevel": 99,
+    "masteryLevel": 120
+  },
+  "skills": [
+    {
+      "id": "woodcutting",
+      "name": "Bûcheronnage",
+      "icon": "🪓",
+      "description": "Abattre des arbres pour obtenir du bois et des matériaux rares.",
+      "toolSlot": "tool_woodcutting",
+      "defaultTool": null,
+      "levelMilestones": [
+        {
+          "level": 10,
+          "unlock": "Chêne débloqué"
+        },
+        {
+          "level": 25,
+          "unlock": "If débloqué"
+        },
+        {
+          "level": 40,
+          "unlock": "Zone Forêt des Brumes débloquée"
+        },
+        {
+          "level": 50,
+          "bonus": "doubleLog",
+          "description": "10% de chance de double bûche"
+        },
+        {
+          "level": 60,
+          "unlock": "Érable Enchanté débloqué"
+        },
+        {
+          "level": 75,
+          "unlock": "Forêt Ancienne débloquée + Hache d'Or craftable"
+        },
+        {
+          "level": 99,
+          "reward": "cape_forestier",
+          "description": "Cape du Grand Forestier"
+        }
+      ],
+      "actions": [
+        {
+          "id": "cut_common",
+          "name": "Arbre Commun",
+          "icon": "🌲",
+          "reqLevel": 1,
+          "baseActionTime": 4,
+          "xpPerAction": 10,
+          "outputs": [
+            {
+              "itemId": "wood_common",
+              "quantity": 1,
+              "chance": 1
+            },
+            {
+              "itemId": "charcoal",
+              "quantity": 1,
+              "chance": 0.15
+            },
+            {
+              "itemId": "plank_common",
+              "quantity": 1,
+              "chance": 0.1
+            }
+          ]
+        },
+        {
+          "id": "cut_oak",
+          "name": "Chêne",
+          "icon": "🌳",
+          "reqLevel": 10,
+          "baseActionTime": 6,
+          "xpPerAction": 28,
+          "outputs": [
+            {
+              "itemId": "wood_oak",
+              "quantity": 1,
+              "chance": 1
+            },
+            {
+              "itemId": "plank_oak",
+              "quantity": 1,
+              "chance": 0.2
+            },
+            {
+              "itemId": "charcoal",
+              "quantity": 2,
+              "chance": 0.25
+            }
+          ]
+        },
+        {
+          "id": "cut_yew",
+          "name": "If",
+          "icon": "🌲",
+          "reqLevel": 25,
+          "baseActionTime": 8,
+          "xpPerAction": 68,
+          "outputs": [
+            {
+              "itemId": "wood_yew",
+              "quantity": 1,
+              "chance": 1
+            },
+            {
+              "itemId": "branch_magic",
+              "quantity": 1,
+              "chance": 0.12
+            },
+            {
+              "itemId": "charcoal",
+              "quantity": 2,
+              "chance": 0.3
+            }
+          ]
+        },
+        {
+          "id": "cut_maple",
+          "name": "Érable Enchanté",
+          "icon": "✨",
+          "reqLevel": 60,
+          "baseActionTime": 12,
+          "xpPerAction": 220,
+          "outputs": [
+            {
+              "itemId": "wood_maple",
+              "quantity": 1,
+              "chance": 1
+            },
+            {
+              "itemId": "resin_maple",
+              "quantity": 1,
+              "chance": 0.25
+            },
+            {
+              "itemId": "branch_magic",
+              "quantity": 2,
+              "chance": 0.2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mining",
+      "name": "Minage",
+      "icon": "⛏️",
+      "description": "Extraire des minerais, pierres et gemmes des profondeurs.",
+      "toolSlot": "tool_mining",
+      "defaultTool": null,
+      "levelMilestones": [
+        {
+          "level": 10,
+          "unlock": "Fer débloqué"
+        },
+        {
+          "level": 20,
+          "unlock": "Argent débloqué + quête Livraison au Forgeron"
+        },
+        {
+          "level": 30,
+          "unlock": "Or débloqué"
+        },
+        {
+          "level": 40,
+          "bonus": "detectVein",
+          "description": "Révèle les minerais rares présents"
+        },
+        {
+          "level": 45,
+          "unlock": "Mines Profondes débloquées (zone)"
+        },
+        {
+          "level": 50,
+          "unlock": "Mithril débloqué"
+        },
+        {
+          "level": 70,
+          "unlock": "Adamantite débloqué"
+        },
+        {
+          "level": 80,
+          "bonus": "deepExtraction",
+          "description": "+30% minerai par action"
+        },
+        {
+          "level": 99,
+          "reward": "cape_mineur",
+          "description": "Cape du Grand Mineur"
+        }
+      ],
+      "actions": [
+        {
+          "id": "mine_copper",
+          "name": "Veine de Cuivre",
+          "icon": "🟤",
+          "reqLevel": 1,
+          "baseActionTime": 3,
+          "xpPerAction": 12,
+          "outputs": [
+            {
+              "itemId": "ore_copper",
+              "quantity": 1,
+              "chance": 1
+            },
+            {
+              "itemId": "stone_cut",
+              "quantity": 1,
+              "chance": 0.3
+            },
+            {
+              "itemId": "gem_ruby",
+              "quantity": 1,
+              "chance": 0.005
+            }
+          ]
+        },
+        {
+          "id": "mine_iron",
+          "name": "Veine de Fer",
+          "icon": "⚫",
+          "reqLevel": 10,
+          "baseActionTime": 4,
+          "xpPerAction": 30,
+          "outputs": [
+            {
+              "itemId": "ore_iron",
+              "quantity": 1,
+              "chance": 1
+            },
+            {
+              "itemId": "stone_cut",
+              "quantity": 1,
+              "chance": 0.2
+            },
+            {
+              "itemId": "gem_sapphire",
+              "quantity": 1,
+              "chance": 0.005
+            }
+          ]
+        },
+        {
+          "id": "mine_silver",
+          "name": "Veine d'Argent",
+          "icon": "⚪",
+          "reqLevel": 20,
+          "baseActionTime": 6,
+          "xpPerAction": 65,
+          "outputs": [
+            {
+              "itemId": "ore_silver",
+              "quantity": 1,
+              "chance": 1
+            },
+            {
+              "itemId": "gem_sapphire",
+              "quantity": 1,
+              "chance": 0.02
+            }
+          ]
+        },
+        {
+          "id": "mine_gold",
+          "name": "Veine d'Or",
+          "icon": "🟡",
+          "reqLevel": 30,
+          "baseActionTime": 8,
+          "xpPerAction": 120,
+          "outputs": [
+            {
+              "itemId": "ore_gold",
+              "quantity": 1,
+              "chance": 1
+            },
+            {
+              "itemId": "gem_ruby",
+              "quantity": 1,
+              "chance": 0.03
+            },
+            {
+              "itemId": "gem_diamond",
+              "quantity": 1,
+              "chance": 0.005
+            }
+          ]
+        },
+        {
+          "id": "mine_mithril",
+          "name": "Veine de Mithril",
+          "icon": "💠",
+          "reqLevel": 50,
+          "baseActionTime": 10,
+          "xpPerAction": 250,
+          "outputs": [
+            {
+              "itemId": "ore_mithril",
+              "quantity": 1,
+              "chance": 1
+            },
+            {
+              "itemId": "essence_fire",
+              "quantity": 1,
+              "chance": 0.04
+            }
+          ]
+        },
+        {
+          "id": "mine_adamantite",
+          "name": "Veine d'Adamantite",
+          "icon": "🔷",
+          "reqLevel": 70,
+          "baseActionTime": 14,
+          "xpPerAction": 540,
+          "outputs": [
+            {
+              "itemId": "ore_adamantite",
+              "quantity": 1,
+              "chance": 1
+            },
+            {
+              "itemId": "essence_dark",
+              "quantity": 1,
+              "chance": 0.05
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fishing",
+      "name": "Pêche",
+      "icon": "🎣",
+      "description": "Pêcher dans lacs, rivières et mer pour obtenir poissons et objets rares.",
+      "toolSlot": "tool_fishing",
+      "defaultTool": "tool_rod_basic",
+      "reqSkill": {
+        "woodcutting": 5
+      },
+      "levelMilestones": [
+        {
+          "level": 10,
+          "unlock": "Rivière Rapide débloquée"
+        },
+        {
+          "level": 20,
+          "unlock": "Saumon débloqué"
+        },
+        {
+          "level": 30,
+          "unlock": "Barque débloquée (craft) → Mer Profonde"
+        },
+        {
+          "level": 50,
+          "bonus": "netFishing",
+          "description": "Chance de double poisson"
+        },
+        {
+          "level": 60,
+          "bonus": "netFishing2",
+          "description": "Filet auto : plusieurs poissons simultanés"
+        },
+        {
+          "level": 99,
+          "reward": "cape_pecheur"
+        }
+      ],
+      "actions": [
+        {
+          "id": "fish_lake",
+          "name": "Lac Calme",
+          "icon": "🏞️",
+          "reqLevel": 1,
+          "baseActionTime": 5,
+          "xpPerAction": 14,
+          "outputs": [
+            {
+              "itemId": "fish_sardine",
+              "quantity": 1,
+              "chance": 1
+            },
+            {
+              "itemId": "herb_aquatic",
+              "quantity": 1,
+              "chance": 0.2
+            },
+            {
+              "itemId": "slime_gel",
+              "quantity": 1,
+              "chance": 0.15
+            }
+          ]
+        },
+        {
+          "id": "fish_river",
+          "name": "Rivière Rapide",
+          "icon": "🌊",
+          "reqLevel": 10,
+          "baseActionTime": 6,
+          "xpPerAction": 35,
+          "outputs": [
+            {
+              "itemId": "fish_trout",
+              "quantity": 1,
+              "chance": 1
+            },
+            {
+              "itemId": "fish_sardine",
+              "quantity": 1,
+              "chance": 0.25
+            },
+            {
+              "itemId": "herb_aquatic",
+              "quantity": 1,
+              "chance": 0.15
+            }
+          ]
+        },
+        {
+          "id": "fish_sea",
+          "name": "Mer Profonde",
+          "icon": "🌊",
+          "reqLevel": 30,
+          "baseActionTime": 8,
+          "xpPerAction": 90,
+          "reqUnlock": "boat_built",
+          "outputs": [
+            {
+              "itemId": "fish_salmon",
+              "quantity": 1,
+              "chance": 1
+            },
+            {
+              "itemId": "fish_eel_glow",
+              "quantity": 1,
+              "chance": 0.08
+            },
+            {
+              "itemId": "fish_sharkling",
+              "quantity": 1,
+              "chance": 0.01
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "farming",
+      "name": "Agriculture",
+      "icon": "🌾",
+      "description": "Cultiver herbes, fleurs et plantes magiques dans les parcelles du village.",
+      "toolSlot": null,
+      "reqSkill": {},
+      "mechanic": "growth",
+      "levelMilestones": [
+        {
+          "level": 10,
+          "unlock": "Parcelle 2 débloquée (total: 2 slots)"
+        },
+        {
+          "level": 20,
+          "unlock": "Graine Dorée débloquée"
+        },
+        {
+          "level": 30,
+          "unlock": "Parcelle 3 débloquée (total: 3 slots)"
+        },
+        {
+          "level": 40,
+          "unlock": "Graine Nocturne + Fleur de Lumière débloquées"
+        },
+        {
+          "level": 50,
+          "unlock": "Parcelle 4 débloquée (total: 4 slots)"
+        },
+        {
+          "level": 60,
+          "bonus": "doubleHarvest",
+          "description": "15% chance double récolte"
+        },
+        {
+          "level": 70,
+          "unlock": "Parcelle 5 (total: 5 slots)"
+        },
+        {
+          "level": 99,
+          "unlock": "Parcelle 6 (total: 6 slots) + cape_agriculteur"
+        }
+      ],
+      "plots": {
+        "startSlots": 1,
+        "maxSlots": 6
+      },
+      "actions": [
+        {
+          "id": "grow_healing",
+          "name": "Herbe Guérisseuse",
+          "icon": "🌿",
+          "reqLevel": 1,
+          "seedId": "seed_healing",
+          "growTime": 120,
+          "xpPerHarvest": 20,
+          "outputs": [
+            {
+              "itemId": "herb_healing",
+              "quantity": 3,
+              "chance": 1
+            },
+            {
+              "itemId": "seed_healing",
+              "quantity": 1,
+              "chance": 0.5
+            }
+          ]
+        },
+        {
+          "id": "grow_wheat",
+          "name": "Blé",
+          "icon": "🌾",
+          "reqLevel": 1,
+          "seedId": "seed_wheat",
+          "growTime": 90,
+          "xpPerHarvest": 12,
+          "outputs": [
+            {
+              "itemId": "wheat",
+              "quantity": 5,
+              "chance": 1
+            }
+          ]
+        },
+        {
+          "id": "grow_golden",
+          "name": "Rose Dorée",
+          "icon": "🌹",
+          "reqLevel": 20,
+          "seedId": "seed_golden",
+          "growTime": 300,
+          "xpPerHarvest": 65,
+          "outputs": [
+            {
+              "itemId": "flower_golden",
+              "quantity": 2,
+              "chance": 1
+            },
+            {
+              "itemId": "seed_golden",
+              "quantity": 1,
+              "chance": 0.35
+            }
+          ]
+        },
+        {
+          "id": "grow_night",
+          "name": "Herbe Nocturne",
+          "icon": "🌑",
+          "reqLevel": 40,
+          "seedId": "seed_night",
+          "growTime": 600,
+          "xpPerHarvest": 180,
+          "outputs": [
+            {
+              "itemId": "herb_night",
+              "quantity": 2,
+              "chance": 1
+            },
+            {
+              "itemId": "seed_night",
+              "quantity": 1,
+              "chance": 0.3
+            }
+          ]
+        },
+        {
+          "id": "grow_dawn",
+          "name": "Fleur de Lumière",
+          "icon": "🌸",
+          "reqLevel": 40,
+          "seedId": "seed_dawn",
+          "growTime": 600,
+          "xpPerHarvest": 175,
+          "outputs": [
+            {
+              "itemId": "flower_dawn",
+              "quantity": 2,
+              "chance": 1
+            },
+            {
+              "itemId": "seed_dawn",
+              "quantity": 1,
+              "chance": 0.3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "smithing",
+      "name": "Forge",
+      "icon": "🔨",
+      "description": "Fondre des minerais et forger armes, armures et outils.",
+      "toolSlot": null,
+      "reqSkill": {
+        "mining": 5
+      },
+      "mechanic": "craft",
+      "levelMilestones": [
+        {
+          "level": 10,
+          "unlock": "Acier débloqué (recettes)"
+        },
+        {
+          "level": 20,
+          "unlock": "Livraison au Forgeron PNJ (quête)"
+        },
+        {
+          "level": 30,
+          "unlock": "Argent/Or fondu débloqué"
+        },
+        {
+          "level": 45,
+          "unlock": "Mithril fondable débloqué"
+        },
+        {
+          "level": 55,
+          "unlock": "Recettes Épiques de Forge"
+        },
+        {
+          "level": 70,
+          "unlock": "Golem Sentinelle craftable"
+        },
+        {
+          "level": 99,
+          "reward": "cape_forgeron"
+        }
+      ]
+    },
+    {
+      "id": "cooking",
+      "name": "Cuisine",
+      "icon": "🍳",
+      "description": "Préparer des repas qui soignent et renforcent le personnage en combat.",
+      "toolSlot": null,
+      "reqSkill": {
+        "fishing": 5
+      },
+      "mechanic": "craft",
+      "levelMilestones": [
+        {
+          "level": 10,
+          "unlock": "Truite Rôtie débloquée"
+        },
+        {
+          "level": 20,
+          "unlock": "Saumon Fumé débloqué"
+        },
+        {
+          "level": 35,
+          "unlock": "Repas du Guerrier débloqué"
+        },
+        {
+          "level": 60,
+          "unlock": "Festin de Mithril (buff de combat puissant)"
+        },
+        {
+          "level": 99,
+          "reward": "cape_cuisinier"
+        }
+      ]
+    },
+    {
+      "id": "alchemy",
+      "name": "Alchimie",
+      "icon": "🧪",
+      "description": "Créer potions, essences et réactifs à partir de plantes et minerais.",
+      "toolSlot": null,
+      "reqSkill": {},
+      "mechanic": "craft",
+      "levelMilestones": [
+        {
+          "level": 15,
+          "unlock": "Potion de Soin débloquée"
+        },
+        {
+          "level": 30,
+          "unlock": "Potion de Force débloquée"
+        },
+        {
+          "level": 40,
+          "unlock": "Essence d'Aube débloquée"
+        },
+        {
+          "level": 45,
+          "unlock": "Potion de Soin Supérieure (multi-métier)"
+        },
+        {
+          "level": 50,
+          "unlock": "Grimoire de l'Absent craftable"
+        },
+        {
+          "level": 60,
+          "unlock": "Recettes Épiques Alchimie"
+        },
+        {
+          "level": 99,
+          "reward": "cape_alchimiste"
+        }
+      ]
+    },
+    {
+      "id": "combat",
+      "name": "Combat",
+      "icon": "⚔️",
+      "description": "Affronter des monstres dans les zones d'exploration.",
+      "toolSlot": null,
+      "mechanic": "combat",
+      "levelMilestones": [
+        {
+          "level": 5,
+          "unlock": "Forêt des Gobelins débloquée"
+        },
+        {
+          "level": 10,
+          "unlock": "Bouclier équipable"
+        },
+        {
+          "level": 15,
+          "unlock": "Mines Abandonnées débloquées (si Minage 20)"
+        },
+        {
+          "level": 20,
+          "unlock": "Tannerie débloquée"
+        },
+        {
+          "level": 30,
+          "unlock": "Marécages Maudits (si quête)"
+        },
+        {
+          "level": 45,
+          "unlock": "Tours du Mage Fou (si Alchimie 40)"
+        },
+        {
+          "level": 99,
+          "reward": "cape_champion"
+        }
+      ]
+    }
+  ],
+  "xpTable": {
+    "1": 0,
+    "2": 83,
+    "3": 247,
+    "4": 501,
+    "5": 868,
+    "6": 1368,
+    "7": 2023,
+    "8": 2857,
+    "9": 3898,
+    "10": 5181,
+    "15": 15612,
+    "20": 37224,
+    "25": 77978,
+    "30": 151419,
+    "35": 277604,
+    "40": 486780,
+    "45": 826683,
+    "50": 1368024,
+    "55": 2222633,
+    "60": 3543146,
+    "65": 5580770,
+    "70": 8699718,
+    "75": 13437840,
+    "80": 20592937,
+    "85": 31399340,
+    "90": 47632100,
+    "95": 71961745,
+    "99": 103973745,
+    "_comment": "XP requis TOTAL pour atteindre le niveau N (précalculé pour perf)"
+  }
+}

@@ -1,0 +1,1271 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "description": "Idle Realms — Recettes de craft",
+    "note": "Les recettes multi-étapes sont définies avec 'steps'. Les recettes simples avec 'inputs'/'output' directement."
+  },
+  "recipes": [
+    {
+      "id": "smelt_copper",
+      "name": "Fondre Cuivre",
+      "skill": "smithing",
+      "reqLevel": 1,
+      "craftTime": 3,
+      "xpPerCraft": 8,
+      "inputs": [
+        {
+          "itemId": "ore_copper",
+          "qty": 3
+        },
+        {
+          "itemId": "charcoal",
+          "qty": 1
+        }
+      ],
+      "output": {
+        "itemId": "bar_copper",
+        "qty": 1
+      }
+    },
+    {
+      "id": "smelt_iron",
+      "name": "Fondre Fer",
+      "skill": "smithing",
+      "reqLevel": 5,
+      "craftTime": 4,
+      "xpPerCraft": 18,
+      "inputs": [
+        {
+          "itemId": "ore_iron",
+          "qty": 3
+        },
+        {
+          "itemId": "charcoal",
+          "qty": 2
+        }
+      ],
+      "output": {
+        "itemId": "bar_iron",
+        "qty": 1
+      }
+    },
+    {
+      "id": "smelt_steel",
+      "name": "Fondre Acier",
+      "skill": "smithing",
+      "reqLevel": 10,
+      "craftTime": 5,
+      "xpPerCraft": 40,
+      "inputs": [
+        {
+          "itemId": "ore_iron",
+          "qty": 4
+        },
+        {
+          "itemId": "charcoal",
+          "qty": 3
+        },
+        {
+          "itemId": "stone_cut",
+          "qty": 1
+        }
+      ],
+      "output": {
+        "itemId": "bar_steel",
+        "qty": 1
+      }
+    },
+    {
+      "id": "smelt_silver",
+      "name": "Fondre Argent",
+      "skill": "smithing",
+      "reqLevel": 20,
+      "craftTime": 5,
+      "xpPerCraft": 55,
+      "inputs": [
+        {
+          "itemId": "ore_silver",
+          "qty": 3
+        },
+        {
+          "itemId": "charcoal",
+          "qty": 2
+        }
+      ],
+      "output": {
+        "itemId": "bar_silver",
+        "qty": 1
+      }
+    },
+    {
+      "id": "smelt_gold",
+      "name": "Fondre Or",
+      "skill": "smithing",
+      "reqLevel": 30,
+      "craftTime": 6,
+      "xpPerCraft": 95,
+      "inputs": [
+        {
+          "itemId": "ore_gold",
+          "qty": 3
+        },
+        {
+          "itemId": "charcoal",
+          "qty": 3
+        }
+      ],
+      "output": {
+        "itemId": "bar_gold",
+        "qty": 1
+      }
+    },
+    {
+      "id": "smelt_mithril",
+      "name": "Fondre Mithril",
+      "skill": "smithing",
+      "reqLevel": 45,
+      "craftTime": 8,
+      "xpPerCraft": 200,
+      "inputs": [
+        {
+          "itemId": "ore_mithril",
+          "qty": 3
+        },
+        {
+          "itemId": "charcoal",
+          "qty": 4
+        }
+      ],
+      "output": {
+        "itemId": "bar_mithril",
+        "qty": 1
+      }
+    },
+    {
+      "id": "craft_plank",
+      "name": "Tailler Planches",
+      "skill": "woodcutting",
+      "reqLevel": 1,
+      "craftTime": 2,
+      "xpPerCraft": 5,
+      "inputs": [
+        {
+          "itemId": "wood_common",
+          "qty": 3
+        }
+      ],
+      "output": {
+        "itemId": "plank_common",
+        "qty": 2
+      }
+    },
+    {
+      "id": "craft_plank_oak",
+      "name": "Planches de Chêne",
+      "skill": "woodcutting",
+      "reqLevel": 10,
+      "craftTime": 3,
+      "xpPerCraft": 15,
+      "inputs": [
+        {
+          "itemId": "wood_oak",
+          "qty": 3
+        }
+      ],
+      "output": {
+        "itemId": "plank_oak",
+        "qty": 2
+      }
+    },
+    {
+      "id": "craft_charcoal",
+      "name": "Produire Charbon",
+      "skill": "woodcutting",
+      "reqLevel": 5,
+      "craftTime": 3,
+      "xpPerCraft": 8,
+      "inputs": [
+        {
+          "itemId": "wood_common",
+          "qty": 5
+        }
+      ],
+      "output": {
+        "itemId": "charcoal",
+        "qty": 3
+      }
+    },
+    {
+      "id": "forge_sword_copper",
+      "name": "Épée de Cuivre",
+      "skill": "smithing",
+      "reqLevel": 1,
+      "craftTime": 8,
+      "xpPerCraft": 25,
+      "inputs": [
+        {
+          "itemId": "bar_copper",
+          "qty": 2
+        },
+        {
+          "itemId": "wood_common",
+          "qty": 1
+        }
+      ],
+      "output": {
+        "itemId": "sword_copper",
+        "qty": 1
+      }
+    },
+    {
+      "id": "forge_sword_iron",
+      "name": "Épée de Fer",
+      "skill": "smithing",
+      "reqLevel": 10,
+      "craftTime": 10,
+      "xpPerCraft": 55,
+      "inputs": [
+        {
+          "itemId": "bar_iron",
+          "qty": 3
+        },
+        {
+          "itemId": "wood_oak",
+          "qty": 1
+        },
+        {
+          "itemId": "charcoal",
+          "qty": 2
+        }
+      ],
+      "output": {
+        "itemId": "sword_iron",
+        "qty": 1
+      }
+    },
+    {
+      "id": "forge_sword_steel",
+      "name": "Épée d'Acier",
+      "skill": "smithing",
+      "reqLevel": 25,
+      "craftTime": 14,
+      "xpPerCraft": 120,
+      "inputs": [
+        {
+          "itemId": "bar_steel",
+          "qty": 4
+        },
+        {
+          "itemId": "wood_yew",
+          "qty": 1
+        },
+        {
+          "itemId": "charcoal",
+          "qty": 2
+        }
+      ],
+      "output": {
+        "itemId": "sword_steel",
+        "qty": 1
+      }
+    },
+    {
+      "id": "forge_sword_mithril",
+      "name": "Épée de Mithril",
+      "skill": "smithing",
+      "reqLevel": 50,
+      "craftTime": 20,
+      "xpPerCraft": 400,
+      "inputs": [
+        {
+          "itemId": "bar_mithril",
+          "qty": 3
+        },
+        {
+          "itemId": "wood_maple",
+          "qty": 1
+        },
+        {
+          "itemId": "charcoal",
+          "qty": 4
+        }
+      ],
+      "output": {
+        "itemId": "sword_mithril",
+        "qty": 1
+      }
+    },
+    {
+      "id": "forge_staff_maple",
+      "name": "Bâton d'Érable",
+      "skill": "smithing",
+      "reqLevel": 35,
+      "craftTime": 18,
+      "xpPerCraft": 280,
+      "inputs": [
+        {
+          "itemId": "wood_maple",
+          "qty": 2
+        },
+        {
+          "itemId": "bar_silver",
+          "qty": 2
+        },
+        {
+          "itemId": "branch_magic",
+          "qty": 3
+        }
+      ],
+      "output": {
+        "itemId": "staff_maple",
+        "qty": 1
+      }
+    },
+    {
+      "id": "forge_helm_copper",
+      "name": "Casque de Cuivre",
+      "skill": "smithing",
+      "reqLevel": 1,
+      "craftTime": 6,
+      "xpPerCraft": 18,
+      "inputs": [
+        {
+          "itemId": "bar_copper",
+          "qty": 2
+        }
+      ],
+      "output": {
+        "itemId": "helm_copper",
+        "qty": 1
+      }
+    },
+    {
+      "id": "forge_chest_copper",
+      "name": "Plastron de Cuivre",
+      "skill": "smithing",
+      "reqLevel": 1,
+      "craftTime": 8,
+      "xpPerCraft": 28,
+      "inputs": [
+        {
+          "itemId": "bar_copper",
+          "qty": 4
+        }
+      ],
+      "output": {
+        "itemId": "chest_copper",
+        "qty": 1
+      }
+    },
+    {
+      "id": "forge_helm_iron",
+      "name": "Casque de Fer",
+      "skill": "smithing",
+      "reqLevel": 10,
+      "craftTime": 8,
+      "xpPerCraft": 45,
+      "inputs": [
+        {
+          "itemId": "bar_iron",
+          "qty": 3
+        }
+      ],
+      "output": {
+        "itemId": "helm_iron",
+        "qty": 1
+      }
+    },
+    {
+      "id": "forge_chest_iron",
+      "name": "Plastron de Fer",
+      "skill": "smithing",
+      "reqLevel": 10,
+      "craftTime": 12,
+      "xpPerCraft": 70,
+      "inputs": [
+        {
+          "itemId": "bar_iron",
+          "qty": 5
+        },
+        {
+          "itemId": "charcoal",
+          "qty": 2
+        }
+      ],
+      "output": {
+        "itemId": "chest_iron",
+        "qty": 1
+      }
+    },
+    {
+      "id": "forge_chest_steel",
+      "name": "Plastron d'Acier",
+      "skill": "smithing",
+      "reqLevel": 25,
+      "craftTime": 16,
+      "xpPerCraft": 160,
+      "inputs": [
+        {
+          "itemId": "bar_steel",
+          "qty": 6
+        },
+        {
+          "itemId": "charcoal",
+          "qty": 3
+        }
+      ],
+      "output": {
+        "itemId": "chest_steel",
+        "qty": 1
+      }
+    },
+    {
+      "id": "forge_shield_iron",
+      "name": "Bouclier de Fer",
+      "skill": "smithing",
+      "reqLevel": 8,
+      "craftTime": 10,
+      "xpPerCraft": 40,
+      "inputs": [
+        {
+          "itemId": "bar_iron",
+          "qty": 4
+        },
+        {
+          "itemId": "plank_common",
+          "qty": 2
+        }
+      ],
+      "output": {
+        "itemId": "shield_iron",
+        "qty": 1
+      }
+    },
+    {
+      "id": "craft_axe_iron",
+      "name": "Hache de Bûcheron (Fer)",
+      "skill": "smithing",
+      "reqLevel": 5,
+      "craftTime": 10,
+      "xpPerCraft": 35,
+      "inputs": [
+        {
+          "itemId": "bar_iron",
+          "qty": 3
+        },
+        {
+          "itemId": "wood_oak",
+          "qty": 2
+        }
+      ],
+      "output": {
+        "itemId": "tool_axe_iron",
+        "qty": 1
+      }
+    },
+    {
+      "id": "craft_axe_steel",
+      "name": "Hache de Bûcheron (Acier)",
+      "skill": "smithing",
+      "reqLevel": 20,
+      "craftTime": 14,
+      "xpPerCraft": 100,
+      "inputs": [
+        {
+          "itemId": "bar_steel",
+          "qty": 3
+        },
+        {
+          "itemId": "wood_yew",
+          "qty": 2
+        },
+        {
+          "itemId": "charcoal",
+          "qty": 2
+        }
+      ],
+      "output": {
+        "itemId": "tool_axe_steel",
+        "qty": 1
+      }
+    },
+    {
+      "id": "craft_pickaxe_iron",
+      "name": "Pioche de Fer",
+      "skill": "smithing",
+      "reqLevel": 5,
+      "craftTime": 10,
+      "xpPerCraft": 35,
+      "inputs": [
+        {
+          "itemId": "bar_iron",
+          "qty": 3
+        },
+        {
+          "itemId": "wood_common",
+          "qty": 2
+        }
+      ],
+      "output": {
+        "itemId": "tool_pickaxe_iron",
+        "qty": 1
+      }
+    },
+    {
+      "id": "craft_pickaxe_mithril",
+      "name": "Pioche de Mithril",
+      "skill": "smithing",
+      "reqLevel": 50,
+      "craftTime": 22,
+      "xpPerCraft": 350,
+      "inputs": [
+        {
+          "itemId": "bar_mithril",
+          "qty": 3
+        },
+        {
+          "itemId": "wood_yew",
+          "qty": 2
+        },
+        {
+          "itemId": "rune_power",
+          "qty": 1
+        }
+      ],
+      "output": {
+        "itemId": "tool_pickaxe_mithril",
+        "qty": 1
+      }
+    },
+    {
+      "id": "craft_rod_enchanted",
+      "name": "Canne Enchantée",
+      "skill": "smithing",
+      "reqLevel": 30,
+      "craftTime": 18,
+      "xpPerCraft": 200,
+      "inputs": [
+        {
+          "itemId": "wood_maple",
+          "qty": 2
+        },
+        {
+          "itemId": "bar_silver",
+          "qty": 2
+        },
+        {
+          "itemId": "gem_sapphire",
+          "qty": 1
+        }
+      ],
+      "output": {
+        "itemId": "tool_rod_enchanted",
+        "qty": 1
+      }
+    },
+    {
+      "id": "cook_sardine",
+      "name": "Griller Sardine",
+      "skill": "cooking",
+      "reqLevel": 1,
+      "craftTime": 4,
+      "xpPerCraft": 12,
+      "inputs": [
+        {
+          "itemId": "fish_sardine",
+          "qty": 1
+        }
+      ],
+      "output": {
+        "itemId": "food_sardine_cooked",
+        "qty": 1
+      }
+    },
+    {
+      "id": "cook_trout",
+      "name": "Rôtir Truite",
+      "skill": "cooking",
+      "reqLevel": 10,
+      "craftTime": 5,
+      "xpPerCraft": 30,
+      "inputs": [
+        {
+          "itemId": "fish_trout",
+          "qty": 1
+        },
+        {
+          "itemId": "herb_healing",
+          "qty": 1
+        }
+      ],
+      "output": {
+        "itemId": "food_trout_cooked",
+        "qty": 1
+      }
+    },
+    {
+      "id": "cook_salmon",
+      "name": "Fumer Saumon",
+      "skill": "cooking",
+      "reqLevel": 20,
+      "craftTime": 7,
+      "xpPerCraft": 75,
+      "inputs": [
+        {
+          "itemId": "fish_salmon",
+          "qty": 1
+        },
+        {
+          "itemId": "herb_healing",
+          "qty": 2
+        },
+        {
+          "itemId": "wheat",
+          "qty": 2
+        }
+      ],
+      "output": {
+        "itemId": "food_salmon_cooked",
+        "qty": 1
+      }
+    },
+    {
+      "id": "cook_warrior_meal",
+      "name": "Repas du Guerrier",
+      "skill": "cooking",
+      "reqLevel": 35,
+      "craftTime": 12,
+      "xpPerCraft": 180,
+      "inputs": [
+        {
+          "itemId": "fish_salmon",
+          "qty": 2
+        },
+        {
+          "itemId": "flower_golden",
+          "qty": 1
+        },
+        {
+          "itemId": "wheat",
+          "qty": 3
+        },
+        {
+          "itemId": "herb_healing",
+          "qty": 2
+        }
+      ],
+      "output": {
+        "itemId": "meal_warrior",
+        "qty": 1
+      }
+    },
+    {
+      "id": "brew_potion_minor",
+      "name": "Potion de Soin Mineure",
+      "skill": "alchemy",
+      "reqLevel": 5,
+      "craftTime": 8,
+      "xpPerCraft": 20,
+      "inputs": [
+        {
+          "itemId": "herb_healing",
+          "qty": 3
+        },
+        {
+          "itemId": "herb_aquatic",
+          "qty": 1
+        }
+      ],
+      "output": {
+        "itemId": "potion_healing_minor",
+        "qty": 1
+      }
+    },
+    {
+      "id": "brew_potion",
+      "name": "Potion de Soin",
+      "skill": "alchemy",
+      "reqLevel": 15,
+      "craftTime": 10,
+      "xpPerCraft": 55,
+      "inputs": [
+        {
+          "itemId": "herb_healing",
+          "qty": 5
+        },
+        {
+          "itemId": "flower_golden",
+          "qty": 1
+        },
+        {
+          "itemId": "herb_aquatic",
+          "qty": 2
+        }
+      ],
+      "output": {
+        "itemId": "potion_healing",
+        "qty": 1
+      }
+    },
+    {
+      "id": "brew_potion_strength",
+      "name": "Potion de Force",
+      "skill": "alchemy",
+      "reqLevel": 30,
+      "craftTime": 12,
+      "xpPerCraft": 90,
+      "inputs": [
+        {
+          "itemId": "mushroom_magic",
+          "qty": 2
+        },
+        {
+          "itemId": "flower_golden",
+          "qty": 2
+        },
+        {
+          "itemId": "slime_gel",
+          "qty": 1
+        }
+      ],
+      "output": {
+        "itemId": "potion_strength",
+        "qty": 1
+      }
+    },
+    {
+      "id": "brew_essence_dawn",
+      "name": "Essence d'Aube",
+      "skill": "alchemy",
+      "reqLevel": 40,
+      "craftTime": 16,
+      "xpPerCraft": 200,
+      "inputs": [
+        {
+          "itemId": "flower_dawn",
+          "qty": 3
+        },
+        {
+          "itemId": "gem_sapphire",
+          "qty": 1
+        },
+        {
+          "itemId": "herb_healing",
+          "qty": 5
+        }
+      ],
+      "output": {
+        "itemId": "essence_dawn",
+        "qty": 1
+      }
+    },
+    {
+      "id": "brew_varnish_sacred",
+      "name": "Vernis Sacré",
+      "skill": "alchemy",
+      "reqLevel": 35,
+      "craftTime": 14,
+      "xpPerCraft": 150,
+      "inputs": [
+        {
+          "itemId": "flower_dawn",
+          "qty": 2
+        },
+        {
+          "itemId": "flower_golden",
+          "qty": 2
+        },
+        {
+          "itemId": "resin_maple",
+          "qty": 1
+        }
+      ],
+      "output": {
+        "itemId": "varnish_sacred",
+        "qty": 1
+      }
+    },
+    {
+      "id": "craft_potion_healing_superior",
+      "name": "Potion de Soin Supérieure",
+      "type": "multistep",
+      "reqSkills": {
+        "alchemy": 40,
+        "fishing": 30,
+        "farming": 35
+      },
+      "totalXp": 450,
+      "steps": [
+        {
+          "step": 1,
+          "name": "Extraire la Bave",
+          "skill": "fishing",
+          "reqLevel": 30,
+          "craftTime": 5,
+          "xpPerCraft": 50,
+          "inputs": [
+            {
+              "itemId": "fish_eel_glow",
+              "qty": 3
+            }
+          ],
+          "output": {
+            "itemId": "slime_gel",
+            "qty": 3,
+            "label": "Bave Régénérante"
+          }
+        },
+        {
+          "step": 2,
+          "name": "Préparer Concentré Floral",
+          "skill": "farming",
+          "reqLevel": 35,
+          "craftTime": 8,
+          "xpPerCraft": 60,
+          "inputs": [
+            {
+              "itemId": "herb_healing",
+              "qty": 5
+            },
+            {
+              "itemId": "flower_golden",
+              "qty": 2
+            }
+          ],
+          "output": {
+            "itemId": "essence_dawn",
+            "qty": 1,
+            "label": "Concentré Floral"
+          }
+        },
+        {
+          "step": 3,
+          "name": "Purifier Résine",
+          "skill": "woodcutting",
+          "reqLevel": 25,
+          "craftTime": 4,
+          "xpPerCraft": 30,
+          "inputs": [
+            {
+              "itemId": "resin_maple",
+              "qty": 1
+            }
+          ],
+          "output": {
+            "itemId": "resin_maple",
+            "qty": 1,
+            "label": "Résine Purifiée"
+          }
+        },
+        {
+          "step": 4,
+          "name": "Distillation Finale",
+          "skill": "alchemy",
+          "reqLevel": 40,
+          "craftTime": 14,
+          "xpPerCraft": 310,
+          "inputs": [
+            {
+              "itemId": "slime_gel",
+              "qty": 3,
+              "fromStep": 1
+            },
+            {
+              "itemId": "essence_dawn",
+              "qty": 1,
+              "fromStep": 2
+            },
+            {
+              "itemId": "resin_maple",
+              "qty": 1,
+              "fromStep": 3
+            }
+          ],
+          "output": {
+            "itemId": "potion_healing_superior",
+            "qty": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "craft_plastron_aube",
+      "name": "Plastron de l'Aube",
+      "type": "multistep",
+      "reqSkills": {
+        "smithing": 50,
+        "mining": 35,
+        "alchemy": 35,
+        "combat": 25
+      },
+      "totalXp": 1200,
+      "steps": [
+        {
+          "step": 1,
+          "name": "Fondre Alliage d'Or",
+          "skill": "smithing",
+          "reqLevel": 35,
+          "craftTime": 12,
+          "xpPerCraft": 200,
+          "inputs": [
+            {
+              "itemId": "bar_gold",
+              "qty": 4
+            },
+            {
+              "itemId": "bar_iron",
+              "qty": 2
+            }
+          ],
+          "output": {
+            "itemId": "bar_gold",
+            "qty": 4,
+            "label": "Alliage d'Or Renforcé"
+          }
+        },
+        {
+          "step": 2,
+          "name": "Tanner le Cuir Épais",
+          "skill": "smithing",
+          "reqLevel": 30,
+          "craftTime": 10,
+          "xpPerCraft": 150,
+          "inputs": [
+            {
+              "itemId": "hide_bear",
+              "qty": 3
+            }
+          ],
+          "output": {
+            "itemId": "hide_bear",
+            "qty": 3,
+            "label": "Cuir Épais"
+          }
+        },
+        {
+          "step": 3,
+          "name": "Forger l'Armure Brute",
+          "skill": "smithing",
+          "reqLevel": 45,
+          "craftTime": 18,
+          "xpPerCraft": 400,
+          "inputs": [
+            {
+              "itemId": "bar_gold",
+              "qty": 4,
+              "fromStep": 1
+            },
+            {
+              "itemId": "charcoal",
+              "qty": 4
+            }
+          ],
+          "output": {
+            "itemId": "chest_steel",
+            "qty": 1,
+            "label": "Armure d'Or Brute"
+          }
+        },
+        {
+          "step": 4,
+          "name": "Appliquer le Vernis Sacré",
+          "skill": "alchemy",
+          "reqLevel": 35,
+          "craftTime": 14,
+          "xpPerCraft": 450,
+          "inputs": [
+            {
+              "itemId": "chest_steel",
+              "qty": 1,
+              "fromStep": 3
+            },
+            {
+              "itemId": "hide_bear",
+              "qty": 3,
+              "fromStep": 2
+            },
+            {
+              "itemId": "varnish_sacred",
+              "qty": 1
+            },
+            {
+              "itemId": "essence_dawn",
+              "qty": 1
+            }
+          ],
+          "output": {
+            "itemId": "chest_steel",
+            "qty": 1,
+            "label": "Plastron de l'Aube ✦"
+          }
+        }
+      ]
+    },
+    {
+      "id": "upgrade_forge_1",
+      "name": "Forge Améliorée (niv. 1)",
+      "type": "upgrade",
+      "upgradeId": "forge_building",
+      "upgradeLevel": 1,
+      "reqSkills": {
+        "smithing": 15,
+        "mining": 10
+      },
+      "craftTime": 30,
+      "xpPerCraft": 0,
+      "inputs": [
+        {
+          "itemId": "bar_iron",
+          "qty": 50
+        },
+        {
+          "itemId": "stone_cut",
+          "qty": 20
+        },
+        {
+          "itemId": "plank_oak",
+          "qty": 10
+        }
+      ],
+      "effect": {
+        "smithingSlots": 1
+      },
+      "description": "+1 slot de craft Forge simultané"
+    },
+    {
+      "id": "upgrade_warehouse_1",
+      "name": "Entrepôt Étendu (niv. 1)",
+      "type": "upgrade",
+      "upgradeId": "warehouse",
+      "upgradeLevel": 1,
+      "reqSkills": {
+        "woodcutting": 10,
+        "smithing": 5
+      },
+      "craftTime": 20,
+      "xpPerCraft": 0,
+      "inputs": [
+        {
+          "itemId": "plank_oak",
+          "qty": 30
+        },
+        {
+          "itemId": "bar_iron",
+          "qty": 10
+        }
+      ],
+      "effect": {
+        "inventorySlots": 50
+      },
+      "description": "+50 slots d'inventaire (100 → 150)"
+    },
+    {
+      "id": "upgrade_grimoire_absent",
+      "name": "Grimoire de l'Absent",
+      "type": "upgrade",
+      "upgradeId": "offline_cap",
+      "upgradeLevel": 1,
+      "reqSkills": {
+        "alchemy": 50,
+        "woodcutting": 40
+      },
+      "craftTime": 60,
+      "xpPerCraft": 0,
+      "inputs": [
+        {
+          "itemId": "wood_maple",
+          "qty": 5
+        },
+        {
+          "itemId": "resin_maple",
+          "qty": 3
+        },
+        {
+          "itemId": "herb_night",
+          "qty": 5
+        },
+        {
+          "itemId": "essence_magic",
+          "qty": 10
+        },
+        {
+          "itemId": "gem_sapphire",
+          "qty": 2
+        }
+      ],
+      "effect": {
+        "offlineCapHours": 72
+      },
+      "description": "Plafond progression hors-ligne : 48h → 72h"
+    },
+    {
+      "id": "upgrade_watch",
+      "name": "Montre de l'Aventurier",
+      "type": "upgrade",
+      "upgradeId": "offline_speed",
+      "upgradeLevel": 1,
+      "reqSkills": {
+        "mining": 40,
+        "smithing": 35
+      },
+      "craftTime": 40,
+      "xpPerCraft": 0,
+      "inputs": [
+        {
+          "itemId": "bar_gold",
+          "qty": 3
+        },
+        {
+          "itemId": "gem_ruby",
+          "qty": 1
+        },
+        {
+          "itemId": "bar_mithril",
+          "qty": 2
+        }
+      ],
+      "effect": {
+        "offlineSpeedBonus": 0.1
+      },
+      "description": "+10% vitesse de toutes les actions hors-ligne"
+    },
+    {
+      "id": "upgrade_net_auto",
+      "name": "Filet Automatique",
+      "type": "upgrade",
+      "upgradeId": "fishing_offline",
+      "upgradeLevel": 1,
+      "reqSkills": {
+        "fishing": 30,
+        "woodcutting": 25,
+        "smithing": 20
+      },
+      "craftTime": 35,
+      "xpPerCraft": 0,
+      "inputs": [
+        {
+          "itemId": "plank_oak",
+          "qty": 10
+        },
+        {
+          "itemId": "bar_iron",
+          "qty": 5
+        },
+        {
+          "itemId": "wood_yew",
+          "qty": 5
+        }
+      ],
+      "effect": {
+        "fishingOfflineBonus": 0.5
+      },
+      "description": "+50% ressources de pêche hors-ligne"
+    },
+    {
+      "id": "craft_bridge",
+      "name": "Réparer le Pont Brisé",
+      "type": "zoneUnlock",
+      "unlockZone": "plains_south",
+      "reqSkills": {
+        "woodcutting": 15,
+        "smithing": 10
+      },
+      "craftTime": 45,
+      "xpPerCraft": 0,
+      "inputs": [
+        {
+          "itemId": "plank_oak",
+          "qty": 60
+        },
+        {
+          "itemId": "bar_iron",
+          "qty": 40
+        },
+        {
+          "itemId": "stone_cut",
+          "qty": 20
+        }
+      ],
+      "description": "Reconstruit le pont vers les Plaines du Sud"
+    },
+    {
+      "id": "craft_mine_key",
+      "name": "Clé des Mines Profondes",
+      "type": "zoneUnlock",
+      "unlockZone": "deep_mines",
+      "reqSkills": {
+        "mining": 45,
+        "alchemy": 30,
+        "smithing": 40
+      },
+      "craftTime": 40,
+      "xpPerCraft": 0,
+      "inputs": [
+        {
+          "itemId": "bar_mithril",
+          "qty": 5
+        },
+        {
+          "itemId": "rune_power",
+          "qty": 3
+        },
+        {
+          "itemId": "essence_fire",
+          "qty": 1
+        }
+      ],
+      "description": "Ouvre la porte des Mines Profondes"
+    },
+    {
+      "id": "craft_boat",
+      "name": "Construire la Barque",
+      "type": "zoneUnlock",
+      "unlockZone": "deep_sea",
+      "reqSkills": {
+        "woodcutting": 30,
+        "fishing": 25,
+        "smithing": 15
+      },
+      "craftTime": 50,
+      "xpPerCraft": 0,
+      "inputs": [
+        {
+          "itemId": "plank_oak",
+          "qty": 30
+        },
+        {
+          "itemId": "wood_yew",
+          "qty": 10
+        },
+        {
+          "itemId": "bar_iron",
+          "qty": 8
+        }
+      ],
+      "unlockFlag": "boat_built",
+      "description": "Permet d'accéder à la Mer Profonde"
+    },
+    {
+      "id": "craft_dungeon_key",
+      "name": "Clé de Donjon",
+      "skill": "smithing",
+      "reqLevel": 15,
+      "craftTime": 12,
+      "xpPerCraft": 50,
+      "inputs": [
+        {
+          "itemId": "bar_iron",
+          "qty": 5
+        },
+        {
+          "itemId": "rune_power",
+          "qty": 1
+        }
+      ],
+      "output": {
+        "itemId": "key_dungeon",
+        "qty": 1
+      }
+    }
+  ]
+}

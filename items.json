@@ -1,0 +1,1228 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "description": "Idle Realms — Master item list",
+    "rarities": [
+      "common",
+      "uncommon",
+      "rare",
+      "epic",
+      "legendary"
+    ],
+    "categories": [
+      "resource",
+      "equipment",
+      "consumable",
+      "material",
+      "seed",
+      "currency"
+    ]
+  },
+  "items": [
+    {
+      "id": "gold",
+      "name": "Or",
+      "category": "currency",
+      "rarity": "common",
+      "icon": "🪙",
+      "stackMax": 9999999,
+      "sellPrice": 0,
+      "buyPrice": 0,
+      "description": "La monnaie du royaume."
+    },
+    {
+      "id": "wood_common",
+      "name": "Bois Commun",
+      "category": "resource",
+      "rarity": "common",
+      "icon": "🪵",
+      "stackMax": 9999,
+      "sellPrice": 2,
+      "buyPrice": 8,
+      "description": "Du bois tout ce qu'il y a de plus ordinaire."
+    },
+    {
+      "id": "wood_oak",
+      "name": "Bois de Chêne",
+      "category": "resource",
+      "rarity": "common",
+      "icon": "🪵",
+      "stackMax": 9999,
+      "sellPrice": 5,
+      "buyPrice": 18,
+      "description": "Solide et polyvalent, apprécié des forgerons et charpentiers."
+    },
+    {
+      "id": "wood_yew",
+      "name": "Bois d'If",
+      "category": "resource",
+      "rarity": "uncommon",
+      "icon": "🪵",
+      "stackMax": 9999,
+      "sellPrice": 15,
+      "buyPrice": 50,
+      "description": "Bois dense, idéal pour les arcs de longue portée."
+    },
+    {
+      "id": "wood_maple",
+      "name": "Érable Enchanté",
+      "category": "resource",
+      "rarity": "rare",
+      "icon": "✨",
+      "stackMax": 999,
+      "sellPrice": 60,
+      "buyPrice": 200,
+      "description": "Une sève dorée coule dans ses veines. Résonne avec la magie."
+    },
+    {
+      "id": "resin_maple",
+      "name": "Résine d'Érable",
+      "category": "material",
+      "rarity": "rare",
+      "icon": "🫙",
+      "stackMax": 999,
+      "sellPrice": 40,
+      "buyPrice": 140,
+      "description": "Extraite de l'Érable Enchanté. Composant alchimique précieux."
+    },
+    {
+      "id": "branch_magic",
+      "name": "Branche Magique",
+      "category": "material",
+      "rarity": "uncommon",
+      "icon": "🌿",
+      "stackMax": 999,
+      "sellPrice": 20,
+      "buyPrice": 70,
+      "description": "Vibre légèrement au toucher. Base pour les manches d'armes magiques."
+    },
+    {
+      "id": "charcoal",
+      "name": "Charbon de Bois",
+      "category": "resource",
+      "rarity": "common",
+      "icon": "⬛",
+      "stackMax": 9999,
+      "sellPrice": 3,
+      "buyPrice": 10,
+      "description": "Produit en brûlant du bois. Indispensable pour la forge."
+    },
+    {
+      "id": "plank_common",
+      "name": "Planche",
+      "category": "material",
+      "rarity": "common",
+      "icon": "🪵",
+      "stackMax": 9999,
+      "sellPrice": 4,
+      "buyPrice": 14,
+      "description": "Planche taillée dans du bois commun."
+    },
+    {
+      "id": "plank_oak",
+      "name": "Planche de Chêne",
+      "category": "material",
+      "rarity": "common",
+      "icon": "🪵",
+      "stackMax": 9999,
+      "sellPrice": 10,
+      "buyPrice": 35,
+      "description": "Planche robuste, base de construction."
+    },
+    {
+      "id": "ore_copper",
+      "name": "Minerai de Cuivre",
+      "category": "resource",
+      "rarity": "common",
+      "icon": "🟤",
+      "stackMax": 9999,
+      "sellPrice": 3,
+      "buyPrice": 10,
+      "description": "Abondant en surface. Premier métal de tout aventurier."
+    },
+    {
+      "id": "ore_iron",
+      "name": "Minerai de Fer",
+      "category": "resource",
+      "rarity": "common",
+      "icon": "⚫",
+      "stackMax": 9999,
+      "sellPrice": 6,
+      "buyPrice": 20,
+      "description": "La colonne vertébrale de la forge."
+    },
+    {
+      "id": "ore_silver",
+      "name": "Minerai d'Argent",
+      "category": "resource",
+      "rarity": "uncommon",
+      "icon": "⚪",
+      "stackMax": 9999,
+      "sellPrice": 18,
+      "buyPrice": 60,
+      "description": "Conduit la magie avec une efficacité surprenante."
+    },
+    {
+      "id": "ore_gold",
+      "name": "Minerai d'Or",
+      "category": "resource",
+      "rarity": "uncommon",
+      "icon": "🟡",
+      "stackMax": 9999,
+      "sellPrice": 35,
+      "buyPrice": 120,
+      "description": "Précieux et malléable. La joaillerie en raffole."
+    },
+    {
+      "id": "ore_mithril",
+      "name": "Minerai de Mithril",
+      "category": "resource",
+      "rarity": "rare",
+      "icon": "💠",
+      "stackMax": 999,
+      "sellPrice": 100,
+      "buyPrice": 350,
+      "description": "Métal légendaire d'une dureté extrême mais d'une légèreté remarquable."
+    },
+    {
+      "id": "ore_adamantite",
+      "name": "Minerai d'Adamantite",
+      "category": "resource",
+      "rarity": "epic",
+      "icon": "🔷",
+      "stackMax": 999,
+      "sellPrice": 300,
+      "buyPrice": 999,
+      "description": "Quasiment indestructible. Seuls les plus grands forgerons peuvent le travailler."
+    },
+    {
+      "id": "bar_copper",
+      "name": "Lingot de Cuivre",
+      "category": "material",
+      "rarity": "common",
+      "icon": "🟤",
+      "stackMax": 9999,
+      "sellPrice": 8,
+      "buyPrice": 25,
+      "description": "Cuivre fondu et coulé en lingot."
+    },
+    {
+      "id": "bar_iron",
+      "name": "Lingot de Fer",
+      "category": "material",
+      "rarity": "common",
+      "icon": "⚫",
+      "stackMax": 9999,
+      "sellPrice": 15,
+      "buyPrice": 50,
+      "description": "Fer purifié, prêt pour la forge."
+    },
+    {
+      "id": "bar_steel",
+      "name": "Lingot d'Acier",
+      "category": "material",
+      "rarity": "uncommon",
+      "icon": "🔩",
+      "stackMax": 9999,
+      "sellPrice": 35,
+      "buyPrice": 110,
+      "description": "Alliage de fer et de charbon. Plus résistant que le fer seul."
+    },
+    {
+      "id": "bar_silver",
+      "name": "Lingot d'Argent",
+      "category": "material",
+      "rarity": "uncommon",
+      "icon": "⚪",
+      "stackMax": 9999,
+      "sellPrice": 45,
+      "buyPrice": 150,
+      "description": "Argent raffiné. Excellent conducteur magique."
+    },
+    {
+      "id": "bar_gold",
+      "name": "Lingot d'Or",
+      "category": "material",
+      "rarity": "uncommon",
+      "icon": "🟡",
+      "stackMax": 9999,
+      "sellPrice": 90,
+      "buyPrice": 300,
+      "description": "Or fondu. La matière de base de la joaillerie."
+    },
+    {
+      "id": "bar_mithril",
+      "name": "Lingot de Mithril",
+      "category": "material",
+      "rarity": "rare",
+      "icon": "💠",
+      "stackMax": 999,
+      "sellPrice": 250,
+      "buyPrice": 800,
+      "description": "Mithril fondu. Requis pour les armures et armes de haut rang."
+    },
+    {
+      "id": "gem_ruby",
+      "name": "Rubis",
+      "category": "material",
+      "rarity": "rare",
+      "icon": "💎",
+      "stackMax": 999,
+      "sellPrice": 150,
+      "buyPrice": 500,
+      "description": "Pierre précieuse rouge sang. Renforce les enchantements de feu."
+    },
+    {
+      "id": "gem_sapphire",
+      "name": "Saphir",
+      "category": "material",
+      "rarity": "rare",
+      "icon": "💎",
+      "stackMax": 999,
+      "sellPrice": 150,
+      "buyPrice": 500,
+      "description": "Pierre précieuse bleue. Amplificateur magique reconnu."
+    },
+    {
+      "id": "gem_diamond",
+      "name": "Diamant",
+      "category": "material",
+      "rarity": "epic",
+      "icon": "💎",
+      "stackMax": 99,
+      "sellPrice": 500,
+      "buyPrice": 1800,
+      "description": "La plus dure des pierres. Indispensable aux joyaux légendaires."
+    },
+    {
+      "id": "stone_cut",
+      "name": "Pierre Taillée",
+      "category": "material",
+      "rarity": "common",
+      "icon": "🪨",
+      "stackMax": 9999,
+      "sellPrice": 4,
+      "buyPrice": 14,
+      "description": "Pierre de construction taillée dans les carrières."
+    },
+    {
+      "id": "essence_fire",
+      "name": "Essence de Feu",
+      "category": "material",
+      "rarity": "rare",
+      "icon": "🔥",
+      "stackMax": 999,
+      "sellPrice": 120,
+      "buyPrice": 400,
+      "description": "Cristallisation magique issue des profondeurs volcaniques."
+    },
+    {
+      "id": "essence_dark",
+      "name": "Essence Sombre",
+      "category": "material",
+      "rarity": "epic",
+      "icon": "🌑",
+      "stackMax": 99,
+      "sellPrice": 400,
+      "buyPrice": 1400,
+      "description": "Énergie condensée des abysses. Extrêmement instable."
+    },
+    {
+      "id": "fish_sardine",
+      "name": "Sardine",
+      "category": "resource",
+      "rarity": "common",
+      "icon": "🐟",
+      "stackMax": 9999,
+      "sellPrice": 4,
+      "buyPrice": 14,
+      "description": "Poisson commun des lacs calmes. Nourrissant."
+    },
+    {
+      "id": "fish_trout",
+      "name": "Truite",
+      "category": "resource",
+      "rarity": "common",
+      "icon": "🐟",
+      "stackMax": 9999,
+      "sellPrice": 8,
+      "buyPrice": 28,
+      "description": "Poisson de rivière au goût délicat."
+    },
+    {
+      "id": "fish_salmon",
+      "name": "Saumon",
+      "category": "resource",
+      "rarity": "uncommon",
+      "icon": "🐠",
+      "stackMax": 9999,
+      "sellPrice": 20,
+      "buyPrice": 65,
+      "description": "Riche en énergie. Les cuisiniers s'en disputent les filets."
+    },
+    {
+      "id": "fish_eel_glow",
+      "name": "Anguille Luminescente",
+      "category": "resource",
+      "rarity": "rare",
+      "icon": "🐉",
+      "stackMax": 999,
+      "sellPrice": 80,
+      "buyPrice": 260,
+      "description": "Émet une douce lumière bleue. Ses fluides ont des propriétés régénérantes."
+    },
+    {
+      "id": "fish_sharkling",
+      "name": "Requinard",
+      "category": "resource",
+      "rarity": "epic",
+      "icon": "🦈",
+      "stackMax": 99,
+      "sellPrice": 350,
+      "buyPrice": 1200,
+      "description": "Créature des profondeurs marines. Extrêmement rare."
+    },
+    {
+      "id": "herb_aquatic",
+      "name": "Herbe Aquatique",
+      "category": "material",
+      "rarity": "common",
+      "icon": "🌿",
+      "stackMax": 999,
+      "sellPrice": 6,
+      "buyPrice": 20,
+      "description": "Pousse dans les fonds boueux. Base de nombreuses potions."
+    },
+    {
+      "id": "slime_gel",
+      "name": "Gelée de Slime",
+      "category": "material",
+      "rarity": "common",
+      "icon": "🫧",
+      "stackMax": 999,
+      "sellPrice": 5,
+      "buyPrice": 18,
+      "description": "Matière visqueuse récupérée sur les slimes. Sert d'adhésif naturel."
+    },
+    {
+      "id": "herb_healing",
+      "name": "Herbe Guérisseuse",
+      "category": "resource",
+      "rarity": "common",
+      "icon": "🌿",
+      "stackMax": 9999,
+      "sellPrice": 5,
+      "buyPrice": 18,
+      "description": "Propriétés régénérantes bien connues des herboristes."
+    },
+    {
+      "id": "flower_golden",
+      "name": "Rose Dorée",
+      "category": "resource",
+      "rarity": "uncommon",
+      "icon": "🌹",
+      "stackMax": 999,
+      "sellPrice": 25,
+      "buyPrice": 80,
+      "description": "Fleur rare aux pétales dorés. Composant alchimique de haut rang."
+    },
+    {
+      "id": "herb_night",
+      "name": "Herbe Nocturne",
+      "category": "resource",
+      "rarity": "rare",
+      "icon": "🌑",
+      "stackMax": 999,
+      "sellPrice": 70,
+      "buyPrice": 230,
+      "description": "Ne pousse qu'à l'ombre. Liée aux enchantements sombres."
+    },
+    {
+      "id": "flower_dawn",
+      "name": "Fleur de Lumière",
+      "category": "resource",
+      "rarity": "rare",
+      "icon": "🌸",
+      "stackMax": 999,
+      "sellPrice": 65,
+      "buyPrice": 220,
+      "description": "S'épanouit à l'aube. Composant de l'Essence d'Aube."
+    },
+    {
+      "id": "wheat",
+      "name": "Blé",
+      "category": "resource",
+      "rarity": "common",
+      "icon": "🌾",
+      "stackMax": 9999,
+      "sellPrice": 2,
+      "buyPrice": 7,
+      "description": "Grain de base pour les recettes de cuisine."
+    },
+    {
+      "id": "mushroom_magic",
+      "name": "Champignon Magique",
+      "category": "resource",
+      "rarity": "uncommon",
+      "icon": "🍄",
+      "stackMax": 999,
+      "sellPrice": 22,
+      "buyPrice": 75,
+      "description": "Pousse dans l'obscurité humide. Légèrement hallucinogène, très utile en alchimie."
+    },
+    {
+      "id": "seed_healing",
+      "name": "Graine Guérisseuse",
+      "category": "seed",
+      "rarity": "common",
+      "icon": "🌱",
+      "stackMax": 999,
+      "sellPrice": 3,
+      "buyPrice": 10,
+      "growTime": 120,
+      "description": "Donne une Herbe Guérisseuse après 2 minutes de pousse."
+    },
+    {
+      "id": "seed_golden",
+      "name": "Graine Dorée",
+      "category": "seed",
+      "rarity": "uncommon",
+      "icon": "🌱",
+      "stackMax": 999,
+      "sellPrice": 15,
+      "buyPrice": 50,
+      "growTime": 300,
+      "description": "Donne une Rose Dorée après 5 minutes de pousse."
+    },
+    {
+      "id": "seed_night",
+      "name": "Graine Nocturne",
+      "category": "seed",
+      "rarity": "rare",
+      "icon": "🌱",
+      "stackMax": 999,
+      "sellPrice": 40,
+      "buyPrice": 140,
+      "growTime": 600,
+      "description": "Donne une Herbe Nocturne après 10 minutes de pousse."
+    },
+    {
+      "id": "seed_dawn",
+      "name": "Graine de Lumière",
+      "category": "seed",
+      "rarity": "rare",
+      "icon": "🌱",
+      "stackMax": 999,
+      "sellPrice": 40,
+      "buyPrice": 140,
+      "growTime": 600,
+      "description": "Donne une Fleur de Lumière après 10 minutes de pousse."
+    },
+    {
+      "id": "sword_copper",
+      "name": "Épée de Cuivre",
+      "category": "equipment",
+      "rarity": "common",
+      "icon": "⚔️",
+      "stackMax": 1,
+      "sellPrice": 20,
+      "buyPrice": 70,
+      "slot": "mainhand",
+      "stats": {
+        "attack": 8,
+        "attackSpeed": 2.4
+      },
+      "reqLevel": {
+        "combat": 1
+      },
+      "description": "Première arme de tout aventurier."
+    },
+    {
+      "id": "sword_iron",
+      "name": "Épée de Fer",
+      "category": "equipment",
+      "rarity": "common",
+      "icon": "⚔️",
+      "stackMax": 1,
+      "sellPrice": 55,
+      "buyPrice": 180,
+      "slot": "mainhand",
+      "stats": {
+        "attack": 18,
+        "attackSpeed": 2.4
+      },
+      "reqLevel": {
+        "combat": 5
+      },
+      "description": "Fiable et abordable."
+    },
+    {
+      "id": "sword_steel",
+      "name": "Épée d'Acier",
+      "category": "equipment",
+      "rarity": "uncommon",
+      "icon": "⚔️",
+      "stackMax": 1,
+      "sellPrice": 150,
+      "buyPrice": 500,
+      "slot": "mainhand",
+      "stats": {
+        "attack": 35,
+        "attackSpeed": 2.2
+      },
+      "reqLevel": {
+        "combat": 15
+      },
+      "description": "Forgée dans l'acier, elle tient la durée."
+    },
+    {
+      "id": "sword_mithril",
+      "name": "Épée de Mithril",
+      "category": "equipment",
+      "rarity": "rare",
+      "icon": "⚔️",
+      "stackMax": 1,
+      "sellPrice": 600,
+      "buyPrice": 2000,
+      "slot": "mainhand",
+      "stats": {
+        "attack": 70,
+        "attackSpeed": 2,
+        "precision": 10
+      },
+      "reqLevel": {
+        "combat": 35
+      },
+      "description": "Légère comme une plume, tranchante comme le vent."
+    },
+    {
+      "id": "axe_copper",
+      "name": "Hache de Cuivre",
+      "category": "equipment",
+      "rarity": "common",
+      "icon": "🪓",
+      "stackMax": 1,
+      "sellPrice": 18,
+      "buyPrice": 65,
+      "slot": "mainhand",
+      "stats": {
+        "attack": 10,
+        "attackSpeed": 2.8
+      },
+      "reqLevel": {
+        "combat": 1
+      },
+      "description": "Lourde mais dévastatrice au bon timing."
+    },
+    {
+      "id": "staff_wood",
+      "name": "Bâton de Bois",
+      "category": "equipment",
+      "rarity": "common",
+      "icon": "🪄",
+      "stackMax": 1,
+      "sellPrice": 15,
+      "buyPrice": 55,
+      "slot": "mainhand",
+      "stats": {
+        "attack": 6,
+        "magicAttack": 12,
+        "attackSpeed": 2.6
+      },
+      "reqLevel": {
+        "combat": 1
+      },
+      "description": "Canalise faiblement la magie ambiante."
+    },
+    {
+      "id": "staff_maple",
+      "name": "Bâton d'Érable",
+      "category": "equipment",
+      "rarity": "rare",
+      "icon": "🪄",
+      "stackMax": 1,
+      "sellPrice": 400,
+      "buyPrice": 1400,
+      "slot": "mainhand",
+      "stats": {
+        "attack": 10,
+        "magicAttack": 65,
+        "attackSpeed": 2.2
+      },
+      "reqLevel": {
+        "combat": 30
+      },
+      "description": "L'Érable Enchanté amplifie naturellement les sorts."
+    },
+    {
+      "id": "helm_copper",
+      "name": "Casque de Cuivre",
+      "category": "equipment",
+      "rarity": "common",
+      "icon": "⛑️",
+      "stackMax": 1,
+      "sellPrice": 15,
+      "buyPrice": 55,
+      "slot": "head",
+      "stats": {
+        "defense": 4,
+        "hp": 10
+      },
+      "reqLevel": {
+        "combat": 1
+      },
+      "description": "Protection basique pour la tête."
+    },
+    {
+      "id": "helm_iron",
+      "name": "Casque de Fer",
+      "category": "equipment",
+      "rarity": "common",
+      "icon": "⛑️",
+      "stackMax": 1,
+      "sellPrice": 40,
+      "buyPrice": 140,
+      "slot": "head",
+      "stats": {
+        "defense": 10,
+        "hp": 25
+      },
+      "reqLevel": {
+        "combat": 5
+      },
+      "description": "Protège des coups directs."
+    },
+    {
+      "id": "chest_copper",
+      "name": "Plastron de Cuivre",
+      "category": "equipment",
+      "rarity": "common",
+      "icon": "🦺",
+      "stackMax": 1,
+      "sellPrice": 25,
+      "buyPrice": 90,
+      "slot": "chest",
+      "stats": {
+        "defense": 8,
+        "hp": 20
+      },
+      "reqLevel": {
+        "combat": 1
+      },
+      "description": "Couvre le torse, laisse les bras libres."
+    },
+    {
+      "id": "chest_iron",
+      "name": "Plastron de Fer",
+      "category": "equipment",
+      "rarity": "common",
+      "icon": "🦺",
+      "stackMax": 1,
+      "sellPrice": 70,
+      "buyPrice": 230,
+      "slot": "chest",
+      "stats": {
+        "defense": 20,
+        "hp": 50
+      },
+      "reqLevel": {
+        "combat": 5
+      },
+      "description": "Solide protection pour le torse."
+    },
+    {
+      "id": "chest_steel",
+      "name": "Plastron d'Acier",
+      "category": "equipment",
+      "rarity": "uncommon",
+      "icon": "🦺",
+      "stackMax": 1,
+      "sellPrice": 200,
+      "buyPrice": 680,
+      "slot": "chest",
+      "stats": {
+        "defense": 42,
+        "hp": 100
+      },
+      "reqLevel": {
+        "combat": 15
+      },
+      "description": "Résiste aux coups de monstres puissants."
+    },
+    {
+      "id": "shield_wood",
+      "name": "Bouclier de Bois",
+      "category": "equipment",
+      "rarity": "common",
+      "icon": "🛡️",
+      "stackMax": 1,
+      "sellPrice": 12,
+      "buyPrice": 45,
+      "slot": "offhand",
+      "stats": {
+        "defense": 5,
+        "blockChance": 0.05
+      },
+      "reqLevel": {
+        "combat": 1
+      },
+      "description": "Léger mais offre une protection de base."
+    },
+    {
+      "id": "shield_iron",
+      "name": "Bouclier de Fer",
+      "category": "equipment",
+      "rarity": "common",
+      "icon": "🛡️",
+      "stackMax": 1,
+      "sellPrice": 45,
+      "buyPrice": 155,
+      "slot": "offhand",
+      "stats": {
+        "defense": 14,
+        "blockChance": 0.1
+      },
+      "reqLevel": {
+        "combat": 5
+      },
+      "description": "Absorbe une partie des dégâts reçus."
+    },
+    {
+      "id": "food_sardine_cooked",
+      "name": "Sardine Grillée",
+      "category": "consumable",
+      "rarity": "common",
+      "icon": "🍖",
+      "stackMax": 999,
+      "sellPrice": 8,
+      "buyPrice": 28,
+      "effect": {
+        "healHp": 30
+      },
+      "description": "Restaure 30 HP."
+    },
+    {
+      "id": "food_trout_cooked",
+      "name": "Truite Rôtie",
+      "category": "consumable",
+      "rarity": "common",
+      "icon": "🍖",
+      "stackMax": 999,
+      "sellPrice": 18,
+      "buyPrice": 60,
+      "effect": {
+        "healHp": 70
+      },
+      "description": "Restaure 70 HP."
+    },
+    {
+      "id": "food_salmon_cooked",
+      "name": "Saumon Fumé",
+      "category": "consumable",
+      "rarity": "uncommon",
+      "icon": "🍖",
+      "stackMax": 999,
+      "sellPrice": 45,
+      "buyPrice": 150,
+      "effect": {
+        "healHp": 150,
+        "buffAttack": 5,
+        "buffDuration": 120
+      },
+      "description": "Restaure 150 HP et augmente l'attaque de 5 pendant 2 min."
+    },
+    {
+      "id": "meal_warrior",
+      "name": "Repas du Guerrier",
+      "category": "consumable",
+      "rarity": "uncommon",
+      "icon": "🍲",
+      "stackMax": 999,
+      "sellPrice": 80,
+      "buyPrice": 270,
+      "effect": {
+        "healHp": 200,
+        "buffAttack": 10,
+        "buffDefense": 5,
+        "buffDuration": 300
+      },
+      "description": "Restaure 200 HP. +10 ATK et +5 DEF pendant 5 min."
+    },
+    {
+      "id": "potion_healing_minor",
+      "name": "Potion de Soin Mineure",
+      "category": "consumable",
+      "rarity": "common",
+      "icon": "🧪",
+      "stackMax": 999,
+      "sellPrice": 12,
+      "buyPrice": 40,
+      "effect": {
+        "healHp": 80
+      },
+      "description": "Restaure 80 HP instantanément."
+    },
+    {
+      "id": "potion_healing",
+      "name": "Potion de Soin",
+      "category": "consumable",
+      "rarity": "uncommon",
+      "icon": "🧪",
+      "stackMax": 999,
+      "sellPrice": 35,
+      "buyPrice": 120,
+      "effect": {
+        "healHp": 200
+      },
+      "description": "Restaure 200 HP instantanément."
+    },
+    {
+      "id": "potion_healing_superior",
+      "name": "Potion de Soin Supérieure",
+      "category": "consumable",
+      "rarity": "rare",
+      "icon": "🧪",
+      "stackMax": 999,
+      "sellPrice": 100,
+      "buyPrice": 340,
+      "effect": {
+        "healHp": 500
+      },
+      "description": "Restaure 500 HP. Recette multi-métiers."
+    },
+    {
+      "id": "potion_strength",
+      "name": "Potion de Force",
+      "category": "consumable",
+      "rarity": "uncommon",
+      "icon": "🧪",
+      "stackMax": 999,
+      "sellPrice": 50,
+      "buyPrice": 170,
+      "effect": {
+        "buffAttack": 20,
+        "buffDuration": 180
+      },
+      "description": "+20 ATK pendant 3 min."
+    },
+    {
+      "id": "essence_dawn",
+      "name": "Essence d'Aube",
+      "category": "material",
+      "rarity": "rare",
+      "icon": "☀️",
+      "stackMax": 99,
+      "sellPrice": 90,
+      "buyPrice": 300,
+      "description": "Concentré de lumière pure. Composant des crafts sacrés."
+    },
+    {
+      "id": "varnish_sacred",
+      "name": "Vernis Sacré",
+      "category": "material",
+      "rarity": "rare",
+      "icon": "✨",
+      "stackMax": 99,
+      "sellPrice": 80,
+      "buyPrice": 280,
+      "description": "Appliqué sur une armure, il renforce sa résistance contre les attaques magiques."
+    },
+    {
+      "id": "ring_silver",
+      "name": "Bague d'Argent",
+      "category": "equipment",
+      "rarity": "uncommon",
+      "icon": "💍",
+      "stackMax": 1,
+      "sellPrice": 80,
+      "buyPrice": 270,
+      "slot": "ring1",
+      "stats": {
+        "hp": 30,
+        "precision": 5
+      },
+      "reqLevel": {
+        "combat": 10
+      },
+      "description": "Légère mais efficace."
+    },
+    {
+      "id": "ring_gold",
+      "name": "Bague d'Or",
+      "category": "equipment",
+      "rarity": "uncommon",
+      "icon": "💍",
+      "stackMax": 1,
+      "sellPrice": 180,
+      "buyPrice": 600,
+      "slot": "ring1",
+      "stats": {
+        "hp": 60,
+        "precision": 10,
+        "attack": 5
+      },
+      "reqLevel": {
+        "combat": 20
+      },
+      "description": "Forgée dans l'or, porte-bonheur du combattant."
+    },
+    {
+      "id": "amulet_miner",
+      "name": "Amulette du Mineur",
+      "category": "equipment",
+      "rarity": "rare",
+      "icon": "📿",
+      "stackMax": 1,
+      "sellPrice": 250,
+      "buyPrice": 850,
+      "slot": "neck",
+      "stats": {
+        "defense": 15,
+        "hp": 80
+      },
+      "reqLevel": {
+        "combat": 25
+      },
+      "description": "Taillée dans la pierre des profondeurs."
+    },
+    {
+      "id": "hide_rat",
+      "name": "Peau de Rat",
+      "category": "material",
+      "rarity": "common",
+      "icon": "🐀",
+      "stackMax": 999,
+      "sellPrice": 3,
+      "buyPrice": 10,
+      "description": "Peau fine. Peu utile seule, mais en quantité..."
+    },
+    {
+      "id": "hide_wolf",
+      "name": "Peau de Loup",
+      "category": "material",
+      "rarity": "uncommon",
+      "icon": "🐺",
+      "stackMax": 999,
+      "sellPrice": 25,
+      "buyPrice": 85,
+      "description": "Résistante et chaude. Les tanneurs en font de bon cuir."
+    },
+    {
+      "id": "hide_bear",
+      "name": "Peau d'Ours",
+      "category": "material",
+      "rarity": "uncommon",
+      "icon": "🐻",
+      "stackMax": 999,
+      "sellPrice": 40,
+      "buyPrice": 140,
+      "description": "Épaisse et robuste. Base des armures en cuir épaisses."
+    },
+    {
+      "id": "fang_goblin",
+      "name": "Croc de Gobelin",
+      "category": "material",
+      "rarity": "common",
+      "icon": "🦷",
+      "stackMax": 999,
+      "sellPrice": 5,
+      "buyPrice": 18,
+      "description": "Arraché à un gobelin vaincu. Sert à certaines recettes d'alchimie sombre."
+    },
+    {
+      "id": "core_golem",
+      "name": "Cœur de Golem",
+      "category": "material",
+      "rarity": "epic",
+      "icon": "💠",
+      "stackMax": 99,
+      "sellPrice": 500,
+      "buyPrice": 1800,
+      "description": "La source d'énergie d'un Golem. Requis pour les améliorations de Forge avancées."
+    },
+    {
+      "id": "dust_bone",
+      "name": "Poudre d'Os",
+      "category": "material",
+      "rarity": "common",
+      "icon": "🦴",
+      "stackMax": 999,
+      "sellPrice": 4,
+      "buyPrice": 14,
+      "description": "Broyés depuis les squelettes. Composant alchimique basique."
+    },
+    {
+      "id": "essence_magic",
+      "name": "Essence Magique",
+      "category": "material",
+      "rarity": "uncommon",
+      "icon": "✨",
+      "stackMax": 999,
+      "sellPrice": 30,
+      "buyPrice": 100,
+      "description": "Résidu magique laissé par les créatures enchantées."
+    },
+    {
+      "id": "rune_power",
+      "name": "Rune de Puissance",
+      "category": "material",
+      "rarity": "rare",
+      "icon": "🔮",
+      "stackMax": 99,
+      "sellPrice": 120,
+      "buyPrice": 400,
+      "description": "Inscrite par des mages anciens. Amplifie les enchantements offensifs."
+    },
+    {
+      "id": "rune_defense",
+      "name": "Rune de Protection",
+      "category": "material",
+      "rarity": "rare",
+      "icon": "🔮",
+      "stackMax": 99,
+      "sellPrice": 120,
+      "buyPrice": 400,
+      "description": "Renforce les armures enchantées contre toutes les attaques."
+    },
+    {
+      "id": "tool_axe_iron",
+      "name": "Hache de Bûcheron (Fer)",
+      "category": "equipment",
+      "rarity": "common",
+      "icon": "🪓",
+      "stackMax": 1,
+      "sellPrice": 30,
+      "buyPrice": 100,
+      "slot": "tool_woodcutting",
+      "stats": {
+        "actionSpeedBonus": 0.1
+      },
+      "description": "+10% vitesse de bûcheronnage."
+    },
+    {
+      "id": "tool_axe_steel",
+      "name": "Hache de Bûcheron (Acier)",
+      "category": "equipment",
+      "rarity": "uncommon",
+      "icon": "🪓",
+      "stackMax": 1,
+      "sellPrice": 90,
+      "buyPrice": 300,
+      "slot": "tool_woodcutting",
+      "stats": {
+        "actionSpeedBonus": 0.25
+      },
+      "description": "+25% vitesse de bûcheronnage."
+    },
+    {
+      "id": "tool_pickaxe_iron",
+      "name": "Pioche de Fer",
+      "category": "equipment",
+      "rarity": "common",
+      "icon": "⛏️",
+      "stackMax": 1,
+      "sellPrice": 30,
+      "buyPrice": 100,
+      "slot": "tool_mining",
+      "stats": {
+        "actionSpeedBonus": 0.1
+      },
+      "description": "+10% vitesse de minage."
+    },
+    {
+      "id": "tool_pickaxe_mithril",
+      "name": "Pioche de Mithril",
+      "category": "equipment",
+      "rarity": "rare",
+      "icon": "⛏️",
+      "stackMax": 1,
+      "sellPrice": 400,
+      "buyPrice": 1400,
+      "slot": "tool_mining",
+      "stats": {
+        "actionSpeedBonus": 0.4,
+        "rareDropBonus": 0.05
+      },
+      "description": "+40% vitesse de minage. +5% chance de minerai rare."
+    },
+    {
+      "id": "tool_rod_basic",
+      "name": "Canne à Pêche Basique",
+      "category": "equipment",
+      "rarity": "common",
+      "icon": "🎣",
+      "stackMax": 1,
+      "sellPrice": 20,
+      "buyPrice": 65,
+      "slot": "tool_fishing",
+      "stats": {
+        "actionSpeedBonus": 0
+      },
+      "description": "Permet la pêche."
+    },
+    {
+      "id": "tool_rod_enchanted",
+      "name": "Canne Enchantée",
+      "category": "equipment",
+      "rarity": "rare",
+      "icon": "🎣",
+      "stackMax": 1,
+      "sellPrice": 300,
+      "buyPrice": 1000,
+      "slot": "tool_fishing",
+      "stats": {
+        "actionSpeedBonus": 0.3,
+        "rareDropBonus": 0.08
+      },
+      "description": "+30% vitesse de pêche. +8% chance de poisson rare."
+    },
+    {
+      "id": "chest_common",
+      "name": "Coffre Commun",
+      "category": "consumable",
+      "rarity": "common",
+      "icon": "📦",
+      "stackMax": 99,
+      "sellPrice": 0,
+      "buyPrice": 0,
+      "description": "Contient un assortiment de ressources communes."
+    },
+    {
+      "id": "chest_rare",
+      "name": "Coffre Rare",
+      "category": "consumable",
+      "rarity": "rare",
+      "icon": "📦",
+      "stackMax": 99,
+      "sellPrice": 0,
+      "buyPrice": 0,
+      "description": "Contient des ressources rares ou épiques."
+    },
+    {
+      "id": "key_dungeon",
+      "name": "Clé de Donjon",
+      "category": "material",
+      "rarity": "uncommon",
+      "icon": "🗝️",
+      "stackMax": 99,
+      "sellPrice": 50,
+      "buyPrice": 180,
+      "description": "Ouvre l'accès aux boss de zone. Se craft avec fer + rune."
+    },
+    {
+      "id": "scroll_xp",
+      "name": "Parchemin d'XP",
+      "category": "consumable",
+      "rarity": "uncommon",
+      "icon": "📜",
+      "stackMax": 99,
+      "sellPrice": 30,
+      "buyPrice": 0,
+      "effect": {
+        "xpBonus": 1.5,
+        "duration": 1800
+      },
+      "description": "+50% XP dans tous les métiers pendant 30 min."
+    }
+  ]
+}
