@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --surface: #1a1a2e;
+  --surface-card: #16213e;
+  --surface-hover: #0f3460;
+  --gold: #f0c040;
+  --text-primary: #e2e8f0;
+  --text-muted: #94a3b8;
+}
+
+body {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Rarity colors */
+.rarity-common { color: #9ca3af; }
+.rarity-uncommon { color: #4ade80; }
+.rarity-rare { color: #60a5fa; }
+.rarity-epic { color: #c084fc; }
+.rarity-legendary { color: #fbbf24; }
+
+/* XP bar animation */
+@keyframes xp-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.xp-active {
+  animation: xp-pulse 2s ease-in-out infinite;
+}
+
+/* Smooth progress bar */
+.progress-bar-fill {
+  transition: width 250ms linear;
+}
+
+/* Card hover */
+.game-card {
+  @apply bg-[#16213e] border border-[#0f3460] rounded-lg p-4;
+  transition: border-color 150ms ease;
+}
+.game-card:hover {
+  border-color: #1e4a8a;
+}
+
+/* Gold text */
+.text-gold { color: #f0c040; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0d0d1a; }
+::-webkit-scrollbar-thumb { background: #0f3460; border-radius: 3px; }
