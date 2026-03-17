@@ -202,4 +202,5 @@ export interface PlayerStats {
   precision: number;
   hpRegen: number; // HP/s
   critChance: number; // 0.0–0.40
+  blockChance: number;
 }

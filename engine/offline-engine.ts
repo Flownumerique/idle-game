@@ -187,5 +187,6 @@ export function computePlayerStats(state: GameState): PlayerStats {
     precision,
     hpRegen,
     critChance: Math.min(precision / 200, 0.4),
+    blockChance,
   };
 }

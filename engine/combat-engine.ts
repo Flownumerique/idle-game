@@ -292,7 +292,11 @@ export function simulateCombatsOffline(
     remaining -= avgFightMs;
 
     const playerDps = Math.max(0, (playerStats.attack - monster.stats.defense * DEF_PENETRATION)) / playerStats.attackSpeed;
-    const monsterDps = Math.max(0, (monster.stats.attack - playerStats.defense * DEF_PENETRATION)) / monster.stats.attackSpeed;
+    let monsterDps = Math.max(0, (monster.stats.attack - playerStats.defense * DEF_PENETRATION)) / monster.stats.attackSpeed;
+    // Account for block chance in average monster DPS
+    if (playerStats.blockChance > 0) {
+      monsterDps *= (1 - playerStats.blockChance + playerStats.blockChance * BLOCK_REDUCTION);
+    }
     const timeToKill = playerDps > 0 ? (monster.maxHp / playerDps) * 1000 : Infinity;
     const timeToBeKilled = monsterDps > 0 ? (pHp / monsterDps) * 1000 : Infinity;
 
