@@ -9,16 +9,28 @@ export type SkillId =
   | "farming"
   | "smithing"
   | "cooking"
-  | "alchemy";
+  | "alchemy"
+  | "attack"
+  | "strength"
+  | "ranged"
+  | "magic"
+  | "defense"
+  | "dodge"
+  | "constitution"
+  | "prayer";
 
 export type SlotId =
-  | "weapon"
-  | "helmet"
-  | "chestplate"
-  | "shield"
+  | "head"
+  | "chest"
+  | "legs"
+  | "hands"
+  | "feet"
+  | "mainhand"
+  | "offhand"
+  | "neck"
   | "ring1"
   | "ring2"
-  | "amulet"
+  | "cape"
   | "tool_woodcutting"
   | "tool_mining"
   | "tool_fishing";
@@ -198,8 +210,10 @@ export interface PlayerStats {
   maxHp: number;
   attack: number;
   defense: number;
+  dodgeChance: number;
   attackSpeed: number; // seconds
-  precision: number;
-  hpRegen: number; // HP/s
   critChance: number; // 0.0–0.40
+  hpRegen: number; // HP/s
+  prayerBonus: number;
+  activeStyle: 'attack' | 'strength' | 'ranged' | 'magic' | null;
 }

@@ -108,7 +108,7 @@ export function useGameLoop() {
       // ── Combat tick ──
       if (state.combat.active && state.combat.zoneId && state.combat.currentMonster) {
         const playerStats = computePlayerStats(state);
-        const shield = state.equipment["shield"];
+        const shield = state.equipment["offhand"];
         // Get block chance from equipped shield
         const getBlockChance = () => 0; // TODO: read from items data
         const result = tickCombat(

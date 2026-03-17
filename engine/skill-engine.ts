@@ -156,6 +156,6 @@ export function getAvailableActions(
   level: number
 ): SkillAction[] {
   const skill = skillsMap.get(skillId);
-  if (!skill) return [];
+  if (!skill || !skill.actions) return [];
   return skill.actions.filter((a) => level >= a.reqLevel);
 }

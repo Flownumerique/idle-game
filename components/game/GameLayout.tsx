@@ -7,15 +7,22 @@ import SkillPanel from "./SkillPanel";
 import CombatPanel from "./CombatPanel";
 import InventoryPanel from "./InventoryPanel";
 import MarketPanel from "./MarketPanel";
+import CharacterSheet from "./CharacterSheet";
+import FarmingPanel from "./FarmingPanel";
+import CraftingPanel from "./CraftingPanel";
+import QuestTracker from "./QuestTracker";
 import type { SkillId } from "@/types/game";
 
-type Tab = "skills" | "combat" | "inventory" | "market";
+type Tab = "skills" | "combat" | "inventory" | "farming" | "crafting" | "market" | "character";
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: "skills", label: "Métiers", icon: "⚒️" },
   { id: "combat", label: "Combat", icon: "⚔️" },
   { id: "inventory", label: "Inventaire", icon: "🎒" },
+  { id: "farming", label: "Agriculture", icon: "🌾" },
+  { id: "crafting", label: "Artisanat", icon: "🛠️" },
   { id: "market", label: "Marché", icon: "🏪" },
+  { id: "character", label: "Personnage", icon: "👤" },
 ];
 
 const SKILL_IDS: SkillId[] = [
@@ -36,9 +43,14 @@ export default function GameLayout() {
     <div className="min-h-screen flex flex-col">
       <ResourceBar />
 
-      {/* Tab navigation */}
-      <nav className="bg-[#16213e] border-b border-[#0f3460] px-4">
-        <div className="flex gap-1 overflow-x-auto">
+      <div className="flex-1 flex overflow-hidden">
+        {/* Quest Tracker Sidebar */}
+        <QuestTracker />
+
+        <div className="flex-1 flex flex-col">
+          {/* Tab navigation */}
+          <nav className="bg-[#16213e] border-b border-[#0f3460] px-4">
+            <div className="flex gap-1 overflow-x-auto">
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -78,15 +90,35 @@ export default function GameLayout() {
           </div>
         )}
 
+        {activeTab === "farming" && (
+          <div className="max-w-2xl mx-auto">
+            <FarmingPanel />
+          </div>
+        )}
+
+        {activeTab === "crafting" && (
+          <div className="max-w-2xl mx-auto">
+            <CraftingPanel />
+          </div>
+        )}
+
         {activeTab === "market" && (
           <div className="max-w-lg mx-auto">
             <MarketPanel />
           </div>
         )}
-      </main>
+
+        {activeTab === "character" && (
+          <div className="max-w-lg mx-auto">
+            <CharacterSheet />
+          </div>
+        )}
+          </main>
+        </div>
+      </div>
 
       {/* Footer */}
-      <footer className="bg-[#16213e] border-t border-[#0f3460] px-4 py-2 text-xs text-slate-500 text-center">
+      <footer className="bg-[#16213e] border-t border-[#0f3460] px-4 py-2 text-xs text-slate-500 text-center z-10">
         Idle Realms — Sauvegarde automatique toutes les 30s
       </footer>
     </div>

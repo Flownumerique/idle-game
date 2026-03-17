@@ -16,6 +16,14 @@ const SKILL_LABELS: Record<SkillId, { name: string; icon: string }> = {
   smithing: { name: "Forge", icon: "🔨" },
   cooking: { name: "Cuisine", icon: "🍳" },
   alchemy: { name: "Alchimie", icon: "⚗️" },
+  attack: { name: "Attaque", icon: "⚔️" },
+  strength: { name: "Force", icon: "💪" },
+  ranged: { name: "Distance", icon: "🏹" },
+  magic: { name: "Magie", icon: "✨" },
+  defense: { name: "Défense", icon: "🛡️" },
+  dodge: { name: "Esquive", icon: "💨" },
+  constitution: { name: "Constitution", icon: "❤️" },
+  prayer: { name: "Prière", icon: "🙏" },
 };
 
 interface SkillPanelProps {

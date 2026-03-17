@@ -151,41 +151,73 @@ for (const item of (itemsData as { items: ItemWithStats[] }).items) {
 }
 
 export function computePlayerStats(state: GameState): PlayerStats {
-  // Use combat level from skills — for now approximated via total XP
-  // TODO: add explicit combat skill when GDD combat skill is implemented
-  const combatLevel = 1; // base, equipment-dependent
-
-  let attack = 0;
-  let defense = 0;
+  let equipmentAttack = 0;
+  let equipmentDefense = 0;
   let hpBonus = 0;
   let attackSpeed = 2.4;
-  let precision = 10 + combatLevel * 0.5;
-  let hpRegen = 2 + combatLevel * 0.1;
-  let blockChance = 0;
+  let precision = 10;
+  let equipmentHpRegen = 0;
+
+  let activeStyle: 'attack' | 'strength' | 'ranged' | 'magic' | null = null;
+
+  if (state.equipment.mainhand) {
+    const weapon = itemsById.get(state.equipment.mainhand) as any;
+    if (weapon) {
+       // simple heuristic: if it's a bow/ranged, style is ranged; if staff/wand, magic; if 2h, strength; else attack
+       if (weapon.category === 'weapon_ranged' || state.equipment.mainhand.includes('bow')) {
+         activeStyle = 'ranged';
+       } else if (weapon.category === 'weapon_magic' || state.equipment.mainhand.includes('staff') || state.equipment.mainhand.includes('wand')) {
+         activeStyle = 'magic';
+       } else if (state.equipment.mainhand.includes('2h') || state.equipment.mainhand.includes('great')) {
+         activeStyle = 'strength';
+       } else {
+         activeStyle = 'attack';
+       }
+    }
+  } else {
+    activeStyle = 'attack';
+  }
 
   for (const itemId of Object.values(state.equipment)) {
     if (!itemId) continue;
     const item = itemsById.get(itemId);
     if (!item?.stats) continue;
-    attack += item.stats.attack ?? 0;
-    defense += item.stats.defense ?? 0;
+    equipmentAttack += item.stats.attack ?? 0;
+    equipmentDefense += item.stats.defense ?? 0;
     hpBonus += item.stats.hp ?? 0;
     precision += item.stats.precision ?? 0;
-    hpRegen += item.stats.hpRegen ?? 0;
+    equipmentHpRegen += item.stats.hpRegen ?? 0;
     if (item.stats.attackSpeed) attackSpeed = item.stats.attackSpeed;
-    if (item.stats.blockChance) blockChance = Math.max(blockChance, item.stats.blockChance);
   }
 
+  const constitutionLevel = state.skills.constitution?.level ?? 1;
+  const attackLevel = state.skills.attack?.level ?? 1;
+  const strengthLevel = state.skills.strength?.level ?? 1;
+  const rangedLevel = state.skills.ranged?.level ?? 1;
+  const magicLevel = state.skills.magic?.level ?? 1;
+  const defenseLevel = state.skills.defense?.level ?? 1;
+  const dodgeLevel = state.skills.dodge?.level ?? 1;
+
+  let baseAttack = 0;
+  if (activeStyle === 'attack') baseAttack = attackLevel;
+  else if (activeStyle === 'strength') baseAttack = strengthLevel;
+  else if (activeStyle === 'ranged') baseAttack = rangedLevel;
+  else if (activeStyle === 'magic') baseAttack = magicLevel;
+
+  let totalAttack = baseAttack + equipmentAttack;
+
   // Class bonus
-  if (state.upgrades["class_bonus_warrior"]) attack += attack * 0.1;
+  if (state.upgrades["class_bonus_warrior"]) totalAttack += totalAttack * 0.1;
 
   return {
-    maxHp: 100 + combatLevel * 10 + hpBonus,
-    attack: Math.max(5, attack + combatLevel * 0.5),
-    defense: defense + combatLevel * 0.2,
+    maxHp: 100 + (constitutionLevel * 10) + hpBonus,
+    attack: Math.max(1, totalAttack),
+    defense: (defenseLevel * 0.7) + equipmentDefense,
+    dodgeChance: Math.min(dodgeLevel / 300, 0.25),
     attackSpeed,
-    precision,
-    hpRegen,
     critChance: Math.min(precision / 200, 0.4),
+    hpRegen: 2 + (constitutionLevel * 0.1) + equipmentHpRegen,
+    prayerBonus: 1.0, // default, to be implemented if active prayers exist
+    activeStyle,
   };
 }
