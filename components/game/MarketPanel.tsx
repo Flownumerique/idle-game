@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useGameStore } from "@/stores/game-store";
 import { getDynamicSellPrice, getBasePrice } from "@/engine/market-engine";
 import { formatNumber } from "@/lib/formatters";
@@ -30,6 +30,11 @@ export default function MarketPanel() {
   }));
 
   const [tab, setTab] = useState<"sell" | "buy">("sell");
+
+  const sellableInventoryItems = useMemo(
+    () => sellableItems.filter((item) => (inventory[item.id] ?? 0) > 0),
+    [inventory]
+  );
 
   function handleSell(itemId: string, qty: number) {
     if ((inventory[itemId] ?? 0) < qty) return;
@@ -64,34 +69,32 @@ export default function MarketPanel() {
 
       {tab === "sell" && (
         <div className="space-y-1 max-h-72 overflow-y-auto">
-          {sellableItems
-            .filter((item) => (inventory[item.id] ?? 0) > 0)
-            .map((item) => {
-              const qty = inventory[item.id] ?? 0;
-              const price = getDynamicSellPrice(item.id, marketSales[item.id]);
-              return (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between p-2 bg-[#0d1525] rounded border border-slate-700/50"
-                >
-                  <div>
-                    <div className="text-sm text-slate-200">{item.name}</div>
-                    <div className="text-xs text-slate-400">
-                      ×{formatNumber(qty)} · {formatNumber(price)} 🪙 chacun
-                    </div>
-                  </div>
-                  <div className="flex gap-1">
-                    <Button size="sm" variant="secondary" onClick={() => handleSell(item.id, 1)}>
-                      ×1
-                    </Button>
-                    <Button size="sm" variant="secondary" onClick={() => handleSell(item.id, qty)}>
-                      Tout
-                    </Button>
+          {sellableInventoryItems.map((item) => {
+            const qty = inventory[item.id] ?? 0;
+            const price = getDynamicSellPrice(item.id, marketSales[item.id]);
+            return (
+              <div
+                key={item.id}
+                className="flex items-center justify-between p-2 bg-[#0d1525] rounded border border-slate-700/50"
+              >
+                <div>
+                  <div className="text-sm text-slate-200">{item.name}</div>
+                  <div className="text-xs text-slate-400">
+                    ×{formatNumber(qty)} · {formatNumber(price)} 🪙 chacun
                   </div>
                 </div>
-              );
-            })}
-          {sellableItems.filter((item) => (inventory[item.id] ?? 0) > 0).length === 0 && (
+                <div className="flex gap-1">
+                  <Button size="sm" variant="secondary" onClick={() => handleSell(item.id, 1)}>
+                    ×1
+                  </Button>
+                  <Button size="sm" variant="secondary" onClick={() => handleSell(item.id, qty)}>
+                    Tout
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+          {sellableInventoryItems.length === 0 && (
             <p className="text-xs text-slate-500 italic">Aucun item à vendre</p>
           )}
         </div>
