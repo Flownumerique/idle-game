@@ -1,3 +1,27 @@
+import itemsData from "@/items.json";
+import { mulberry32 } from "@/lib/rng";
+import { getLevelForXp } from "@/lib/xp-calc";
+import { tickSkill } from "./skill-engine";
+import { simulateCombatsOffline } from "./combat-engine";
+import { MAX_OFFLINE_MS, GRIMOIRE_OFFLINE_MS } from "./constants";
+import { SKILL_IDS, type GameState, type OfflineResult, type SkillId, type PlayerStats } from "@/types/game";
+
+/**
+ * Calculate all progress that occurred while the player was offline.
+ * Uses a deterministic seeded RNG based on lastSaveAt to prevent cheating.
+ */
+export function calculateOfflineProgress(
+  state: GameState,
+  nowMs: number
+): OfflineResult {
+  const hasGrimoire = (state.upgrades["grimoire"] ?? 0) > 0;
+  const cap = hasGrimoire ? GRIMOIRE_OFFLINE_MS : MAX_OFFLINE_MS;
+  const rawDelta = nowMs - state.lastSaveAt;
+  const delta = Math.min(rawDelta, cap);
+
+  const hasWatch = (state.upgrades["adventurers_watch"] ?? 0) > 0;
+  const speedMult = hasWatch ? 1.1 : 1.0;
+  const effectiveDelta = delta * speedMult;
 import itemsData from "../items.json"
 import { mulberry32 } from "../lib/rng"
 import { getLevelForXp } from "../lib/xp-calc"

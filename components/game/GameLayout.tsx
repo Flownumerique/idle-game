@@ -11,7 +11,7 @@ import CharacterSheet from "./CharacterSheet";
 import FarmingPanel from "./FarmingPanel";
 import CraftingPanel from "./CraftingPanel";
 import QuestTracker from "./QuestTracker";
-import type { SkillId } from "@/types/game";
+import { SKILL_IDS } from "@/types/game";
 
 type Tab = "skills" | "combat" | "inventory" | "farming" | "crafting" | "market" | "character";
 
@@ -23,16 +23,6 @@ const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: "crafting", label: "Artisanat", icon: "🛠️" },
   { id: "market", label: "Marché", icon: "🏪" },
   { id: "character", label: "Personnage", icon: "👤" },
-];
-
-const SKILL_IDS: SkillId[] = [
-  "woodcutting",
-  "mining",
-  "fishing",
-  "farming",
-  "smithing",
-  "cooking",
-  "alchemy",
 ];
 
 export default function GameLayout() {
