@@ -1,7 +1,7 @@
 "use client";
 
 import { useGameStore } from "@/stores/game-store";
-import { getAllZones, spawnMonster } from "@/engine/combat-engine";
+import { getAllZones, spawnMonster, getMonstersInZone } from "@/engine/combat-engine";
 import { computePlayerStats } from "@/engine/offline-engine";
 import { formatNumber } from "@/lib/formatters";
 import { mulberry32 } from "@/lib/rng";
@@ -18,7 +18,8 @@ export default function CombatPanel() {
 
   function handleEnterZone(zoneId: string) {
     const rng = mulberry32(Date.now());
-    const monster = spawnMonster(zoneId, rng);
+    const zoneMonsters = getMonstersInZone(zoneId);
+    const monster = spawnMonster(zoneMonsters, rng);
     updateCombatState({
       active: true,
       zoneId,
