@@ -4,17 +4,7 @@ import { getLevelForXp } from "@/lib/xp-calc";
 import { tickSkill } from "./skill-engine";
 import { simulateCombatsOffline } from "./combat-engine";
 import { MAX_OFFLINE_MS, GRIMOIRE_OFFLINE_MS } from "./constants";
-import type { GameState, OfflineResult, SkillId, PlayerStats } from "@/types/game";
-
-const SKILL_IDS: SkillId[] = [
-  "woodcutting",
-  "mining",
-  "fishing",
-  "farming",
-  "smithing",
-  "cooking",
-  "alchemy",
-];
+import { SKILL_IDS, type GameState, type OfflineResult, type SkillId, type PlayerStats } from "@/types/game";
 
 /**
  * Calculate all progress that occurred while the player was offline.
@@ -32,23 +22,96 @@ export function calculateOfflineProgress(
   const hasWatch = (state.upgrades["adventurers_watch"] ?? 0) > 0;
   const speedMult = hasWatch ? 1.1 : 1.0;
   const effectiveDelta = delta * speedMult;
+import itemsData from "../items.json"
+import { mulberry32 } from "../lib/rng"
+import { getLevelForXp } from "../lib/xp-calc"
+import { tickSkill } from "./skill-engine"
+import { simulateCombatsOffline } from "./combat-engine"
+import { MAX_OFFLINE_MS, GRIMOIRE_OFFLINE_MS } from "./constants"
+import { GameState, OfflineResult, SkillId, PlayerStats, ItemDrop } from "../types/game"
+import { GameData } from "./data-loader"
+import { FLAGS } from "../lib/feature-flags"
 
+const SKILL_IDS: SkillId[] = [
+  "woodcutting",
+  "mining",
+  "fishing",
+  "farming",
+  "smithing",
+  "cooking",
+  "alchemy",
+]
+
+function validateDelta(rawDelta: number, hasGrimoire: boolean): number {
+  if (!Number.isFinite(rawDelta) || rawDelta < 0) {
+    console.error('[Offline] Invalid delta:', rawDelta)
+    return 0
+  }
+  const cap = hasGrimoire ? GRIMOIRE_OFFLINE_MS : MAX_OFFLINE_MS
+  return Math.min(rawDelta, cap)
+}
+
+function safeXp(base: number, count: number): number {
+  const result = base * count
+  if (!Number.isFinite(result) || result < 0) return 0
+  return Math.floor(result)
+}
+
+function applyOfflineLoot(store: GameState, loot: Record<string, number>): string[] {
+  const warnings: string[] = []
+  for (const [itemId, qty] of Object.entries(loot)) {
+    if (!Number.isFinite(qty) || qty <= 0) {
+      warnings.push(`Invalid qty for ${itemId}`)
+      continue
+    }
+    const current = store.inventory[itemId] ?? 0
+    let item
+    try {
+      item = GameData.item(itemId)
+    } catch {
+      warnings.push(`Unknown item: ${itemId}`)
+      continue
+    }
+    const maxStack = item.stackMax ?? 999
+    const spaceLeft = Math.max(0, maxStack - current)
+    const capped = Math.min(qty, spaceLeft)
+    if (capped < qty) {
+      warnings.push(`Stack overflow: ${itemId} (lost ${qty - capped})`)
+    }
+    if (capped > 0) {
+      store.inventory[itemId] = current + capped
+    }
+  }
+  return warnings
+}
+
+export function calculateOfflineProgress(state: GameState, nowMs: number): OfflineResult {
   const result: OfflineResult = {
-    duration: delta,
+    duration: 0,
     skills: {},
     loot: {},
     goldGained: 0,
-  };
+  }
 
-  if (effectiveDelta <= 0) return result;
+  const rawDelta = nowMs - state.lastSaveAt
+  const hasGrimoire = (state.upgrades["grimoire"] ?? 0) > 0
+  const delta = validateDelta(rawDelta, hasGrimoire)
 
-  // Seeded RNG — deterministic based on disconnect timestamp
-  const rng = mulberry32(state.lastSaveAt >>> 0);
+  if (delta <= 0) return result
+
+  const hasWatch = (state.upgrades["adventurers_watch"] ?? 0) > 0
+  const speedMult = hasWatch ? 1.1 : 1.0
+  const effectiveDelta = delta * speedMult
+
+  result.duration = delta
+
+  // RNG seedé — deterministic based on disconnect timestamp
+  const rng = mulberry32(state.lastSaveAt >>> 0)
 
   // ── Skill progression ──
   for (const skillId of SKILL_IDS) {
-    const skillState = state.skills[skillId];
-    if (!skillState?.activeAction) continue;
+    const skillState = state.skills[skillId]
+    if (!skillState?.activeAction) continue
 
     const tickResult = tickSkill(
       skillId,
@@ -57,75 +120,73 @@ export function calculateOfflineProgress(
       effectiveDelta,
       (rng() * 0xffffffff) >>> 0,
       true
-    );
+    )
 
     if (tickResult.actionsCompleted > 0) {
+      const xpGained = safeXp(tickResult.xpGained / tickResult.actionsCompleted, tickResult.actionsCompleted)
       result.skills[skillId] = {
         actionsCount: tickResult.actionsCompleted,
-        xpGained: tickResult.xpGained,
-        levelsGained: tickResult.levelsGained,
-      };
+        xpGained: xpGained,
+        levelsGained: tickResult.levelsGained, // tickSkill may need updating but this is basic
+      }
       for (const [itemId, qty] of Object.entries(tickResult.loot)) {
-        result.loot[itemId] = (result.loot[itemId] ?? 0) + qty;
+        if (!Number.isFinite(qty) || qty <= 0) continue
+        result.loot[itemId] = (result.loot[itemId] ?? 0) + qty
       }
     }
   }
 
   // ── Combat offline ──
   if (state.combat.active && state.combat.zoneId) {
-    const playerStats = computePlayerStats(state);
+    const playerStats = computePlayerStats(state)
     const combatResult = simulateCombatsOffline(
       state.combat.zoneId,
       playerStats,
       playerStats.maxHp,
       effectiveDelta,
       rng
-    );
+    )
     for (const [itemId, qty] of Object.entries(combatResult.loot)) {
-      result.loot[itemId] = (result.loot[itemId] ?? 0) + qty;
+      if (!Number.isFinite(qty) || qty <= 0) continue
+      result.loot[itemId] = (result.loot[itemId] ?? 0) + qty
     }
-    result.goldGained += combatResult.gold;
+    result.goldGained += combatResult.gold
     result.combatSummary = {
       fights: combatResult.fights,
       wins: combatResult.wins,
       deaths: combatResult.deaths,
-    };
-  }
-
-  return result;
-}
-
-/** Apply offline result to game state (returns new state) */
-export function applyOfflineResult(
-  state: GameState,
-  result: OfflineResult
-): GameState {
-  const newSkills = { ...state.skills };
-  const newInventory = { ...state.inventory };
-
-  for (const [skillId, skillResult] of Object.entries(result.skills)) {
-    const existing = newSkills[skillId as SkillId];
-    if (existing) {
-      const newXp = existing.xp + skillResult.xpGained;
-      newSkills[skillId as SkillId] = {
-        ...existing,
-        xp: newXp,
-        level: getLevelForXp(newXp),
-      };
     }
   }
 
-  for (const [itemId, qty] of Object.entries(result.loot)) {
-    newInventory[itemId] = (newInventory[itemId] ?? 0) + qty;
+  return result
+}
+
+export function applyOfflineResult(state: GameState, result: OfflineResult): GameState {
+  // Never mutate state directly in a pure application function if we can clone
+  const newState = structuredClone(state)
+
+  for (const [skillIdStr, skillResult] of Object.entries(result.skills)) {
+    const skillId = skillIdStr as SkillId
+    const existing = newState.skills[skillId]
+    if (existing && skillResult) {
+      const newXp = existing.xp + skillResult.xpGained
+      newState.skills[skillId] = {
+        ...existing,
+        xp: newXp,
+        level: getLevelForXp(newXp),
+      }
+    }
   }
 
-  return {
-    ...state,
-    skills: newSkills,
-    inventory: newInventory,
-    gold: state.gold + result.goldGained,
-    lastSaveAt: Date.now(),
-  };
+  const warnings = applyOfflineLoot(newState, result.loot)
+  if (warnings.length > 0 && FLAGS.DEBUG_SHOW_TICK_STATS) {
+    console.warn('[Offline] Warnings:', warnings)
+  }
+
+  newState.gold += result.goldGained
+  newState.lastSaveAt = Date.now()
+
+  return newState
 }
 
 // ──────────────────────────────────────────────
@@ -157,13 +218,13 @@ export function computePlayerStats(state: GameState): PlayerStats {
   let attackSpeed = 2.4;
   let precision = 10;
   let equipmentHpRegen = 0;
+  let blockChance = 0;
 
   let activeStyle: 'attack' | 'strength' | 'ranged' | 'magic' | null = null;
 
   if (state.equipment.mainhand) {
     const weapon = itemsById.get(state.equipment.mainhand) as any;
     if (weapon) {
-       // simple heuristic: if it's a bow/ranged, style is ranged; if staff/wand, magic; if 2h, strength; else attack
        if (weapon.category === 'weapon_ranged' || state.equipment.mainhand.includes('bow')) {
          activeStyle = 'ranged';
        } else if (weapon.category === 'weapon_magic' || state.equipment.mainhand.includes('staff') || state.equipment.mainhand.includes('wand')) {
@@ -187,6 +248,9 @@ export function computePlayerStats(state: GameState): PlayerStats {
     hpBonus += item.stats.hp ?? 0;
     precision += item.stats.precision ?? 0;
     equipmentHpRegen += item.stats.hpRegen ?? 0;
+    if (item.stats.blockChance) {
+      blockChance = Math.max(blockChance, item.stats.blockChance);
+    }
     if (item.stats.attackSpeed) attackSpeed = item.stats.attackSpeed;
   }
 
@@ -206,7 +270,6 @@ export function computePlayerStats(state: GameState): PlayerStats {
 
   let totalAttack = baseAttack + equipmentAttack;
 
-  // Class bonus
   if (state.upgrades["class_bonus_warrior"]) totalAttack += totalAttack * 0.1;
 
   return {
@@ -217,7 +280,8 @@ export function computePlayerStats(state: GameState): PlayerStats {
     attackSpeed,
     critChance: Math.min(precision / 200, 0.4),
     hpRegen: 2 + (constitutionLevel * 0.1) + equipmentHpRegen,
-    prayerBonus: 1.0, // default, to be implemented if active prayers exist
+    prayerBonus: 1.0,
     activeStyle,
+    blockChance,
   };
 }

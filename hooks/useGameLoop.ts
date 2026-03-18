@@ -12,17 +12,7 @@ import {
   UI_TICK_INTERVAL_MS,
   HP_REGEN_DELAY_MS,
 } from "@/engine/constants";
-import type { SkillId } from "@/types/game";
-
-const SKILL_IDS: SkillId[] = [
-  "woodcutting",
-  "mining",
-  "fishing",
-  "farming",
-  "smithing",
-  "cooking",
-  "alchemy",
-];
+import { SKILL_IDS } from "@/types/game";
 
 /**
  * Main game loop hook.
@@ -108,16 +98,12 @@ export function useGameLoop() {
       // ── Combat tick ──
       if (state.combat.active && state.combat.zoneId && state.combat.currentMonster) {
         const playerStats = computePlayerStats(state);
-        const shield = state.equipment["offhand"];
-        // Get block chance from equipped shield
-        const getBlockChance = () => 0; // TODO: read from items data
         const result = tickCombat(
           state.combat,
           playerStats,
           state.combat.playerHp,
           deltaMs,
-          rngRef.current,
-          getBlockChance
+          rngRef.current
         );
         updates.combat = result.newCombatState;
         for (const [itemId, qty] of Object.entries(result.loot)) {

@@ -19,6 +19,24 @@ export type SkillId =
   | "constitution"
   | "prayer";
 
+export const SKILL_IDS = [
+  "woodcutting",
+  "mining",
+  "fishing",
+  "farming",
+  "smithing",
+  "cooking",
+  "alchemy",
+  "attack",
+  "strength",
+  "ranged",
+  "magic",
+  "defense",
+  "dodge",
+  "constitution",
+  "prayer",
+] as const satisfies SkillId[];
+
 export type SlotId =
   | "head"
   | "chest"
@@ -216,4 +234,28 @@ export interface PlayerStats {
   hpRegen: number; // HP/s
   prayerBonus: number;
   activeStyle: 'attack' | 'strength' | 'ranged' | 'magic' | null;
+  blockChance: number;
+}
+
+export interface ItemDrop {
+  itemId: string;
+  qty: number;
+}
+
+export interface QuestReward {
+  gold?: number;
+  xp?: Record<SkillId, number>;
+  items?: ItemDrop[];
+}
+
+export interface OfflineSummary {
+  duration: number; // ms actually processed (capped)
+  skills: Partial<Record<SkillId, OfflineSkillResult>>;
+  loot: Record<string, number>;
+  goldGained: number;
+  combatSummary?: {
+    fights: number;
+    wins: number;
+    deaths: number;
+  };
 }

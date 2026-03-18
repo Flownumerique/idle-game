@@ -57,34 +57,70 @@ export function getAllZones(): ZoneDef[] {
   return (zonesData as { zones: ZoneDef[] }).zones;
 }
 
-export function spawnMonster(
-  zoneId: string,
-  rng: () => number
-): MonsterInstance | null {
-  const zone = zonesMap.get(zoneId);
-  if (!zone || zone.monsters.length === 0) return null;
+export interface MonsterData {
+  def: MonsterDef;
+  isBoss: boolean;
+  bossChance?: number;
+}
 
-  // Boss chance
-  let monsterId: string;
-  if (zone.bossId && zone.bossChance && rng() < zone.bossChance) {
-    monsterId = zone.bossId;
-  } else {
-    monsterId = zone.monsters[Math.floor(rng() * zone.monsters.length)];
+export function getMonstersInZone(zoneId: string): MonsterData[] {
+  const zone = zonesMap.get(zoneId);
+  if (!zone) return [];
+
+  const monsters: MonsterData[] = zone.monsters
+    .map(id => monstersMap.get(id))
+    .filter((def): def is MonsterDef => def !== undefined)
+    .map(def => ({ def, isBoss: false }));
+
+  if (zone.bossId) {
+    const bossDef = monstersMap.get(zone.bossId);
+    if (bossDef) {
+      monsters.push({ def: bossDef, isBoss: true, bossChance: zone.bossChance });
+    }
   }
 
-  const def = monstersMap.get(monsterId);
-  if (!def) return null;
+  return monsters;
+}
+
+export function spawnMonsterWithDef(
+  monsters: MonsterData[],
+  rng: () => number
+): { instance: MonsterInstance; def: MonsterDef } | null {
+  if (monsters.length === 0) return null;
+
+  const boss = monsters.find(m => m.isBoss);
+  let def: MonsterDef;
+
+  if (boss && boss.bossChance && rng() < boss.bossChance) {
+    def = boss.def;
+  } else {
+    const regulars = monsters.filter(m => !m.isBoss);
+    if (regulars.length === 0) return null;
+    def = regulars[Math.floor(rng() * regulars.length)].def;
+  }
+
   return {
-    id: def.id,
-    name: def.name,
-    hp: def.stats.hp,
-    maxHp: def.stats.hp,
-    stats: {
-      attack: def.stats.attack,
-      defense: def.stats.defense,
-      attackSpeed: def.stats.attackSpeed,
+    instance: {
+      id: def.id,
+      name: def.name,
+      hp: def.stats.hp,
+      maxHp: def.stats.hp,
+      stats: {
+        attack: def.stats.attack,
+        defense: def.stats.defense,
+        attackSpeed: def.stats.attackSpeed,
+      },
     },
+    def,
   };
+}
+
+export function spawnMonster(
+  monsters: MonsterData[],
+  rng: () => number
+): MonsterInstance | null {
+  const result = spawnMonsterWithDef(monsters, rng);
+  return result ? result.instance : null;
 }
 
 // ──────────────────────────────────────────────
@@ -94,13 +130,15 @@ export function spawnMonster(
 export function calcDamage(
   atk: number,
   def: number,
-  critChance: number,
+  precision: number,
   shieldBlockChance: number,
   rng: () => number
 ): { dmg: number; isCrit: boolean; isBlocked: boolean } {
-  // critChance is expected to be a percentage (0 to 1). If it's passed as a raw whole number, scale it down.
-  const normalizedCrit = critChance > 1 ? critChance / 100 : critChance;
-  const isCrit = rng() < Math.min(normalizedCrit, MAX_CRIT_CHANCE);
+  if (Number.isNaN(atk) || Number.isNaN(def) || Number.isNaN(precision) || Number.isNaN(shieldBlockChance)) {
+    return { dmg: 1, isCrit: false, isBlocked: false };
+  }
+
+  const isCrit = rng() < Math.min(precision / 200, MAX_CRIT_CHANCE);
   const isBlocked = shieldBlockChance > 0 && rng() < shieldBlockChance;
 
   let dmg = Math.max(
@@ -130,8 +168,7 @@ export function tickCombat(
   playerStats: PlayerStats,
   playerHp: number,
   deltaMs: number,
-  rng: () => number,
-  getShieldBlockChance: () => number
+  rng: () => number
 ): CombatTickResult {
   const result: CombatTickResult = {
     newCombatState: { ...state },
@@ -151,7 +188,7 @@ export function tickCombat(
   let pHitCd = state.playerHitCooldown;
   let mHitCd = state.monsterHitCooldown;
   let remaining = deltaMs;
-  const blockChance = getShieldBlockChance();
+  const blockChance = playerStats.blockChance;
 
   while (remaining > 0 && newState.active) {
     const step = Math.min(remaining, pHitCd > 0 ? pHitCd : Infinity, mHitCd > 0 ? mHitCd : Infinity);
@@ -215,7 +252,8 @@ export function tickCombat(
       ];
 
       if (newState.autoRestart && newState.zoneId) {
-        const next = spawnMonster(newState.zoneId, rng);
+        const zoneMonsters = getMonstersInZone(newState.zoneId);
+        const next = spawnMonster(zoneMonsters, rng);
         if (next) {
           monster = next;
           mHitCd = next.stats.attackSpeed * 1000;
@@ -277,24 +315,24 @@ export function simulateCombatsOffline(
   rng: () => number
 ): OfflineCombatResult {
   const result: OfflineCombatResult = { loot: {}, gold: 0, fights: 0, wins: 0, deaths: 0 };
-  const zone = zonesMap.get(zoneId);
-  if (!zone) return result;
+  const zoneMonsters = getMonstersInZone(zoneId);
+  if (zoneMonsters.length === 0) return result;
 
   let pHp = playerMaxHp;
   let remaining = deltaMs;
   const avgFightMs = 15_000;
 
   while (remaining > avgFightMs) {
-    const monster = spawnMonster(zoneId, rng);
-    if (!monster) break;
-    const def = monstersMap.get(monster.id);
-    if (!def) break;
+    const spawned = spawnMonsterWithDef(zoneMonsters, rng);
+    if (!spawned) break;
+    const { instance: monster, def } = spawned;
 
     result.fights++;
     remaining -= avgFightMs;
 
     const playerDps = Math.max(0, (playerStats.attack - monster.stats.defense * DEF_PENETRATION)) / playerStats.attackSpeed;
-    const monsterDps = Math.max(0, (monster.stats.attack - playerStats.defense * DEF_PENETRATION)) / monster.stats.attackSpeed;
+    const baseMonsterDps = Math.max(0, (monster.stats.attack - playerStats.defense * DEF_PENETRATION)) / monster.stats.attackSpeed;
+    const monsterDps = baseMonsterDps * (1 - playerStats.blockChance + playerStats.blockChance * BLOCK_REDUCTION);
     const timeToKill = playerDps > 0 ? (monster.maxHp / playerDps) * 1000 : Infinity;
     const timeToBeKilled = monsterDps > 0 ? (pHp / monsterDps) * 1000 : Infinity;
 

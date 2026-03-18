@@ -1,4 +1,4 @@
-import skillsData from "@/skills.json";
+import skillsData from "../skills.json";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const rawXpTable: Record<string, unknown> = (skillsData as any).xpTable;

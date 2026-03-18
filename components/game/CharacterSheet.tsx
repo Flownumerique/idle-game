@@ -5,17 +5,20 @@ import { computePlayerStats } from "@/engine/offline-engine";
 import type { SkillId } from "@/types/game";
 import ProgressBar from "@/components/ui/ProgressBar";
 import { getLevelProgress, getXpForLevel, getXpToNextLevel } from "@/lib/xp-calc";
+import { SKILL_IDS } from "@/types/game";
 
-const COMBAT_SKILLS: SkillId[] = [
-  "attack",
-  "strength",
-  "ranged",
-  "magic",
-  "defense",
-  "dodge",
-  "constitution",
-  "prayer",
-];
+const COMBAT_SKILLS = SKILL_IDS.filter((id) =>
+  [
+    "attack",
+    "strength",
+    "ranged",
+    "magic",
+    "defense",
+    "dodge",
+    "constitution",
+    "prayer",
+  ].includes(id)
+);
 
 const SKILL_ICONS: Record<string, string> = {
   attack: "⚔️",
