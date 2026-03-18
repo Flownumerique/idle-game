@@ -91,5 +91,25 @@ describe("XP Calculation Library", () => {
       const xpJustBelowLevel2 = 82;
       expect(getLevelProgress(xpJustBelowLevel2)).toBeLessThan(1);
     });
+
+    it("should return NaN when XP is NaN", () => {
+      expect(getLevelProgress(NaN)).toBeNaN();
+    });
+
+    it("should handle Infinity XP properly", () => {
+      // getLevelForXp(Infinity) will return 120 (MASTERY_MAX)
+      // getLevelProgress for MASTERY_MAX returns 1
+      expect(getLevelProgress(Infinity)).toBe(1);
+    });
+
+    it("should handle negative XP appropriately", () => {
+      // getLevelForXp(-100) returns 1
+      // getXpToNextLevel(1) returns 83
+      // xpAtLevel is 0
+      // progress is (-100 - 0) / 83 = -1.204...
+      // Math.min(-1.204..., 1) is negative
+      expect(getLevelProgress(-100)).toBeLessThan(0);
+    });
+
   });
 });

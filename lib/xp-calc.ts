@@ -88,6 +88,12 @@ export function getLevelProgress(totalXp: number): number {
   if (level >= MASTERY_MAX) return 1;
   const xpAtLevel = getXpForLevel(level);
   const needed = getXpToNextLevel(level);
+
+  // Mathematical invariant: getLevelForXp ensures we never evaluate a level
+  // where needed <= 0, and MASTERY_MAX check catches Infinity.
+  // This check is purely defensive for corrupted state/inputs.
+  /* istanbul ignore if -- @preserve */
   if (needed <= 0 || !isFinite(needed)) return 1;
+
   return Math.min((totalXp - xpAtLevel) / needed, 1);
 }
