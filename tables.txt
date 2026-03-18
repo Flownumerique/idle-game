@@ -1,0 +1,725 @@
+--- Table 1 ---
+📋  4 Chantiers dans l'ordre d'exécution
+Chantier 1 — Architecture & Event Bus      Découplage complet des modules, data loader, feature flags
+Chantier 2 — Offline/Save Stabilisation    Tests offline, migration saves, garde-fous NaN/overflow
+Chantier 3 — Quest Logic                   Moteur de quêtes, génération seedée, tracking temps réel
+Chantier 4 — Balancing Script              Simulation automatique, métriques, ajustements constants.ts
+
+
+--- Table 2 ---
+⚙️  Principe directeur de cette phase
+Chaque chantier produit du code TypeScript pur (0 React), testable en isolation avec Vitest.
+L'objectif est qu'ajouter une zone, un monstre ou un type de quête ne nécessite
+qu'une entrée JSON — zéro modification de code applicatif.
+Les modules communiquent exclusivement via le GameEventBus.
+Aucun engine ne connaît l'existence d'un autre engine.
+
+
+--- Table 3 ---
+Chantier 1 — Architecture & Event Bus Découplage des modules · Data loader typé · Feature flags · Couche storage abstraite
+
+
+--- Table 4 ---
+🔗  Avant vs Après
+AVANT (couplage direct) :
+combatEngine.killMonster() → questEngine.onMonsterKilled() → achievementEngine.check()
+→ Ajouter les succès oblige à modifier combat-engine.ts
+
+APRÈS (event bus) :
+combatEngine.killMonster() → bus.emit('MONSTER_KILLED', payload)
+questEngine.on('MONSTER_KILLED', ...)   // écoute indépendante
+achievementEngine.on('MONSTER_KILLED', ...)  // écoute indépendante
+statsEngine.on('MONSTER_KILLED', ...)   // ajouté sans toucher au combat
+
+
+--- Table 5 ---
+engine/event-bus.ts — Bus d'événements typé
+// Catalogue exhaustif de tous les événements du jeu
+export type GameEventMap = {
+// Combat
+MONSTER_KILLED:    { monsterId: string; zoneId: string; loot: ItemDrop[]; xpGained: number }
+PLAYER_DAMAGED:    { damage: number; source: string; newHp: number }
+PLAYER_DIED:       { zoneId: string; killedBy: string }
+ATTACK_DODGED:     { attackerId: string }
+COMBAT_STARTED:    { zoneId: string; monsterId: string }
+COMBAT_ENDED:      { zoneId: string; victory: boolean }
+
+// Métiers
+SKILL_ACTION_DONE: { skillId: SkillId; actionId: string; xpGained: number; outputs: ItemDrop[] }
+SKILL_LEVEL_UP:    { skillId: SkillId; newLevel: number }
+SKILL_MILESTONE:   { skillId: SkillId; level: number; bonus: string }
+
+// Craft
+CRAFT_COMPLETED:   { recipeId: string; skillId: SkillId; output: ItemDrop; xpGained: number }
+CRAFT_FAILED:      { recipeId: string; reason: string }
+UPGRADE_BUILT:     { upgradeId: string; level: number }
+
+// Inventaire
+ITEM_ADDED:        { itemId: string; quantity: number; source: string }
+ITEM_REMOVED:      { itemId: string; quantity: number }
+ITEM_EQUIPPED:     { itemId: string; slot: SlotId }
+INVENTORY_FULL:    { itemId: string; quantityLost: number }
+
+// Agriculture
+PLANT_SOWED:       { plotIndex: number; seedId: string; readyAt: number }
+PLANT_READY:       { plotIndex: number; seedId: string }
+PLANT_HARVESTED:   { plotIndex: number; seedId: string; outputs: ItemDrop[]; perfect: boolean }
+
+// Économie
+ITEM_SOLD:         { itemId: string; quantity: number; goldGained: number }
+ITEM_BOUGHT:       { itemId: string; quantity: number; goldSpent: number }
+GOLD_CHANGED:      { delta: number; newTotal: number; source: string }
+
+// Quêtes
+QUEST_STARTED:     { questId: string }
+QUEST_OBJECTIVE:   { questId: string; objectiveIndex: number; current: number; target: number }
+QUEST_COMPLETED:   { questId: string; rewards: QuestReward }
+DAILY_RESET:       { date: string; newQuestIds: string[] }
+
+// Session
+GAME_LOADED:       { isGuest: boolean; offlineDuration: number }
+OFFLINE_RECOVERED: { duration: number; summary: OfflineSummary }
+SAVE_COMPLETED:    { target: 'local' | 'cloud' }
+}
+
+type Listener<T> = (payload: T) => void
+
+class GameEventBus {
+private listeners = new Map<string, Set<Listener<any>>>()
+
+on<K extends keyof GameEventMap>(event: K, listener: Listener<GameEventMap[K]>): () => void {
+if (!this.listeners.has(event)) this.listeners.set(event, new Set())
+this.listeners.get(event)!.add(listener)
+return () => this.listeners.get(event)?.delete(listener)  // unsubscribe fn
+}
+
+emit<K extends keyof GameEventMap>(event: K, payload: GameEventMap[K]): void {
+this.listeners.get(event)?.forEach(fn => {
+try { fn(payload) }
+catch (err) { console.error(`[EventBus] Error in ${event} listener:`, err) }
+})
+}
+
+// Vider tous les listeners (utile pour les tests)
+clear(): void { this.listeners.clear() }
+}
+
+export const bus = new GameEventBus()  // singleton partagé
+
+
+--- Table 6 ---
+engine/data-loader.ts — Loader centralisé
+import rawItems    from '@/data/items.json'
+import rawSkills   from '@/data/skills.json'
+import rawRecipes  from '@/data/recipes.json'
+import rawZones    from '@/data/zones_monsters.json'
+import rawQuests   from '@/data/quests.json'
+
+// Maps indexées pour lookups O(1)
+const itemMap    = new Map(rawItems.items.map(i => [i.id, i]))
+const skillMap   = new Map(rawSkills.skills.map(s => [s.id, s]))
+const recipeMap  = new Map(rawRecipes.recipes.map(r => [r.id, r]))
+const monsterMap = new Map(rawZones.monsters.map(m => [m.id, m]))
+const zoneMap    = new Map(rawZones.zones.map(z => [z.id, z]))
+const questMap   = new Map([
+...rawQuests.mainQuests.map(q => [q.id, q]),
+...Object.values(rawQuests.skillQuests).flat().map(q => [q.id, q]),
+])
+
+// Accesseurs avec erreur explicite
+export const GameData = {
+item    : (id: string) => { const v = itemMap.get(id);    if (!v) throw new Error(`Unknown item: ${id}`);    return v },
+skill   : (id: string) => { const v = skillMap.get(id);   if (!v) throw new Error(`Unknown skill: ${id}`);   return v },
+recipe  : (id: string) => { const v = recipeMap.get(id);  if (!v) throw new Error(`Unknown recipe: ${id}`);  return v },
+monster : (id: string) => { const v = monsterMap.get(id); if (!v) throw new Error(`Unknown monster: ${id}`); return v },
+zone    : (id: string) => { const v = zoneMap.get(id);    if (!v) throw new Error(`Unknown zone: ${id}`);    return v },
+quest   : (id: string) => { const v = questMap.get(id);   if (!v) throw new Error(`Unknown quest: ${id}`);   return v },
+
+// Collections filtrées
+itemsOfCategory : (cat: string) => rawItems.items.filter(i => i.category === cat),
+recipesForSkill : (skillId: string) => rawRecipes.recipes.filter(r => r.skill === skillId),
+monstersInZone  : (zoneId: string) => rawZones.monsters.filter(m => m.zone === zoneId),
+actionsForSkill : (skillId: string) => GameData.skill(skillId).actions ?? [],
+} as const
+
+// Validation au démarrage (appelée dans app/layout.tsx)
+export function validateGameData(): void {
+const errors: string[] = []
+// Vérifier que chaque output de recette pointe vers un item existant
+rawRecipes.recipes.forEach(r => {
+r.inputs?.forEach(i => { if (!itemMap.has(i.itemId)) errors.push(`Recipe ${r.id}: unknown input ${i.itemId}`) })
+if (r.output && !itemMap.has(r.output.itemId)) errors.push(`Recipe ${r.id}: unknown output ${r.output.itemId}`)
+})
+// Vérifier que chaque drop de monstre pointe vers un item existant
+rawZones.monsters.forEach(m => {
+m.drops?.forEach(d => { if (!itemMap.has(d.itemId)) errors.push(`Monster ${m.id}: unknown drop ${d.itemId}`) })
+})
+if (errors.length > 0) throw new Error(`Data validation failed:\n${errors.join('\n')}`)
+}
+
+
+--- Table 7 ---
+lib/feature-flags.ts
+// Définis dans .env ou dans Supabase remote config
+export const FLAGS = {
+ENABLE_PRAYER_SKILL     : process.env.NEXT_PUBLIC_FLAG_PRAYER     === 'true',
+ENABLE_OFFLINE_PROGRESS : process.env.NEXT_PUBLIC_FLAG_OFFLINE    !== 'false', // true par défaut
+ENABLE_CLOUD_SAVE       : process.env.NEXT_PUBLIC_FLAG_CLOUD_SAVE !== 'false',
+ENABLE_DYNAMIC_MARKET   : process.env.NEXT_PUBLIC_FLAG_DYN_MARKET === 'true',
+ENABLE_MINIGAMES        : process.env.NEXT_PUBLIC_FLAG_MINIGAMES  !== 'false',
+ENABLE_DAILY_QUESTS     : process.env.NEXT_PUBLIC_FLAG_DAILY_Q    !== 'false',
+DEBUG_SHOW_TICK_STATS   : process.env.NODE_ENV === 'development',
+} as const
+
+// Usage dans le code :
+// if (FLAGS.ENABLE_PRAYER_SKILL) { ... }
+// Le moteur tick vérifie FLAGS avant d'appeler chaque sous-système
+
+
+--- Table 8 ---
+lib/storage/storage-adapter.ts
+export interface StorageAdapter {
+loadGameState  (playerId: string): Promise<GameState | null>
+saveGameState  (playerId: string, state: GameState): Promise<void>
+loadSkillProgress(playerId: string): Promise<SkillProgress[]>
+saveSkillProgress(playerId: string, skills: SkillProgress[]): Promise<void>
+}
+
+// Implémentation Supabase
+export class SupabaseAdapter implements StorageAdapter { ... }
+
+// Implémentation localStorage (guest + fallback offline)
+export class LocalStorageAdapter implements StorageAdapter { ... }
+
+// Implémentation mock pour les tests Vitest
+export class MockAdapter implements StorageAdapter {
+private store = new Map<string, any>()
+async loadGameState(id: string)  { return this.store.get(id) ?? null }
+async saveGameState(id: string, s: GameState) { this.store.set(id, s) }
+async loadSkillProgress(id: string) { return this.store.get(`skills_${id}`) ?? [] }
+async saveSkillProgress(id: string, s: SkillProgress[]) { this.store.set(`skills_${id}`, s) }
+}
+
+// Sélection automatique selon l'état auth
+export function createStorageAdapter(isGuest: boolean): StorageAdapter {
+if (isGuest || !FLAGS.ENABLE_CLOUD_SAVE) return new LocalStorageAdapter()
+return new SupabaseAdapter()
+}
+
+
+--- Table 9 ---
+📁  engine/ après refactoring
+engine/
+├── event-bus.ts         ← Bus d'événements typé (singleton)
+├── data-loader.ts       ← Accesseurs typés + validation au boot
+├── constants.ts         ← Toutes les constantes de balancing
+├── tick.ts              ← Orchestrateur principal (appelle les sub-engines)
+├── skill-engine.ts      ← Progression des métiers de collecte
+├── combat-engine.ts     ← Résolution des combats + XP par style
+├── craft-engine.ts      ← Craft simple + multi-étapes + file
+├── farming-engine.ts    ← Timers de pousse + récolte parfaite
+├── offline-engine.ts    ← Calcul delta offline + écran récupération
+├── market-engine.ts     ← Prix dynamiques + offres spéciales
+├── quest-engine.ts      ← Moteur de quêtes (écoute le bus)
+├── prayer-engine.ts     ← Buffs de prière (si FLAG activé)
+└── rng.ts               ← Générateur seedé mulberry32
+
+lib/
+├── storage/
+│   ├── storage-adapter.ts   ← Interface + factory
+│   ├── supabase-adapter.ts  ← Implémentation Supabase
+│   └── localstorage-adapter.ts
+├── feature-flags.ts
+├── xp-calc.ts
+└── save-migrations.ts
+
+
+--- Table 10 ---
+Chantier 2 — Offline/Save Stabilisation Garde-fous NaN/overflow · Tests scénarios extrêmes · Migration saves · Guest → Register
+
+
+--- Table 11 ---
+engine/offline-engine.ts — Guards complets
+// NIVEAU 1 : Validation de l'entrée
+function validateDelta(rawDelta: number): number {
+if (!Number.isFinite(rawDelta) || rawDelta < 0) {
+console.error('[Offline] Invalid delta:', rawDelta)
+return 0
+}
+const cap = FLAGS.ENABLE_PRAYER_SKILL  // exemple flag qui change le cap
+? OFFLINE_CAP_GRIMOIRE_H * 3600 * 1000
+: OFFLINE_CAP_DEFAULT_H  * 3600 * 1000
+return Math.min(rawDelta, cap)
+}
+
+// NIVEAU 2 : Validation de chaque résultat intermédiaire
+function safeXp(base: number, count: number): number {
+const result = base * count
+if (!Number.isFinite(result) || result < 0) return 0
+return Math.floor(result)
+}
+
+// NIVEAU 3 : Validation de l'inventaire avant application
+function applyOfflineLoot(store: GameStore, loot: Record<string, number>): string[] {
+const warnings: string[] = []
+for (const [itemId, qty] of Object.entries(loot)) {
+if (!Number.isFinite(qty) || qty <= 0) { warnings.push(`Invalid qty for ${itemId}`); continue }
+const current = store.inventory[itemId] ?? 0
+const item    = GameData.item(itemId)
+const capped  = Math.min(qty, item.stackMax - current)
+if (capped < qty) warnings.push(`Stack overflow: ${itemId} (lost ${qty - capped})`)
+if (capped > 0) store.inventory[itemId] = current + capped
+}
+return warnings  // affichés dans l'écran de récupération
+}
+
+
+--- Table 12 ---
+Scénario | Input delta | Comportement attendu
+Normal | 8h (28 800 000 ms) | Progression calculée, XP créditée, drops dans inventaire
+Plafond default | 50h | Plafonné à 48h — pas de progression sur les 2h supplémentaires
+Plafond Grimoire | 80h (upgrade actif) | Plafonné à 72h
+Timestamp invalide | NaN / -1 / Infinity | Delta = 0, aucune progression, warning loggé
+Inventaire plein | 8h, stack max atteint | Items excédentaires perdus, warning affiché à l'écran de récup
+Mort en combat | 4h (combat actif) | Combat simulé jusqu'à mort, puis arrêt — pas de loop infinie
+Action nulle | 8h, activeAction = null | Aucun calcul pour ce skill — pas d'erreur
+Save corrompue | lastSaveAt > nowMs | Delta = 0, alerte Sentry, save non modifiée
+
+
+--- Table 13 ---
+engine/__tests__/offline-engine.test.ts
+import { describe, it, expect, beforeEach } from 'vitest'
+import { calculateOfflineProgress } from '../offline-engine'
+import { MockAdapter } from '../../lib/storage/storage-adapter'
+import { makeDefaultGameState } from '../test-helpers'
+
+describe('Offline Engine', () => {
+let store: GameStore
+
+beforeEach(() => {
+store = makeDefaultGameState()
+store.skills.woodcutting.activeAction = 'cut_common'
+store.lastSaveAt = Date.now() - 8 * 3600 * 1000  // 8h ago
+})
+
+it('calcule la progression sur 8h sans NaN', () => {
+const result = calculateOfflineProgress(store, Date.now())
+expect(result.skills.woodcutting.xp).toBeGreaterThan(0)
+expect(Number.isFinite(result.skills.woodcutting.xp)).toBe(true)
+})
+
+it('plafonne à 48h par défaut', () => {
+store.lastSaveAt = Date.now() - 72 * 3600 * 1000  // 72h ago
+const result = calculateOfflineProgress(store, Date.now())
+const maxXp = calculateOfflineProgress({ ...store,
+lastSaveAt: Date.now() - 48 * 3600 * 1000 }, Date.now())
+expect(result.skills.woodcutting.xp).toBe(maxXp.skills.woodcutting.xp)
+})
+
+it('retourne delta=0 si lastSaveAt dans le futur', () => {
+store.lastSaveAt = Date.now() + 1000
+const result = calculateOfflineProgress(store, Date.now())
+expect(result.duration).toBe(0)
+})
+
+it('RNG seedé — même résultat pour même seed', () => {
+const r1 = calculateOfflineProgress(store, Date.now())
+const r2 = calculateOfflineProgress(store, Date.now())
+expect(r1.loot).toEqual(r2.loot)
+})
+})
+
+
+--- Table 14 ---
+lib/save-migrations.ts — Migrations chaînées
+export const SAVE_VERSION = 3
+
+type MigrationFn = (state: Record<string, any>) => Record<string, any>
+
+const migrations: Record<number, MigrationFn> = {
+// v1 → v2 : ajout du système d'upgrades
+1: (s) => ({ ...s, upgrades: {}, unlockedFlags: [] }),
+
+// v2 → v3 : combat décomposé en 8 skills
+2: (s) => ({
+...s,
+skills: {
+...s.skills,
+// Migrer l'ancien skill 'combat' vers 'attack' + stats dérivées
+attack:       { level: s.skills.combat?.level ?? 1, xp: s.skills.combat?.xp ?? 0, activeAction: null, actionStartedAt: null },
+strength:     { level: 1, xp: 0, activeAction: null, actionStartedAt: null },
+ranged:       { level: 1, xp: 0, activeAction: null, actionStartedAt: null },
+magic:        { level: 1, xp: 0, activeAction: null, actionStartedAt: null },
+defense:      { level: 1, xp: 0, activeAction: null, actionStartedAt: null },
+dodge:        { level: 1, xp: 0, activeAction: null, actionStartedAt: null },
+constitution: { level: s.skills.combat?.level ?? 1, xp: 0, activeAction: null, actionStartedAt: null },
+prayer:       { level: 1, xp: 0, activeAction: null, actionStartedAt: null },
+},
+}),
+}
+
+export function migrateSave(raw: Record<string, any>): GameState {
+let state = structuredClone(raw)  // ne jamais muter l'original
+const startVersion = state.version ?? 1
+
+for (let v = startVersion; v < SAVE_VERSION; v++) {
+const migrate = migrations[v]
+if (!migrate) throw new Error(`No migration from v${v} to v${v + 1}`)
+state = { ...migrate(state), version: v + 1 }
+console.info(`[Save] Migrated from v${v} to v${v + 1}`)
+}
+return state as GameState
+}
+
+
+--- Table 15 ---
+🔐  Séquence de migration Guest → Compte
+1. DÉTECTION    Le joueur clique 'Créer un compte'
+→ Lire la save guest depuis localStorage
+→ Vérifier que la save est valide (migrateSave si version < courante)
+
+2. AUTH         Supabase signUp(email, password)
+→ En cas d'erreur (email déjà pris) → afficher message, save guest INTACTE
+
+3. CONFLIT      Vérifier si une save cloud existe déjà pour ce userId
+→ Si oui : modal 'Garder local (X niveaux) ou Cloud (Y niveaux) ?'
+→ Si non : passer directement à l'étape 4
+
+4. UPLOAD       saveGameState(newUserId, guestSave)
+→ En cas d'erreur réseau : RETRY 3x avec backoff exponentiel
+→ En cas d'échec total : save guest conservée, message d'erreur
+
+5. NETTOYAGE    Si upload réussi :
+→ localStorage.removeItem('idle-realms-guest-save')
+→ localStorage.removeItem('idle-realms-guest-id')
+→ localStorage.setItem('idle-realms-user-id', newUserId)
+→ bus.emit('GAME_LOADED', { isGuest: false, offlineDuration: 0 })
+
+
+--- Table 16 ---
+Chantier 3 — Quest Logic Moteur de quêtes · Génération seedée · Tracking temps réel · Intégration Event Bus
+
+
+--- Table 17 ---
+engine/quest-engine.ts — Structure principale
+import { bus } from './event-bus'
+import { GameData } from './data-loader'
+
+// Map des handlers par type d'objectif
+type ObjectiveHandler = (
+objective: QuestObjective,
+event: any,
+current: number
+) => number  // retourne la nouvelle valeur de progression
+
+const OBJECTIVE_HANDLERS: Record<string, ObjectiveHandler> = {
+
+kill: (obj, event: GameEventMap['MONSTER_KILLED'], current) => {
+if (obj.monsterId && obj.monsterId !== event.monsterId) return current
+if (obj.zoneId   && obj.zoneId   !== event.zoneId)   return current
+return current + 1
+},
+
+gather: (obj, event: GameEventMap['SKILL_ACTION_DONE'], current) => {
+if (obj.skillId && obj.skillId !== event.skillId) return current
+if (obj.actionId && obj.actionId !== event.actionId) return current
+return current + 1
+},
+
+craft: (obj, event: GameEventMap['CRAFT_COMPLETED'], current) => {
+if (obj.recipeId && obj.recipeId !== event.recipeId) return current
+if (obj.skillId  && obj.skillId  !== event.skillId)  return current
+return current + event.output.qty
+},
+
+harvest: (obj, event: GameEventMap['PLANT_HARVESTED'], current) => current + 1,
+
+sell: (obj, event: GameEventMap['ITEM_SOLD'], current) => {
+if (obj.itemId && obj.itemId !== event.itemId) return current
+return current + event.goldGained
+},
+
+deliver: (obj, event: GameEventMap['ITEM_REMOVED'], current) => {
+if (event.itemId !== obj.itemId) return current
+return current + event.quantity
+},
+
+reach_level: (obj, event: GameEventMap['SKILL_LEVEL_UP'], current) => {
+if (event.skillId !== obj.skillId) return current
+return event.newLevel  // la cible est un niveau, pas un compteur
+},
+
+kill_boss: (obj, event: GameEventMap['MONSTER_KILLED'], current) => {
+const monster = GameData.monster(event.monsterId)
+if (monster.rarity !== 'boss') return current
+if (obj.zoneId && obj.zoneId !== event.zoneId) return current
+return current + 1
+},
+}
+
+
+--- Table 18 ---
+engine/quest-engine.ts — Initialisation et listeners
+export function initQuestEngine(store: QuestStore): void {
+
+// Listener générique — routing vers le bon handler
+function handleEvent(eventType: string, payload: any): void {
+const activeQuests = store.getActiveQuests()
+
+for (const quest of activeQuests) {
+let questUpdated = false
+
+quest.objectives.forEach((obj, idx) => {
+if (obj.type !== eventType) return
+if (obj.completed) return
+
+const handler = OBJECTIVE_HANDLERS[obj.type]
+if (!handler) return
+
+const current  = quest.progress[idx] ?? 0
+const newValue = handler(obj, payload, current)
+
+if (newValue !== current) {
+store.updateObjectiveProgress(quest.id, idx, Math.min(newValue, obj.qty))
+bus.emit('QUEST_OBJECTIVE', { questId: quest.id, objectiveIndex: idx,
+current: Math.min(newValue, obj.qty), target: obj.qty })
+questUpdated = true
+}
+})
+
+// Vérifier si la quête est complète
+if (questUpdated && store.isQuestComplete(quest.id)) {
+completeQuest(quest.id, store)
+}
+}
+}
+
+// Brancher les événements pertinents sur le handler générique
+bus.on('MONSTER_KILLED',    p => { handleEvent('kill', p); handleEvent('kill_boss', p) })
+bus.on('SKILL_ACTION_DONE', p => handleEvent('gather', p))
+bus.on('CRAFT_COMPLETED',   p => handleEvent('craft', p))
+bus.on('PLANT_HARVESTED',   p => handleEvent('harvest', p))
+bus.on('ITEM_SOLD',         p => handleEvent('sell', p))
+bus.on('ITEM_REMOVED',      p => handleEvent('deliver', p))
+bus.on('SKILL_LEVEL_UP',    p => handleEvent('reach_level', p))
+}
+
+function completeQuest(questId: string, store: QuestStore): void {
+const quest   = GameData.quest(questId)
+store.markCompleted(questId)
+// Créditer les récompenses
+applyQuestRewards(quest.rewards, store)
+// Débloquer les quêtes suivantes
+quest.unlocks?.forEach(id => store.unlockQuest(id))
+bus.emit('QUEST_COMPLETED', { questId, rewards: quest.rewards })
+}
+
+
+--- Table 19 ---
+engine/quest-engine.ts — Daily generation
+import { mulberry32 } from './rng'
+
+// Seed unique par joueur par jour
+function getDailySeed(playerId: string): number {
+const dayIndex = Math.floor(Date.now() / 86_400_000)  // UTC
+return dayIndex ^ hashString(playerId)
+}
+
+function getWeeklySeed(playerId: string): number {
+const weekIndex = Math.floor(Date.now() / 604_800_000)
+return weekIndex ^ hashString(playerId)
+}
+
+// Hash FNV-1a simple (déterministe, pas crypto)
+function hashString(str: string): number {
+let hash = 2166136261
+for (const c of str) hash = Math.imul(hash ^ c.charCodeAt(0), 16777619)
+return hash >>> 0  // unsigned 32-bit
+}
+
+export function generateDailyQuests(
+playerId: string,
+playerSkills: Record<SkillId, { level: number }>,
+count = 3
+): string[] {
+const rng  = mulberry32(getDailySeed(playerId))
+const pool = rawQuests.dailyQuestPool.filter(q =>
+isQuestAccessible(q, playerSkills)
+)
+// Sélection sans remise
+const selected: string[] = []
+const available = [...pool]
+while (selected.length < count && available.length > 0) {
+const idx = Math.floor(rng() * available.length)
+selected.push(available[idx].id)
+available.splice(idx, 1)
+}
+return selected
+}
+
+export function generateWeeklyQuest(playerId: string): string {
+const rng = mulberry32(getWeeklySeed(playerId))
+const idx = Math.floor(rng() * rawQuests.weeklyQuests.length)
+return rawQuests.weeklyQuests[idx].id
+}
+
+// Vérifier si une quête est accessible selon les niveaux du joueur
+function isQuestAccessible(quest: any, skills: Record<string, { level: number }>): boolean {
+if (!quest.reqSkills) return true
+return Object.entries(quest.reqSkills).every(
+([skillId, minLevel]) => (skills[skillId]?.level ?? 1) >= (minLevel as number)
+)
+}
+
+
+--- Table 20 ---
+engine/quest-engine.ts — checkDailyReset()
+export function checkDailyReset(store: QuestStore, playerId: string): void {
+const todayStr = new Date().toISOString().slice(0, 10)  // 'YYYY-MM-DD'
+
+if (store.lastDailyDate === todayStr) return  // déjà resetté aujourd'hui
+
+const newQuestIds = generateDailyQuests(playerId, store.playerSkills)
+store.setDailyQuests(newQuestIds, todayStr)
+
+// Reset du streak si un jour a été manqué
+const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10)
+if (store.lastDailyDate !== yesterday) {
+store.resetStreak()
+} else {
+store.incrementStreak()
+}
+
+bus.emit('DAILY_RESET', { date: todayStr, newQuestIds })
+}
+
+
+--- Table 21 ---
+Chantier 4 — Balancing Script Simulation automatique · Métriques · Ajustements constants.ts
+
+
+--- Table 22 ---
+📊  Métriques produites par le script
+PROGRESSION XP
+• Temps (min) pour atteindre chaque niveau de 1 à 99 par métier
+• Temps pour atteindre niv. 10 / 30 / 50 / 99 (objectifs clés)
+• Comparaison online vs offline (avec Montre Aventurier)
+
+ÉCONOMIE
+• Or généré par heure selon la zone de combat
+• Valeur marchande des drops par heure par métier
+• Temps pour acheter chaque upgrade permanent
+
+COMBAT
+• HP moyens perdus par combat selon la zone
+• Taux de survie (combats sans mort) par niveau de combat
+• Potions consommées par heure
+• Temps pour tuer chaque boss selon le niveau du joueur
+
+CRAFT
+• Ressources nécessaires pour crafter chaque item (toutes étapes incluses)
+• Temps de collecte équivalent pour chaque recette
+• Goulots d'étranglement (ressources les plus longues à obtenir)
+
+
+--- Table 23 ---
+scripts/balance.ts — Structure principale
+import { calculateOfflineProgress } from '../engine/offline-engine'
+import { makeDefaultGameState }      from '../engine/test-helpers'
+import { GameData }                  from '../engine/data-loader'
+import { CONSTANTS }                 from '../engine/constants'
+
+const SIMULATION_HOURS = 100
+const TICK_SIZE_MS     = 60_000  // ticks d'1 minute pour la simulation
+
+async function runBalanceSimulation() {
+const store = makeDefaultGameState()
+const report: BalanceReport = { xp: {}, economy: {}, combat: {}, craft: {} }
+
+// Simuler heure par heure
+for (let h = 0; h < SIMULATION_HOURS; h++) {
+const deltaMs = 3600_000
+const result  = calculateOfflineProgress(store, store.lastSaveAt + deltaMs)
+applyOfflineResult(store, result)
+store.lastSaveAt += deltaMs
+
+// Snapshot toutes les 10h
+if (h % 10 === 0) snapshotMetrics(report, store, h)
+}
+
+printReport(report)
+}
+
+function printReport(report: BalanceReport): void {
+console.log('\n=== IDLE REALMS — BALANCE REPORT ===')
+
+console.log('\n📈 XP PROGRESSION (heures pour atteindre le niveau)')
+for (const [skillId, timeline] of Object.entries(report.xp)) {
+console.log(`  ${skillId.padEnd(15)} | niv.10: ${timeline[10]?.toFixed(1)}h | niv.50: ${timeline[50]?.toFixed(1)}h | niv.99: ${timeline[99]?.toFixed(1)}h`)
+}
+
+console.log('\n💰 ÉCONOMIE (par heure)')
+for (const [source, gold] of Object.entries(report.economy)) {
+console.log(`  ${source.padEnd(20)} : ${gold.toFixed(0)} or/h`)
+}
+
+console.log('\n⚔️  COMBAT')
+for (const [zone, stats] of Object.entries(report.combat)) {
+console.log(`  ${zone}: survie ${(stats.survivalRate * 100).toFixed(0)}% | potions: ${stats.potionsPerHour.toFixed(1)}/h`)
+}
+}
+
+runBalanceSimulation()
+
+
+--- Table 24 ---
+Métrique | Cible | Ajustement si hors cible
+Temps niv. 10 (n'importe quel skill) | 20–40 min de jeu actif | xpPerAction dans skills.json
+Temps niv. 50 | 8–15h cumulées | xpPerAction + baseActionTime
+Temps niv. 99 | 60–100h cumulées | Courbe XP xpFormula
+Or/heure en combat (zone 1) | 50–100 or/h | goldDrop min/max dans monsters.json
+Or/heure en combat (zone 4) | 500–1000 or/h | goldMultiplier dans zones.json
+Taux de survie zone 1 (niv. 5) | > 90% | Stats monstres ou regen joueur
+Taux de survie zone 4 (niv. 30) | 70–85% | Stats monstres zone 4
+Potions consommées/heure (zone 3) | < 5 potions/h | Regen HP ou dégâts monstres
+Temps craft Épée Mithril | < 2h de farming équivalent | Inputs recette ou drop rates
+
+
+--- Table 25 ---
+💻  Scripts pnpm
+pnpm balance              → Simulation complète 100h, rapport complet
+pnpm balance --skill wc   → Focus sur le Bûcheronnage uniquement
+pnpm balance --hours 10   → Simulation courte 10h (rapide)
+pnpm balance --zone all   → Focus sur l'économie par zone de combat
+pnpm balance --craft      → Analyse des chaînes de craft (goulots)
+pnpm balance --compare    → Compare les constantes actuelles vs sauvegarde précédente
+
+pnpm test                 → Tous les tests Vitest
+pnpm test:offline         → Tests unitaires offline engine uniquement
+pnpm test:quest           → Tests unitaires quest engine uniquement
+pnpm test:coverage        → Rapport de couverture (objectif : >80% sur engine/)
+
+
+--- Table 26 ---
+Étape | Fichier(s) à créer | Dépendances | Tests
+1a. Event Bus | engine/event-bus.ts | Aucune | Vitest — émission/écoute typée
+1b. Data Loader | engine/data-loader.ts | JSON de jeu | Vitest — validation au boot
+1c. Feature Flags | lib/feature-flags.ts | .env.local | Manuel
+1d. Storage Adapter | lib/storage/storage-adapter.ts + impls | Supabase SDK | MockAdapter dans les tests
+1e. Refactor engines | Tous les engine/*.ts | event-bus, data-loader | Vérifier que bus.emit est bien appelé
+2a. Offline guards | engine/offline-engine.ts (update) | event-bus | Vitest — 8 scénarios
+2b. Save migrations | lib/save-migrations.ts (update) | types/game.ts v3 | Vitest — migration v1→v2→v3
+2c. Guest migration | lib/auth/migrate-guest.ts | storage-adapter | Playwright — flux complet
+3a. Quest engine | engine/quest-engine.ts | event-bus, data-loader | Vitest — chaque type d'objectif
+3b. Daily generation | engine/quest-engine.ts (addendum) | rng.ts | Vitest — déterminisme seed
+3c. Daily reset | engine/quest-engine.ts (addendum) | stores/quest-store.ts | Vitest — streak + reset
+4. Balance script | scripts/balance.ts | Tous engines | Manuel — vérif métriques
+
+
+--- Table 27 ---
+⚠️  Règle absolue pendant cette phase
+Ne pas ajouter de contenu (nouveaux items, zones, recettes) pendant que les chantiers 1 et 2
+sont en cours. Tout ajout de données avant que la validation du data-loader soit en place
+risque de passer inaperçu et de créer des références invalides silencieuses.
+
+Ordre strict : Chantier 1 → Chantier 2 → Chantier 3 → Chantier 4 → Contenu additionnel.
