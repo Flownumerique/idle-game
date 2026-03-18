@@ -130,13 +130,15 @@ export function spawnMonster(
 export function calcDamage(
   atk: number,
   def: number,
-  critChance: number,
+  precision: number,
   shieldBlockChance: number,
   rng: () => number
 ): { dmg: number; isCrit: boolean; isBlocked: boolean } {
-  // critChance is expected to be a percentage (0 to 1). If it's passed as a raw whole number, scale it down.
-  const normalizedCrit = critChance > 1 ? critChance / 100 : critChance;
-  const isCrit = rng() < Math.min(normalizedCrit, MAX_CRIT_CHANCE);
+  if (Number.isNaN(atk) || Number.isNaN(def) || Number.isNaN(precision) || Number.isNaN(shieldBlockChance)) {
+    return { dmg: 1, isCrit: false, isBlocked: false };
+  }
+
+  const isCrit = rng() < Math.min(precision / 200, MAX_CRIT_CHANCE);
   const isBlocked = shieldBlockChance > 0 && rng() < shieldBlockChance;
 
   let dmg = Math.max(
