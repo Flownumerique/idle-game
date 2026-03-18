@@ -12,17 +12,7 @@ import {
   UI_TICK_INTERVAL_MS,
   HP_REGEN_DELAY_MS,
 } from "@/engine/constants";
-import type { SkillId } from "@/types/game";
-
-const SKILL_IDS: SkillId[] = [
-  "woodcutting",
-  "mining",
-  "fishing",
-  "farming",
-  "smithing",
-  "cooking",
-  "alchemy",
-];
+import { SKILL_IDS } from "@/types/game";
 
 /**
  * Main game loop hook.

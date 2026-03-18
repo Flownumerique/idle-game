@@ -19,6 +19,24 @@ export type SkillId =
   | "constitution"
   | "prayer";
 
+export const SKILL_IDS = [
+  "woodcutting",
+  "mining",
+  "fishing",
+  "farming",
+  "smithing",
+  "cooking",
+  "alchemy",
+  "attack",
+  "strength",
+  "ranged",
+  "magic",
+  "defense",
+  "dodge",
+  "constitution",
+  "prayer",
+] as const satisfies SkillId[];
+
 export type SlotId =
   | "head"
   | "chest"

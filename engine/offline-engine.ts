@@ -4,17 +4,7 @@ import { getLevelForXp } from "@/lib/xp-calc";
 import { tickSkill } from "./skill-engine";
 import { simulateCombatsOffline } from "./combat-engine";
 import { MAX_OFFLINE_MS, GRIMOIRE_OFFLINE_MS } from "./constants";
-import type { GameState, OfflineResult, SkillId, PlayerStats } from "@/types/game";
-
-const SKILL_IDS: SkillId[] = [
-  "woodcutting",
-  "mining",
-  "fishing",
-  "farming",
-  "smithing",
-  "cooking",
-  "alchemy",
-];
+import { SKILL_IDS, type GameState, type OfflineResult, type SkillId, type PlayerStats } from "@/types/game";
 
 /**
  * Calculate all progress that occurred while the player was offline.
