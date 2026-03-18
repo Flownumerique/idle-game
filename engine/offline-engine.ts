@@ -194,6 +194,7 @@ export function computePlayerStats(state: GameState): PlayerStats {
   let attackSpeed = 2.4;
   let precision = 10;
   let equipmentHpRegen = 0;
+  let blockChance = 0;
 
   let activeStyle: 'attack' | 'strength' | 'ranged' | 'magic' | null = null;
 
@@ -223,6 +224,9 @@ export function computePlayerStats(state: GameState): PlayerStats {
     hpBonus += item.stats.hp ?? 0;
     precision += item.stats.precision ?? 0;
     equipmentHpRegen += item.stats.hpRegen ?? 0;
+    if (item.stats.blockChance) {
+      blockChance = Math.max(blockChance, item.stats.blockChance);
+    }
     if (item.stats.attackSpeed) attackSpeed = item.stats.attackSpeed;
   }
 
@@ -254,5 +258,6 @@ export function computePlayerStats(state: GameState): PlayerStats {
     hpRegen: 2 + (constitutionLevel * 0.1) + equipmentHpRegen,
     prayerBonus: 1.0,
     activeStyle,
+    blockChance,
   };
 }

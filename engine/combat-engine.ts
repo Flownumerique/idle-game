@@ -168,8 +168,7 @@ export function tickCombat(
   playerStats: PlayerStats,
   playerHp: number,
   deltaMs: number,
-  rng: () => number,
-  getShieldBlockChance: () => number
+  rng: () => number
 ): CombatTickResult {
   const result: CombatTickResult = {
     newCombatState: { ...state },
@@ -189,7 +188,7 @@ export function tickCombat(
   let pHitCd = state.playerHitCooldown;
   let mHitCd = state.monsterHitCooldown;
   let remaining = deltaMs;
-  const blockChance = getShieldBlockChance();
+  const blockChance = playerStats.blockChance;
 
   while (remaining > 0 && newState.active) {
     const step = Math.min(remaining, pHitCd > 0 ? pHitCd : Infinity, mHitCd > 0 ? mHitCd : Infinity);
@@ -332,7 +331,8 @@ export function simulateCombatsOffline(
     remaining -= avgFightMs;
 
     const playerDps = Math.max(0, (playerStats.attack - monster.stats.defense * DEF_PENETRATION)) / playerStats.attackSpeed;
-    const monsterDps = Math.max(0, (monster.stats.attack - playerStats.defense * DEF_PENETRATION)) / monster.stats.attackSpeed;
+    const baseMonsterDps = Math.max(0, (monster.stats.attack - playerStats.defense * DEF_PENETRATION)) / monster.stats.attackSpeed;
+    const monsterDps = baseMonsterDps * (1 - playerStats.blockChance + playerStats.blockChance * BLOCK_REDUCTION);
     const timeToKill = playerDps > 0 ? (monster.maxHp / playerDps) * 1000 : Infinity;
     const timeToBeKilled = monsterDps > 0 ? (pHp / monsterDps) * 1000 : Infinity;
 

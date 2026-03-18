@@ -216,6 +216,7 @@ export interface PlayerStats {
   hpRegen: number; // HP/s
   prayerBonus: number;
   activeStyle: 'attack' | 'strength' | 'ranged' | 'magic' | null;
+  blockChance: number;
 }
 
 export interface ItemDrop {
