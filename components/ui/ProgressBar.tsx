@@ -6,6 +6,7 @@ interface ProgressBarProps {
   height?: string;
   label?: string;
   showPercent?: boolean;
+  className?: string;
 }
 
 export default function ProgressBar({
@@ -14,10 +15,11 @@ export default function ProgressBar({
   height = "h-2",
   label,
   showPercent,
+  className = "",
 }: ProgressBarProps) {
   const pct = Math.min(100, Math.max(0, value * 100));
   return (
-    <div className="w-full">
+    <div className={`w-full ${className}`}>
       {(label || showPercent) && (
         <div className="flex justify-between text-xs text-slate-400 mb-1">
           {label && <span>{label}</span>}

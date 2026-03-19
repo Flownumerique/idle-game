@@ -10,6 +10,8 @@ import type {
   FarmPlot,
   QuestProgress,
 } from "@/types/game";
+import { PROFESSION_SKILL_IDS } from "@/types/game";
+import { getLevelForXp } from "@/lib/xp-calc";
 
 // ──────────────────────────────────────────────
 // Default / initial state
@@ -75,6 +77,7 @@ function defaultGameState(): GameState {
       playerHitCooldown: 2400,
       monsterHitCooldown: 2000,
       autoRestart: true,
+      trainingStyle: "attack",
       log: [],
     },
     farmPlots: [
@@ -89,6 +92,7 @@ function defaultGameState(): GameState {
     lastDailyReset: Date.now(),
     lastWeeklyReset: Date.now(),
     marketSales: {},
+    discoveredItems: [],
     lastSaveAt: Date.now(),
     totalPlayTime: 0,
     version: 1,
@@ -147,6 +151,9 @@ interface GameActions {
 
   // Full state replacement (for offline progress apply / save load)
   hydrateState: (state: Partial<GameState>) => void;
+
+  // Reset game (new character)
+  resetGame: () => void;
 }
 
 // ──────────────────────────────────────────────
@@ -172,17 +179,27 @@ export const useGameStore = create<GameStore>()(
       },
 
       startAction: (skillId, actionId) =>
-        set((s) => ({
-          skills: {
-            ...s.skills,
-            [skillId]: {
-              ...s.skills[skillId],
-              activeAction: actionId,
-              actionStartedAt: Date.now(),
-              actionProgress: 0,
-            },
-          },
-        })),
+        set((s) => {
+          // Stop any other active profession skill first
+          const updatedSkills = { ...s.skills };
+          for (const id of PROFESSION_SKILL_IDS) {
+            if (id !== skillId && updatedSkills[id].activeAction) {
+              updatedSkills[id] = {
+                ...updatedSkills[id],
+                activeAction: null,
+                actionStartedAt: null,
+                actionProgress: 0,
+              };
+            }
+          }
+          updatedSkills[skillId] = {
+            ...updatedSkills[skillId],
+            activeAction: actionId,
+            actionStartedAt: Date.now(),
+            actionProgress: 0,
+          };
+          return { skills: updatedSkills };
+        }),
 
       stopAction: (skillId) =>
         set((s) => ({
@@ -201,10 +218,11 @@ export const useGameStore = create<GameStore>()(
         set((s) => {
           const skill = s.skills[skillId];
           const newXp = skill.xp + xp;
+          const newLevel = getLevelForXp(newXp);
           return {
             skills: {
               ...s.skills,
-              [skillId]: { ...skill, xp: newXp },
+              [skillId]: { ...skill, xp: newXp, level: newLevel },
             },
           };
         }),
@@ -220,8 +238,18 @@ export const useGameStore = create<GameStore>()(
       addItems: (items) =>
         set((s) => {
           const inv = { ...s.inventory };
+          let discoveredSet: Set<string> | null = null;
+          
           for (const [id, qty] of Object.entries(items)) {
             inv[id] = (inv[id] ?? 0) + qty;
+            if (!s.discoveredItems.includes(id)) {
+              if (!discoveredSet) discoveredSet = new Set(s.discoveredItems);
+              discoveredSet.add(id);
+            }
+          }
+          
+          if (discoveredSet) {
+            return { inventory: inv, discoveredItems: Array.from(discoveredSet) };
           }
           return { inventory: inv };
         }),
@@ -352,6 +380,13 @@ export const useGameStore = create<GameStore>()(
       addPlayTime: (ms) => set((s) => ({ totalPlayTime: s.totalPlayTime + ms })),
 
       hydrateState: (partial) => set((s) => ({ ...s, ...partial })),
+
+      resetGame: () => {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("idle-realms-save");
+        }
+        set(defaultGameState());
+      },
     }),
     {
       name: "idle-realms-save",
@@ -381,6 +416,7 @@ export const useGameStore = create<GameStore>()(
         lastDailyReset: s.lastDailyReset,
         lastWeeklyReset: s.lastWeeklyReset,
         marketSales: s.marketSales,
+        discoveredItems: s.discoveredItems,
         lastSaveAt: s.lastSaveAt,
         totalPlayTime: s.totalPlayTime,
         version: s.version,

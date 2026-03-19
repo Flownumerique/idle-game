@@ -1,0 +1,50 @@
+[
+  {
+    "level": 5,
+    "label": "Premier Pas",
+    "description": "Vous progressez vite. Le combat vous est désormais ouvert !",
+    "unlocks": ["feature_combat"]
+  },
+  {
+    "level": 10,
+    "label": "Apprenti du Royaume",
+    "description": "Vous commencez à vous faire un nom à Valcrest.",
+    "unlocks": []
+  },
+  {
+    "level": 15,
+    "label": "Entrepreneur Local",
+    "description": "Vous pouvez maintenant cultiver la terre et échanger au marché.",
+    "unlocks": ["feature_farming", "feature_market"]
+  },
+  {
+    "level": 30,
+    "label": "Artisan en Herbe",
+    "description": "Vos mains deviennent habiles. Vous débloquez des recettes complexes.",
+    "unlocks": ["advanced_recipes"]
+  },
+  {
+    "level": 50,
+    "label": "Érudit des Terres",
+    "description": "Vous avez tant vu ! L'encyclopédie est maintenant complète.",
+    "unlocks": ["feature_encyclopedia"]
+  },
+  {
+    "level": 100,
+    "label": "Aventurier Aguerri",
+    "description": "Votre polyvalence est remarquable dans tout le domaine.",
+    "unlocks": ["title_adventurer"]
+  },
+  {
+    "level": 250,
+    "label": "Héros du Village",
+    "description": "Le village compte sur vous. Vous recevez un bonus de prestige.",
+    "unlocks": ["village_hero_buff"]
+  },
+  {
+    "level": 500,
+    "label": "Légende Vivante",
+    "description": "Votre nom sera gravé dans l'histoire de ce monde.",
+    "unlocks": ["legendary_aura"]
+  }
+]

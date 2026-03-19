@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+.env
+*.docx
+read_docx.py
+project_overview_raw.txt
+tables.txt
+parse_tables.py

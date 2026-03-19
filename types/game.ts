@@ -37,6 +37,27 @@ export const SKILL_IDS = [
   "prayer",
 ] as const satisfies SkillId[];
 
+export const PROFESSION_SKILL_IDS = [
+  "woodcutting",
+  "mining",
+  "fishing",
+  "farming",
+  "smithing",
+  "cooking",
+  "alchemy",
+] as const satisfies SkillId[];
+
+export const COMBAT_SKILL_IDS = [
+  "attack",
+  "strength",
+  "ranged",
+  "magic",
+  "defense",
+  "dodge",
+  "constitution",
+  "prayer",
+] as const satisfies SkillId[];
+
 export type SlotId =
   | "head"
   | "chest"
@@ -118,6 +139,7 @@ export interface CombatState {
   playerHitCooldown: number; // ms remaining
   monsterHitCooldown: number; // ms remaining
   autoRestart: boolean;
+  trainingStyle: SkillId;
   log: CombatLogEntry[];
 }
 
@@ -194,6 +216,9 @@ export interface GameState {
   // Market: track sales for dynamic pricing
   marketSales: Record<string, { count: number; windowStart: number }>;
 
+  // Encyclopedia
+  discoveredItems: string[];
+
   // Meta
   lastSaveAt: number; // timestamp ms
   totalPlayTime: number; // ms
@@ -213,6 +238,7 @@ export interface OfflineResult {
   duration: number; // ms actually processed (capped)
   skills: Partial<Record<SkillId, OfflineSkillResult>>;
   loot: Record<string, number>;
+  consumed: Record<string, number>;
   goldGained: number;
   combatSummary?: {
     fights: number;

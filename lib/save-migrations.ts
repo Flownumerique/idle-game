@@ -1,6 +1,6 @@
 import { GameState } from '../types/game'
 
-export const SAVE_VERSION = 3
+export const SAVE_VERSION = 4
 
 type MigrationFn = (state: Record<string, any>) => Record<string, any>
 
@@ -24,10 +24,16 @@ const migrations: Record<number, MigrationFn> = {
       prayer:       { level: 1, xp: 0, activeAction: null, actionStartedAt: null },
     },
   }),
+
+  // v3 → v4 : Ajout de l'encyclopédie
+  3: (s) => ({
+    ...s,
+    discoveredItems: s.discoveredItems ?? [],
+  }),
 }
 
 export function migrateSave(raw: Record<string, any>): GameState {
-  let state = structuredClone(raw)  // ne jamais muter l'original
+  let state = JSON.parse(JSON.stringify(raw))  // ne jamais muter l'original
   const startVersion = state.version ?? 1
 
   for (let v = startVersion; v < SAVE_VERSION; v++) {

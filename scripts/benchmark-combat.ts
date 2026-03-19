@@ -12,7 +12,10 @@ const MOCK_PLAYER_STATS: PlayerStats = {
   attackSpeed: 1.5,
   dodgeChance: 0.1,
   critChance: 0.1,
-  regen: 5,
+  hpRegen: 5,
+  prayerBonus: 1.0,
+  activeStyle: "attack",
+  blockChance: 0.0,
 };
 
 const SIMULATION_MS = 100 * 3600 * 1000; // 100 hours

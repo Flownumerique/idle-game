@@ -1,5 +1,6 @@
 import skillsData from "@/skills.json";
 import itemsData from "@/items.json";
+import recipesData from "@/recipes.json";
 import { mulberry32 } from "@/lib/rng";
 import { getLevelForXp } from "@/lib/xp-calc";
 import { MIN_ACTION_DURATION_S } from "./constants";
@@ -22,12 +23,15 @@ interface SkillAction {
   reqLevel: number; // actual field name in skills.json
   baseActionTime: number; // seconds
   xpPerAction: number;
-  outputs: SkillActionOutput[];
+  outputs?: SkillActionOutput[];
+  inputs?: { itemId: string; qty: number }[]; // Added for recipes
+  output?: { itemId: string; qty: number };  // Added for recipes
 }
 
 interface SkillDef {
   id: string;
   name: string;
+  description?: string;
   toolSlot?: string;
   actions: SkillAction[];
 }
@@ -45,7 +49,25 @@ export function getAction(
   skillId: string,
   actionId: string
 ): SkillAction | undefined {
-  return skillsMap.get(skillId)?.actions.find((a) => a.id === actionId);
+  const action = skillsMap.get(skillId)?.actions.find((a) => a.id === actionId);
+  if (action) return action;
+
+  // Search in recipes if not found in standard actions
+  const recipe = (recipesData as any).recipes.find((r: any) => r.id === actionId && r.skill === skillId);
+  if (recipe) {
+    return {
+      id: recipe.id,
+      name: recipe.name,
+      icon: recipe.icon || "⚒️",
+      reqLevel: recipe.reqLevel,
+      baseActionTime: recipe.craftTime || 5,
+      xpPerAction: recipe.xpPerCraft || 0,
+      inputs: recipe.inputs,
+      output: recipe.output,
+      outputs: recipe.output ? [{ itemId: recipe.output.itemId, quantity: recipe.output.qty, chance: 1 }] : []
+    };
+  }
+  return undefined;
 }
 
 // ──────────────────────────────────────────────
@@ -95,6 +117,7 @@ export interface SkillTickResult {
   xpGained: number;
   levelsGained: number;
   loot: Record<string, number>;
+  consumed: Record<string, number>; // Added
   actionsCompleted: number;
   newLevel: number;
 }
@@ -102,6 +125,7 @@ export interface SkillTickResult {
 export function tickSkill(
   skillId: SkillId,
   state: SkillState,
+  inventory: Record<string, number>, // Added
   equipment: Record<string, string | null>,
   deltaMs: number,
   rngSeed: number,
@@ -112,6 +136,7 @@ export function tickSkill(
     xpGained: 0,
     levelsGained: 0,
     loot: {},
+    consumed: {}, // Added
     actionsCompleted: 0,
     newLevel: currentLevel,
   };
@@ -125,7 +150,25 @@ export function tickSkill(
 
   const toolBonus = getToolBonus(equipment, skillId);
   const durationMs = getActionDurationMs(action, toolBonus);
-  const count = Math.floor(deltaMs / durationMs);
+  let count = Math.floor(deltaMs / durationMs);
+  if (count === 0) return result;
+
+  // Handle ingredients (inputs)
+  if (action.inputs && action.inputs.length > 0) {
+    let maxAffordable = count;
+    for (const input of action.inputs) {
+      const available = inventory[input.itemId] ?? 0;
+      maxAffordable = Math.min(maxAffordable, Math.floor(available / input.qty));
+    }
+    count = maxAffordable;
+    
+    if (count > 0) {
+      for (const input of action.inputs) {
+        result.consumed[input.itemId] = input.qty * count;
+      }
+    }
+  }
+
   if (count === 0) return result;
 
   result.actionsCompleted = count;
@@ -134,7 +177,7 @@ export function tickSkill(
   // Drops with seeded RNG
   const rng = mulberry32(rngSeed >>> 0);
   for (let i = 0; i < count; i++) {
-    for (const output of action.outputs) {
+    for (const output of (action.outputs || [])) {
       if (rng() < output.chance) {
         result.loot[output.itemId] =
           (result.loot[output.itemId] ?? 0) + output.quantity;

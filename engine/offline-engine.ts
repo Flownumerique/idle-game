@@ -1,27 +1,3 @@
-import itemsData from "@/items.json";
-import { mulberry32 } from "@/lib/rng";
-import { getLevelForXp } from "@/lib/xp-calc";
-import { tickSkill } from "./skill-engine";
-import { simulateCombatsOffline } from "./combat-engine";
-import { MAX_OFFLINE_MS, GRIMOIRE_OFFLINE_MS } from "./constants";
-import { SKILL_IDS, type GameState, type OfflineResult, type SkillId, type PlayerStats } from "@/types/game";
-
-/**
- * Calculate all progress that occurred while the player was offline.
- * Uses a deterministic seeded RNG based on lastSaveAt to prevent cheating.
- */
-export function calculateOfflineProgress(
-  state: GameState,
-  nowMs: number
-): OfflineResult {
-  const hasGrimoire = (state.upgrades["grimoire"] ?? 0) > 0;
-  const cap = hasGrimoire ? GRIMOIRE_OFFLINE_MS : MAX_OFFLINE_MS;
-  const rawDelta = nowMs - state.lastSaveAt;
-  const delta = Math.min(rawDelta, cap);
-
-  const hasWatch = (state.upgrades["adventurers_watch"] ?? 0) > 0;
-  const speedMult = hasWatch ? 1.1 : 1.0;
-  const effectiveDelta = delta * speedMult;
 import itemsData from "../items.json"
 import { mulberry32 } from "../lib/rng"
 import { getLevelForXp } from "../lib/xp-calc"
@@ -80,6 +56,9 @@ function applyOfflineLoot(store: GameState, loot: Record<string, number>): strin
     }
     if (capped > 0) {
       store.inventory[itemId] = current + capped
+      if (!store.discoveredItems.includes(itemId)) {
+        store.discoveredItems.push(itemId)
+      }
     }
   }
   return warnings
@@ -90,6 +69,7 @@ export function calculateOfflineProgress(state: GameState, nowMs: number): Offli
     duration: 0,
     skills: {},
     loot: {},
+    consumed: {}, // Added
     goldGained: 0,
   }
 
@@ -116,6 +96,7 @@ export function calculateOfflineProgress(state: GameState, nowMs: number): Offli
     const tickResult = tickSkill(
       skillId,
       skillState,
+      state.inventory, // Added
       state.equipment,
       effectiveDelta,
       (rng() * 0xffffffff) >>> 0,
@@ -132,6 +113,10 @@ export function calculateOfflineProgress(state: GameState, nowMs: number): Offli
       for (const [itemId, qty] of Object.entries(tickResult.loot)) {
         if (!Number.isFinite(qty) || qty <= 0) continue
         result.loot[itemId] = (result.loot[itemId] ?? 0) + qty
+      }
+      for (const [itemId, qty] of Object.entries(tickResult.consumed)) {
+        if (!Number.isFinite(qty) || qty <= 0) continue
+        result.consumed[itemId] = (result.consumed[itemId] ?? 0) + qty
       }
     }
   }
@@ -156,6 +141,19 @@ export function calculateOfflineProgress(state: GameState, nowMs: number): Offli
       wins: combatResult.wins,
       deaths: combatResult.deaths,
     }
+
+    if (combatResult.xp > 0) {
+      const style = state.combat.trainingStyle ?? "attack";
+      const existStyle = result.skills[style] ?? { actionsCount: 0, xpGained: 0, levelsGained: 0 };
+      existStyle.actionsCount += combatResult.wins;
+      existStyle.xpGained += combatResult.xp;
+      result.skills[style] = existStyle;
+
+      const constStyle = result.skills["constitution"] ?? { actionsCount: 0, xpGained: 0, levelsGained: 0 };
+      constStyle.actionsCount += combatResult.wins;
+      constStyle.xpGained += Math.max(1, Math.floor(combatResult.xp / 3));
+      result.skills["constitution"] = constStyle;
+    }
   }
 
   return result
@@ -163,7 +161,7 @@ export function calculateOfflineProgress(state: GameState, nowMs: number): Offli
 
 export function applyOfflineResult(state: GameState, result: OfflineResult): GameState {
   // Never mutate state directly in a pure application function if we can clone
-  const newState = structuredClone(state)
+  const newState = JSON.parse(JSON.stringify(state)) as GameState
 
   for (const [skillIdStr, skillResult] of Object.entries(result.skills)) {
     const skillId = skillIdStr as SkillId
@@ -176,6 +174,12 @@ export function applyOfflineResult(state: GameState, result: OfflineResult): Gam
         level: getLevelForXp(newXp),
       }
     }
+  }
+
+  // Consume items
+  for (const [itemId, qty] of Object.entries(result.consumed || {})) {
+    const current = newState.inventory[itemId] ?? 0
+    newState.inventory[itemId] = Math.max(0, current - qty)
   }
 
   const warnings = applyOfflineLoot(newState, result.loot)

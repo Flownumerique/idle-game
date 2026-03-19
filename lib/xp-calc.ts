@@ -1,4 +1,6 @@
 import skillsData from "../skills.json";
+import { PROFESSION_SKILL_IDS, COMBAT_SKILL_IDS } from "../types/game";
+import type { SkillId, SkillState } from "../types/game";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const rawXpTable: Record<string, unknown> = (skillsData as any).xpTable;
@@ -96,4 +98,28 @@ export function getLevelProgress(totalXp: number): number {
   if (needed <= 0 || !isFinite(needed)) return 1;
 
   return Math.min((totalXp - xpAtLevel) / needed, 1);
+}
+
+/**
+ * Calculates sum of levels for different categories
+ */
+export function calculateGlobalLevels(skills: Record<SkillId, SkillState>) {
+  let professionLevel = 0;
+  let combatLevel = 0;
+
+  for (const id of PROFESSION_SKILL_IDS) {
+    const xp = skills[id]?.xp ?? 0;
+    professionLevel += getLevelForXp(xp);
+  }
+
+  for (const id of COMBAT_SKILL_IDS) {
+    const xp = skills[id]?.xp ?? 0;
+    combatLevel += getLevelForXp(xp);
+  }
+
+  return {
+    professionLevel,
+    combatLevel,
+    totalLevel: professionLevel + combatLevel,
+  };
 }

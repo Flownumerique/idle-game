@@ -2,6 +2,7 @@
 
 import { useGameStore } from "@/stores/game-store";
 import { formatNumber } from "@/lib/formatters";
+import { calculateGlobalLevels } from "@/lib/xp-calc";
 
 export default function ResourceBar() {
   const { player, gold, skills } = useGameStore((s) => ({
@@ -9,6 +10,8 @@ export default function ResourceBar() {
     gold: s.gold,
     skills: s.skills,
   }));
+
+  const { totalLevel } = calculateGlobalLevels(skills);
 
   // Count active skills
   const activeSkills = Object.values(skills).filter((s) => s.activeAction).length;
@@ -23,6 +26,9 @@ export default function ResourceBar() {
         <div className="flex items-center gap-2">
           <span className="text-slate-400">👤</span>
           <span className="text-slate-200 font-medium">{player.name}</span>
+          <span className="text-xs bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700">
+            Niv. {totalLevel}
+          </span>
         </div>
 
         <div className="flex items-center gap-2">

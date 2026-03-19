@@ -22,21 +22,28 @@ interface MonsterDrop {
 interface MonsterDef {
   id: string;
   name: string;
+  icon?: string;
   zone: string;
+  rarity?: string;
   stats: { hp: number; attack: number; defense: number; attackSpeed: number };
   combatXp: number;
   goldDrop: { min: number; max: number };
   drops: MonsterDrop[];
+  description?: string;
 }
 
 interface ZoneDef {
   id: string;
   name: string;
   icon?: string;
+  description?: string;
+  lore?: string;
   reqLevel?: { combat?: number };
   monsters: string[];
   bossId?: string;
   bossChance?: number;
+  combatXpMultiplier?: number;
+  goldMultiplier?: number;
 }
 
 const monstersMap = new Map<string, MonsterDef>();
@@ -305,6 +312,7 @@ export interface OfflineCombatResult {
   fights: number;
   wins: number;
   deaths: number;
+  xp: number;
 }
 
 export function simulateCombatsOffline(
@@ -314,7 +322,7 @@ export function simulateCombatsOffline(
   deltaMs: number,
   rng: () => number
 ): OfflineCombatResult {
-  const result: OfflineCombatResult = { loot: {}, gold: 0, fights: 0, wins: 0, deaths: 0 };
+  const result: OfflineCombatResult = { loot: {}, gold: 0, fights: 0, wins: 0, deaths: 0, xp: 0 };
   const zoneMonsters = getMonstersInZone(zoneId);
   if (zoneMonsters.length === 0) return result;
 
@@ -343,6 +351,7 @@ export function simulateCombatsOffline(
         result.loot[itemId] = (result.loot[itemId] ?? 0) + qty;
       }
       result.gold += def.goldDrop.min + Math.floor(rng() * (def.goldDrop.max - def.goldDrop.min + 1));
+      result.xp += def.combatXp;
       // HP taken during fight
       pHp = Math.max(1, pHp - monsterDps * (timeToKill / 1000));
     } else {

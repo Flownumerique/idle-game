@@ -1,4 +1,5 @@
 import { GameState } from '../../types/game'
+import { supabase } from '../supabase'
 
 export interface SkillProgress {
   skillId: string
@@ -23,12 +24,41 @@ export class LocalStorageAdapter implements StorageAdapter {
   async saveSkillProgress(id: string, s: SkillProgress[]) { this.store.set(`skills_${id}`, s) }
 }
 
-// Implémentation Supabase (mock for now since we do not have the supabase logic yet)
+// Implémentation Supabase
 export class SupabaseAdapter implements StorageAdapter {
-  async loadGameState(id: string) { return null }
-  async saveGameState(id: string, s: GameState) {}
-  async loadSkillProgress(id: string) { return [] }
-  async saveSkillProgress(id: string, s: SkillProgress[]) {}
+  async loadGameState(id: string): Promise<GameState | null> {
+    const { data, error } = await supabase
+      .from('game_states')
+      .select('state')
+      .eq('player_id', id)
+      .single()
+    if (error || !data) return null
+    return data.state as GameState
+  }
+  
+  async saveGameState(id: string, s: GameState): Promise<void> {
+    const { error } = await supabase
+      .from('game_states')
+      .upsert({ player_id: id, state: s, updated_at: new Date().toISOString() }, { onConflict: 'player_id' })
+    if (error) console.error('[SupabaseAdapter] Error saving game state:', error)
+  }
+  
+  async loadSkillProgress(id: string): Promise<SkillProgress[]> {
+    const { data, error } = await supabase
+      .from('skill_progress')
+      .select('progress')
+      .eq('player_id', id)
+      .single()
+    if (error || !data) return []
+    return data.progress as SkillProgress[]
+  }
+  
+  async saveSkillProgress(id: string, s: SkillProgress[]): Promise<void> {
+    const { error } = await supabase
+      .from('skill_progress')
+      .upsert({ player_id: id, progress: s, updated_at: new Date().toISOString() }, { onConflict: 'player_id' })
+    if (error) console.error('[SupabaseAdapter] Error saving skill progress:', error)
+  }
 }
 
 export class MockAdapter implements StorageAdapter {

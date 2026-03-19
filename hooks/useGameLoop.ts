@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useGameStore } from "@/stores/game-store";
-import { tickSkill } from "@/engine/skill-engine";
+import { tickSkill, getAction, getActionDurationMs, getToolBonus } from "@/engine/skill-engine";
 import { tickCombat } from "@/engine/combat-engine";
 import { calculateOfflineProgress, applyOfflineResult, computePlayerStats } from "@/engine/offline-engine";
 import { getLevelForXp } from "@/lib/xp-calc";
@@ -17,30 +17,45 @@ import { SKILL_IDS } from "@/types/game";
 /**
  * Main game loop hook.
  * - Calculates offline progress on mount
- * - Runs RAF-based game tick
+ * - Runs RAF-based game tick with per-skill time accumulator (fixes XP at 60fps)
  * - Updates UI progress bars at 250ms intervals
  * - Auto-saves every 30s
  */
 export function useGameLoop() {
-  const store = useGameStore;
   const lastTickRef = useRef<number>(Date.now());
   const lastSaveRef = useRef<number>(Date.now());
   const lastCombatEndRef = useRef<number>(0);
   const rngRef = useRef<() => number>(mulberry32(Date.now()));
   const rafRef = useRef<number>(0);
   const uiIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Accumulates delta time per skill so full action cycles are detected correctly
+  const skillAccRef = useRef<Partial<Record<string, { actionId: string; acc: number }>>>({});
 
   // ── Offline progress on mount ──
   useEffect(() => {
     const state = useGameStore.getState();
     if (state.player.name === "") return; // not created yet
+    // ── Pre-sync discovered items with inventory & equipment ──
+    const discoveredSet = new Set(state.discoveredItems || []);
+    let discoveredUpdatedInitial = false;
+    const mark = (id: string | null | undefined) => {
+      if (id && !discoveredSet.has(id)) {
+        discoveredSet.add(id);
+        discoveredUpdatedInitial = true;
+      }
+    };
+    Object.keys(state.inventory).forEach(mark);
+    Object.values(state.equipment).forEach(mark);
+    if (discoveredUpdatedInitial) {
+      useGameStore.setState({ discoveredItems: Array.from(discoveredSet) });
+    }
+
     const now = Date.now();
     const elapsed = now - state.lastSaveAt;
     if (elapsed > 60_000) {
       const result = calculateOfflineProgress(state, now);
       const newState = applyOfflineResult(state, result);
       useGameStore.setState(newState);
-      // Store offline result for display (could use a separate UI store)
       (window as unknown as Record<string, unknown>).__offlineResult = result;
     }
     lastTickRef.current = now;
@@ -67,23 +82,60 @@ export function useGameLoop() {
       const newInventory = { ...state.inventory };
       let newGold = state.gold;
 
+      let discoveredUpdated = false;
+      const discoveredSet = new Set(state.discoveredItems || []);
+      const markDiscovered = (itemId: string) => {
+        if (!discoveredSet.has(itemId)) {
+          discoveredSet.add(itemId);
+          discoveredUpdated = true;
+        }
+      };
+
       // ── Skill ticks ──
       for (const skillId of SKILL_IDS) {
         const skillState = state.skills[skillId];
-        if (!skillState.activeAction) continue;
+        if (!skillState.activeAction) {
+          delete skillAccRef.current[skillId];
+          continue;
+        }
+
+        // Accumulate time; reset accumulator when the active action changes
+        const current = skillAccRef.current[skillId];
+        if (!current || current.actionId !== skillState.activeAction) {
+          skillAccRef.current[skillId] = { actionId: skillState.activeAction, acc: deltaMs };
+        } else {
+          current.acc += deltaMs;
+        }
+        const accMs = skillAccRef.current[skillId]!.acc;
+
+        const action = getAction(skillId, skillState.activeAction);
+        const durationMs = action ? getActionDurationMs(action, getToolBonus(state.equipment, skillId)) : 1000;
+        const potentialCount = Math.floor(accMs / durationMs);
 
         const result = tickSkill(
           skillId,
           skillState,
+          newInventory, // newInventory contains current state
           state.equipment,
-          deltaMs,
+          accMs,
           rngRef.current() * 0xffffffff,
           false
         );
 
+        if (potentialCount > 0 && result.actionsCompleted === 0 && action?.inputs) {
+          // Stopped due to missing ingredients
+          newSkills[skillId] = {
+            ...newSkills[skillId],
+            activeAction: null,
+            actionStartedAt: null,
+            actionProgress: 0,
+          };
+          delete skillAccRef.current[skillId];
+          continue;
+        }
+
         if (result.actionsCompleted > 0) {
-          const oldXp = skillState.xp;
-          const newXp = oldXp + result.xpGained;
+          const newXp = skillState.xp + result.xpGained;
           newSkills[skillId] = {
             ...skillState,
             xp: newXp,
@@ -91,6 +143,17 @@ export function useGameLoop() {
           };
           for (const [itemId, qty] of Object.entries(result.loot)) {
             newInventory[itemId] = (newInventory[itemId] ?? 0) + qty;
+            markDiscovered(itemId);
+          }
+          
+          // Consume inputs
+          for (const [itemId, qty] of Object.entries(result.consumed)) {
+            newInventory[itemId] = Math.max(0, (newInventory[itemId] ?? 0) - qty);
+          }
+
+          // Keep remainder
+          if (action) {
+            skillAccRef.current[skillId]!.acc = accMs % durationMs;
           }
         }
       }
@@ -106,8 +169,26 @@ export function useGameLoop() {
           rngRef.current
         );
         updates.combat = result.newCombatState;
+        
+        if (result.xpGained > 0) {
+           const style = updates.combat.trainingStyle ?? "attack";
+           const currentXp = newSkills[style].xp + result.xpGained;
+           newSkills[style] = {
+             ...newSkills[style],
+             xp: currentXp,
+             level: getLevelForXp(currentXp)
+           };
+           const constXp = newSkills["constitution"].xp + Math.max(1, Math.floor(result.xpGained / 3));
+           newSkills["constitution"] = {
+             ...newSkills["constitution"],
+             xp: constXp,
+             level: getLevelForXp(constXp)
+           };
+        }
+
         for (const [itemId, qty] of Object.entries(result.loot)) {
           newInventory[itemId] = (newInventory[itemId] ?? 0) + qty;
+          markDiscovered(itemId);
         }
         newGold += result.goldGained;
         if (!result.newCombatState.active) {
@@ -127,6 +208,10 @@ export function useGameLoop() {
         }
       }
 
+      if (discoveredUpdated) {
+        updates.discoveredItems = Array.from(discoveredSet);
+      }
+
       // ── Apply updates ──
       useGameStore.setState({
         skills: newSkills,
@@ -139,7 +224,6 @@ export function useGameLoop() {
       if (now - lastSaveRef.current > AUTO_SAVE_INTERVAL_MS) {
         lastSaveRef.current = now;
         useGameStore.setState({ lastSaveAt: now });
-        // Zustand persist middleware handles localStorage automatically
       }
 
       rafRef.current = requestAnimationFrame(tick);
@@ -155,18 +239,22 @@ export function useGameLoop() {
   useEffect(() => {
     uiIntervalRef.current = setInterval(() => {
       const state = useGameStore.getState();
-      const now = Date.now();
       const newSkills = { ...state.skills };
       let updated = false;
 
       for (const skillId of SKILL_IDS) {
         const skillState = state.skills[skillId];
-        if (!skillState.activeAction || !skillState.actionStartedAt) continue;
+        if (!skillState.activeAction) continue;
 
-        // Compute progress of current action
-        const elapsed = now - skillState.actionStartedAt;
-        // Action duration approximation for UI
-        const progress = Math.min(1, (elapsed % 4000) / 4000);
+        const acc = skillAccRef.current[skillId];
+        if (!acc) continue;
+
+        const action = getAction(skillId, skillState.activeAction);
+        if (!action) continue;
+
+        const durationMs = getActionDurationMs(action, getToolBonus(state.equipment, skillId));
+        const progress = Math.min(1, acc.acc / durationMs);
+
         if (Math.abs(progress - skillState.actionProgress) > 0.01) {
           newSkills[skillId] = { ...skillState, actionProgress: progress };
           updated = true;
