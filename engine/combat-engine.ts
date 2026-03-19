@@ -89,45 +89,47 @@ export function getMonstersInZone(zoneId: string): MonsterData[] {
   return monsters;
 }
 
+function makeInstance(def: MonsterDef): MonsterInstance {
+  return {
+    id: def.id,
+    name: def.name,
+    hp: def.stats.hp,
+    maxHp: def.stats.hp,
+    stats: {
+      attack: def.stats.attack,
+      defense: def.stats.defense,
+      attackSpeed: def.stats.attackSpeed,
+    },
+  };
+}
+
+/** Spawn a random regular (non-boss) monster from the pool. */
 export function spawnMonsterWithDef(
   monsters: MonsterData[],
   rng: () => number
 ): { instance: MonsterInstance; def: MonsterDef } | null {
-  if (monsters.length === 0) return null;
-
-  const boss = monsters.find(m => m.isBoss);
-  let def: MonsterDef;
-
-  if (boss && boss.bossChance && rng() < boss.bossChance) {
-    def = boss.def;
-  } else {
-    const regulars = monsters.filter(m => !m.isBoss);
-    if (regulars.length === 0) return null;
-    def = regulars[Math.floor(rng() * regulars.length)].def;
-  }
-
-  return {
-    instance: {
-      id: def.id,
-      name: def.name,
-      hp: def.stats.hp,
-      maxHp: def.stats.hp,
-      stats: {
-        attack: def.stats.attack,
-        defense: def.stats.defense,
-        attackSpeed: def.stats.attackSpeed,
-      },
-    },
-    def,
-  };
+  const regulars = monsters.filter(m => !m.isBoss);
+  if (regulars.length === 0) return null;
+  const def = regulars[Math.floor(rng() * regulars.length)].def;
+  return { instance: makeInstance(def), def };
 }
 
+/** Spawn a random regular monster (instance only). */
 export function spawnMonster(
   monsters: MonsterData[],
   rng: () => number
 ): MonsterInstance | null {
   const result = spawnMonsterWithDef(monsters, rng);
   return result ? result.instance : null;
+}
+
+/** Explicitly spawn the boss of a zone (for manual challenge). */
+export function spawnBossForZone(zoneId: string): MonsterInstance | null {
+  const zone = zonesMap.get(zoneId);
+  if (!zone?.bossId) return null;
+  const bossDef = monstersMap.get(zone.bossId);
+  if (!bossDef) return null;
+  return makeInstance(bossDef);
 }
 
 // ──────────────────────────────────────────────
@@ -168,6 +170,7 @@ export interface CombatTickResult {
   loot: Record<string, number>;
   xpGained: number;
   goldGained: number;
+  monstersKilled: number; // regular kills only (not boss)
 }
 
 export function tickCombat(
@@ -183,6 +186,7 @@ export function tickCombat(
     loot: {},
     xpGained: 0,
     goldGained: 0,
+    monstersKilled: 0,
   };
 
   if (!state.active || !state.currentMonster || !state.zoneId) {
@@ -242,6 +246,9 @@ export function tickCombat(
     // Monster dead
     if (monster.hp <= 0) {
       const monsterDef = monstersMap.get(monster.id);
+      const zone = newState.zoneId ? zonesMap.get(newState.zoneId) : undefined;
+      const isBoss = !!zone && zone.bossId === monster.id;
+
       if (monsterDef) {
         const drops = rollDrops(monsterDef.drops, rng);
         for (const [itemId, qty] of Object.entries(drops)) {
@@ -253,12 +260,19 @@ export function tickCombat(
         result.goldGained += gold;
         result.xpGained += monsterDef.combatXp;
       }
+
+      if (!isBoss) result.monstersKilled++;
+
       newState.log = [
         ...newState.log.slice(-49),
         { type: "monster_death", timestamp: Date.now() },
       ];
 
-      if (newState.autoRestart && newState.zoneId) {
+      // Boss fight always ends after defeat (no auto-restart)
+      if (isBoss) {
+        newState.active = false;
+        newState.currentMonster = null;
+      } else if (newState.autoRestart && newState.zoneId) {
         const zoneMonsters = getMonstersInZone(newState.zoneId);
         const next = spawnMonster(zoneMonsters, rng);
         if (next) {

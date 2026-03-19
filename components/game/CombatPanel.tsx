@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useGameStore } from "@/stores/game-store";
-import { getAllZones, spawnMonster, getMonstersInZone } from "@/engine/combat-engine";
+import { getAllZones, spawnMonster, getMonstersInZone, spawnBossForZone } from "@/engine/combat-engine";
 import { computePlayerStats } from "@/engine/offline-engine";
 import { getLevelForXp, getLevelProgress } from "@/lib/xp-calc";
 import { mulberry32 } from "@/lib/rng";
@@ -38,6 +38,7 @@ const RARITY_TEXT: Record<string, string> = {
 export default function CombatPanel() {
   const state   = useGameStore((s) => s);
   const skills  = useGameStore((s) => s.skills);
+  const zoneKills = useGameStore((s) => s.zoneKills);
   const { combat, unlockedZones, startCombat, stopCombat, setAutoRestart, updateCombatState } = state;
 
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
@@ -58,6 +59,8 @@ export default function CombatPanel() {
 
   const trainingStyle = (combat.trainingStyle ?? "attack") as SkillId;
 
+  const BOSS_KILL_REQUIREMENT = 10;
+
   function handleEnterZone(zoneId: string) {
     const rng          = mulberry32(Date.now());
     const zoneMonsters = getMonstersInZone(zoneId);
@@ -68,6 +71,19 @@ export default function CombatPanel() {
       monsterHitCooldown: (monster?.stats.attackSpeed ?? 2) * 1000,
     });
     startCombat(zoneId);
+    setSelectedZoneId(null);
+  }
+
+  function handleBossFight(zoneId: string) {
+    const boss = spawnBossForZone(zoneId);
+    if (!boss) return;
+    updateCombatState({
+      active: true, zoneId, currentMonster: boss,
+      playerHitCooldown: playerStats.attackSpeed * 1000,
+      monsterHitCooldown: boss.stats.attackSpeed * 1000,
+    });
+    startCombat(zoneId);
+    setSelectedZoneId(null);
   }
 
   const recentLog = [...combat.log].reverse().slice(0, 12);
@@ -215,15 +231,55 @@ export default function CombatPanel() {
                               </div>
                             ))}
                           </div>
-                          {boss && (
-                            <div className="rounded-lg border border-amber-700/40 bg-amber-900/10 p-2.5 flex items-center gap-3">
-                              <span className="text-2xl">{boss.def.icon ?? "👑"}</span>
-                              <div>
-                                <div className="text-xs font-bold text-amber-300">{boss.def.name}</div>
-                                <div className="text-[10px] text-slate-400">❤️{boss.def.stats.hp} ⚔️{boss.def.stats.attack} · {((zone.bossChance ?? 0.02) * 100).toFixed(0)}% de chance</div>
+                          {boss && (() => {
+                            const kills = zoneKills[zone.id] ?? 0;
+                            const bossUnlocked = kills >= BOSS_KILL_REQUIREMENT;
+                            return (
+                              <div className="space-y-2">
+                                <div className={`rounded-lg border p-2.5 ${bossUnlocked ? "border-amber-600/60 bg-amber-900/15" : "border-slate-700/50 bg-slate-800/20"}`}>
+                                  <div className="flex items-center gap-3 mb-2">
+                                    <span className="text-2xl">{boss.def.icon ?? "👑"}</span>
+                                    <div className="flex-1 min-w-0">
+                                      <div className={`text-xs font-bold ${bossUnlocked ? "text-amber-300" : "text-slate-400"}`}>
+                                        {boss.def.name}
+                                      </div>
+                                      <div className="text-[10px] text-slate-500">
+                                        ❤️{boss.def.stats.hp} ⚔️{boss.def.stats.attack} 🛡️{boss.def.stats.defense}
+                                      </div>
+                                    </div>
+                                    {bossUnlocked && (
+                                      <span className="text-[9px] font-bold text-amber-400 bg-amber-900/40 border border-amber-700/50 px-1.5 py-0.5 rounded uppercase">
+                                        Disponible
+                                      </span>
+                                    )}
+                                  </div>
+                                  {/* Kill progress toward boss */}
+                                  <div className="space-y-1">
+                                    <div className="flex justify-between text-[10px]">
+                                      <span className="text-slate-500">Monstres vaincus</span>
+                                      <span className={bossUnlocked ? "text-amber-400 font-bold" : "text-slate-400"}>
+                                        {Math.min(kills, BOSS_KILL_REQUIREMENT)} / {BOSS_KILL_REQUIREMENT}
+                                      </span>
+                                    </div>
+                                    <ProgressBar
+                                      value={Math.min(1, kills / BOSS_KILL_REQUIREMENT)}
+                                      height="h-1.5"
+                                      color={bossUnlocked ? "bg-amber-500" : "bg-slate-600"}
+                                    />
+                                  </div>
+                                </div>
+                                {bossUnlocked && meetsLevel && (
+                                  <Button
+                                    className="w-full font-bold uppercase tracking-wide"
+                                    variant="danger"
+                                    onClick={() => handleBossFight(zone.id)}
+                                  >
+                                    ⚠️ Défier {boss.def.name}
+                                  </Button>
+                                )}
                               </div>
-                            </div>
-                          )}
+                            );
+                          })()}
                           {meetsLevel ? (
                             <Button className="w-full font-bold uppercase tracking-wide" onClick={() => handleEnterZone(zone.id)}>
                               ⚔️ Explorer

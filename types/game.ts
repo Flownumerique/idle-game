@@ -206,6 +206,9 @@ export interface GameState {
   unlockedZones: string[];
   unlockedFlags: string[]; // "boat_built", "bridge_repaired", etc.
 
+  // Kill counters per zone (used to unlock boss)
+  zoneKills: Record<string, number>;
+
   // Quest progress
   quests: Record<string, QuestProgress>;
   dailyQuestIds: string[];

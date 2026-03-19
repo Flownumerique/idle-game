@@ -45,6 +45,7 @@ function makeDefaultGameState(): GameState {
     upgrades: {},
     unlockedZones: ['z1_forest'],
     unlockedFlags: [],
+    zoneKills: {},
     quests: {},
     dailyQuestIds: [],
     weeklyQuestId: null,

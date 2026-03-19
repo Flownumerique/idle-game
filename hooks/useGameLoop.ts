@@ -169,7 +169,16 @@ export function useGameLoop() {
           rngRef.current
         );
         updates.combat = result.newCombatState;
-        
+
+        // Track regular monster kills per zone
+        if (result.monstersKilled > 0 && state.combat.zoneId) {
+          const zid = state.combat.zoneId;
+          updates.zoneKills = {
+            ...state.zoneKills,
+            [zid]: (state.zoneKills[zid] ?? 0) + result.monstersKilled,
+          };
+        }
+
         if (result.xpGained > 0) {
            const style = updates.combat.trainingStyle ?? "attack";
            const currentXp = newSkills[style].xp + result.xpGained;
