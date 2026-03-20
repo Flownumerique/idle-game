@@ -11,24 +11,38 @@ interface ProgressBarProps {
 
 export default function ProgressBar({
   value,
-  color = "bg-cyan-500",
+  color = "bg-green-500",
   height = "h-2",
   label,
   showPercent,
   className = "",
 }: ProgressBarProps) {
   const pct = Math.min(100, Math.max(0, value * 100));
+  // Round to nearest 2px step for a chunky pixel feel
+  const pctDisplay = Math.floor(pct);
+
   return (
     <div className={`w-full ${className}`}>
       {(label || showPercent) && (
-        <div className="flex justify-between text-xs text-slate-400 mb-1">
+        <div
+          className="flex justify-between mb-1 font-crimson"
+          style={{ fontSize: "0.7rem", color: "var(--text-secondary)" }}
+        >
           {label && <span>{label}</span>}
-          {showPercent && <span>{pct.toFixed(1)}%</span>}
+          {showPercent && <span className="font-cinzel" style={{ fontSize: "0.55rem" }}>{pctDisplay}%</span>}
         </div>
       )}
-      <div className={`w-full ${height} bg-slate-700 rounded-full overflow-hidden`}>
+      {/* Pixel track — uses border instead of rounded */}
+      <div
+        className={`w-full ${height}`}
+        style={{
+          background: "rgba(0,0,0,0.5)",
+          border: "1px solid var(--border-default)",
+          boxShadow: "inset 0 1px 3px rgba(0,0,0,0.7)",
+        }}
+      >
         <div
-          className={`${height} ${color} rounded-full progress-bar-fill`}
+          className={`${height} ${color} progress-bar-fill`}
           style={{ width: `${pct}%` }}
         />
       </div>

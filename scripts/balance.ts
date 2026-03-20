@@ -10,6 +10,7 @@ function makeDefaultGameState(): GameState {
       woodcutting: { level: 1, xp: 0, activeAction: 'cut_common', actionStartedAt: Date.now(), actionProgress: 0 },
       mining: { level: 1, xp: 0, activeAction: null, actionStartedAt: null, actionProgress: 0 },
       fishing: { level: 1, xp: 0, activeAction: null, actionStartedAt: null, actionProgress: 0 },
+      planting: { level: 1, xp: 0, activeAction: null, actionStartedAt: null, actionProgress: 0 },
       farming: { level: 1, xp: 0, activeAction: null, actionStartedAt: null, actionProgress: 0 },
       smithing: { level: 1, xp: 0, activeAction: null, actionStartedAt: null, actionProgress: 0 },
       cooking: { level: 1, xp: 0, activeAction: null, actionStartedAt: null, actionProgress: 0 },
@@ -41,9 +42,10 @@ function makeDefaultGameState(): GameState {
       trainingStyle: 'attack' as any,
       log: [],
     },
-    farmPlots: [],
+    plantPlots: [],
+    farmingSpots: [],
     upgrades: {},
-    unlockedZones: ['z1_forest'],
+    unlockedZones: ['plains_start'],
     unlockedFlags: [],
     zoneKills: {},
     quests: {},
@@ -56,6 +58,7 @@ function makeDefaultGameState(): GameState {
     lastSaveAt: Date.now(),
     totalPlayTime: 0,
     version: 3,
+    gameLogs: [],
   }
 }
 

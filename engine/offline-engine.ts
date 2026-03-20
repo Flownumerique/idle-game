@@ -227,7 +227,12 @@ export function computePlayerStats(state: GameState): PlayerStats {
   let activeStyle: 'attack' | 'strength' | 'ranged' | 'magic' | null = null;
 
   if (state.equipment.mainhand) {
-    const weapon = itemsById.get(state.equipment.mainhand) as any;
+    let weapon;
+    try {
+      weapon = GameData.item(state.equipment.mainhand);
+    } catch {
+      // Invalid item, continue with default
+    }
     if (weapon) {
        if (weapon.category === 'weapon_ranged' || state.equipment.mainhand.includes('bow')) {
          activeStyle = 'ranged';
@@ -245,7 +250,12 @@ export function computePlayerStats(state: GameState): PlayerStats {
 
   for (const itemId of Object.values(state.equipment)) {
     if (!itemId) continue;
-    const item = itemsById.get(itemId);
+    let item;
+    try {
+      item = GameData.item(itemId);
+    } catch {
+      continue;
+    }
     if (!item?.stats) continue;
     equipmentAttack += item.stats.attack ?? 0;
     equipmentDefense += item.stats.defense ?? 0;

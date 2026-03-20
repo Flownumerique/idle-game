@@ -12,6 +12,7 @@ const SKILL_LABELS: Record<SkillId, { name: string; icon: string }> = {
   woodcutting: { name: "Bûcheronnage", icon: "🌲" },
   mining: { name: "Minage", icon: "⛏️" },
   fishing: { name: "Pêche", icon: "🎣" },
+  planting: { name: "Plantation", icon: "🌱" },
   farming: { name: "Agriculture", icon: "🌾" },
   smithing: { name: "Forge", icon: "🔨" },
   cooking: { name: "Cuisine", icon: "🍳" },

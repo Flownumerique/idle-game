@@ -453,10 +453,10 @@
       ]
     },
     {
-      "id": "farming",
-      "name": "Agriculture",
-      "icon": "🌾",
-      "description": "Cultiver herbes, fleurs et plantes magiques dans les parcelles du village.",
+      "id": "planting",
+      "name": "Plantation",
+      "icon": "�",
+      "description": "Planter et cultiver des graines dans les parcelles du village.",
       "toolSlot": null,
       "reqSkill": {},
       "mechanic": "growth",
@@ -492,7 +492,7 @@
         },
         {
           "level": 99,
-          "unlock": "Parcelle 6 (total: 6 slots) + cape_agriculteur"
+          "unlock": "Parcelle 6 (total: 6 slots) + cape_plantant"
         }
       ],
       "plots": {
@@ -501,7 +501,7 @@
       },
       "actions": [
         {
-          "id": "grow_healing",
+          "id": "plant_healing",
           "name": "Herbe Guérisseuse",
           "icon": "🌿",
           "reqLevel": 1,
@@ -522,7 +522,7 @@
           ]
         },
         {
-          "id": "grow_wheat",
+          "id": "plant_wheat",
           "name": "Blé",
           "icon": "🌾",
           "reqLevel": 1,
@@ -538,7 +538,7 @@
           ]
         },
         {
-          "id": "grow_golden",
+          "id": "plant_golden",
           "name": "Rose Dorée",
           "icon": "🌹",
           "reqLevel": 20,
@@ -559,7 +559,7 @@
           ]
         },
         {
-          "id": "grow_night",
+          "id": "plant_night",
           "name": "Herbe Nocturne",
           "icon": "🌑",
           "reqLevel": 40,
@@ -580,7 +580,7 @@
           ]
         },
         {
-          "id": "grow_dawn",
+          "id": "plant_dawn",
           "name": "Fleur de Lumière",
           "icon": "🌸",
           "reqLevel": 40,
@@ -597,6 +597,129 @@
               "itemId": "seed_dawn",
               "quantity": 1,
               "chance": 0.3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "farming",
+      "name": "Agriculture",
+      "icon": "🌾",
+      "description": "Récolter les herbes sauvages et plantes médicinales dans la nature.",
+      "toolSlot": null,
+      "reqSkill": {},
+      "mechanic": "gathering",
+      "levelMilestones": [
+        {
+          "level": 10,
+          "unlock": "Herbe Aquatique débloquée"
+        },
+        {
+          "level": 20,
+          "unlock": "Champignon Magique débloqué"
+        },
+        {
+          "level": 30,
+          "unlock": "Forêt des Brumes - spots d'herbes rares"
+        },
+        {
+          "level": 40,
+          "unlock": "Récolte améliorée - +1 herbe par spot"
+        },
+        {
+          "level": 50,
+          "bonus": "fastGather",
+          "description": "20% plus rapide de récolter"
+        },
+        {
+          "level": 60,
+          "unlock": "Marécages - herbes mystiques"
+        },
+        {
+          "level": 99,
+          "reward": "cape_agriculteur",
+          "description": "Cape du Grand Agriculteur"
+        }
+      ],
+      "actions": [
+        {
+          "id": "gather_healing_plains",
+          "name": "Herbe Guérisseuse (Plaines)",
+          "icon": "🌿",
+          "reqLevel": 1,
+          "baseActionTime": 3,
+          "xpPerAction": 15,
+          "outputs": [
+            {
+              "itemId": "herb_healing",
+              "quantity": 2,
+              "chance": 1
+            },
+            {
+              "itemId": "seed_healing",
+              "quantity": 1,
+              "chance": 0.2
+            }
+          ]
+        },
+        {
+          "id": "gather_aquatic_forest",
+          "name": "Herbe Aquatique (Forêt)",
+          "icon": "🌿",
+          "reqLevel": 10,
+          "baseActionTime": 4,
+          "xpPerAction": 25,
+          "outputs": [
+            {
+              "itemId": "herb_aquatic",
+              "quantity": 2,
+              "chance": 1
+            },
+            {
+              "itemId": "mushroom_magic",
+              "quantity": 1,
+              "chance": 0.1
+            }
+          ]
+        },
+        {
+          "id": "gather_mushroom_mystery",
+          "name": "Champignon Magique",
+          "icon": "🍄",
+          "reqLevel": 20,
+          "baseActionTime": 5,
+          "xpPerAction": 40,
+          "outputs": [
+            {
+              "itemId": "mushroom_magic",
+              "quantity": 2,
+              "chance": 1
+            },
+            {
+              "itemId": "herb_aquatic",
+              "quantity": 1,
+              "chance": 0.3
+            }
+          ]
+        },
+        {
+          "id": "gather_night_mystical",
+          "name": "Herbe Nocturne (Mystique)",
+          "icon": "🌑",
+          "reqLevel": 40,
+          "baseActionTime": 6,
+          "xpPerAction": 80,
+          "outputs": [
+            {
+              "itemId": "herb_night",
+              "quantity": 1,
+              "chance": 1
+            },
+            {
+              "itemId": "flower_dawn",
+              "quantity": 1,
+              "chance": 0.15
             }
           ]
         }

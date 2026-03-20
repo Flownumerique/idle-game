@@ -471,6 +471,17 @@
       "description": "Pousse dans l'obscurité humide. Légèrement hallucinogène, très utile en alchimie."
     },
     {
+      "id": "seed_wheat",
+      "name": "Graine de Blé",
+      "category": "seed",
+      "rarity": "common",
+      "icon": "🌾",
+      "stackMax": 999,
+      "sellPrice": 2,
+      "buyPrice": 5,
+      "description": "Une simple graine de blé. Donne 5 épis de blé après 90 secondes de culture."
+    },
+    {
       "id": "seed_healing",
       "name": "Graine Guérisseuse",
       "category": "seed",

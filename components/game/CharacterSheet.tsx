@@ -7,18 +7,42 @@ import { getNextMilestone } from "@/engine/milestone-engine";
 import { COMBAT_SKILL_IDS } from "@/types/game";
 import ProgressBar from "@/components/ui/ProgressBar";
 import Button from "@/components/ui/Button";
+import EquipmentPanel from "./EquipmentPanel";
+import { useState } from "react";
+
+const SKILL_META: Record<string, { icon: string; name: string; bar: string }> = {
+  attack:       { icon: "⚔️",  name: "Attaque",      bar: "bg-amber-500"  },
+  strength:     { icon: "💪",  name: "Force",        bar: "bg-orange-500" },
+  ranged:       { icon: "🏹",  name: "Distance",     bar: "bg-green-500"  },
+  magic:        { icon: "✨",  name: "Magie",        bar: "bg-purple-500" },
+  defense:      { icon: "🛡️",  name: "Défense",      bar: "bg-blue-500"   },
+  dodge:        { icon: "💨",  name: "Esquive",      bar: "bg-cyan-500"   },
+  constitution: { icon: "❤️",  name: "Constitution", bar: "bg-red-500"    },
+  prayer:       { icon: "🙏",  name: "Prière",       bar: "bg-yellow-400" },
+};
+
+const CLASS_NAMES: Record<string, string> = {
+  warrior: "Guerrier", forester: "Forestier", mage: "Mage",
+};
+
+function StatRow({ label, value, color }: { label: string; value: string; color?: string }) {
+  return (
+    <div className="flex justify-between items-center py-1.5" style={{ borderBottom: "1px solid var(--border-subtle)" }}>
+      <span className="font-crimson text-sm" style={{ color: "var(--text-secondary)" }}>{label}</span>
+      <span className="font-cinzel" style={{ fontSize: "0.55rem", color: color ?? "var(--text-primary)" }}>{value}</span>
+    </div>
+  );
+}
 
 export default function CharacterSheet() {
   const { player, skills, resetGame } = useGameStore((s) => ({
-    player: s.player,
-    skills: s.skills,
-    resetGame: s.resetGame,
+    player: s.player, skills: s.skills, resetGame: s.resetGame,
   }));
-
   const state = useGameStore();
   const stats = computePlayerStats(state);
   const { totalLevel, combatLevel, professionLevel } = calculateGlobalLevels(skills);
   const nextMilestone = getNextMilestone(state);
+  const [activeTab, setActiveTab] = useState<"stats" | "equipment">("stats");
 
   function handleReset() {
     if (window.confirm("Créer un nouveau personnage ? La sauvegarde actuelle sera effacée.")) {
@@ -27,129 +51,135 @@ export default function CharacterSheet() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Identity & Global Levels */}
+    <div className="space-y-4">
+
+      {/* Identité */}
       <div className="game-card">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-xl font-bold text-amber-400">{player.name}</h2>
-            <p className="text-sm text-slate-400 capitalize">Classe: {player.playerClass}</p>
-          </div>
-          <Button variant="danger" size="sm" onClick={handleReset}>
-            Nouveau personnage
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-3 gap-4 border-t border-slate-700/50 py-4">
-          <div className="text-center">
-            <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">Niveau Global</div>
-            <div className="text-3xl font-black text-white">{totalLevel}</div>
-          </div>
-          <div className="text-center border-x border-slate-700/30">
-            <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">Martial</div>
-            <div className="text-2xl font-bold text-red-400">{combatLevel}</div>
-          </div>
-          <div className="text-center">
-            <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">Métiers</div>
-            <div className="text-2xl font-bold text-cyan-400">{professionLevel}</div>
-          </div>
-        </div>
-
-        {nextMilestone && (
-          <div className="mt-2 pt-4 border-t border-slate-700/30">
-            <div className="flex justify-between items-end mb-1.5">
-              <div className="text-xs text-slate-400">
-                Prochain objectif : <span className="text-amber-300 font-medium">{nextMilestone.label}</span>
-              </div>
-              <div className="text-[10px] text-slate-500 font-mono">
-                {totalLevel} / {nextMilestone.level}
-              </div>
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <span className="pixel-icon-lg">👤</span>
+            <div>
+              <h2 className="font-cinzel" style={{ fontSize: "0.7rem", color: "var(--gold-light)", letterSpacing: "0.1em" }}>
+                {player.name.toUpperCase()}
+              </h2>
+              <p className="font-cinzel mt-1" style={{ fontSize: "0.45rem", color: "var(--text-secondary)" }}>
+                {(CLASS_NAMES[player.playerClass] ?? player.playerClass).toUpperCase()}
+              </p>
             </div>
-            <ProgressBar
-              value={totalLevel / nextMilestone.level}
-              height="h-1.5"
-              color="bg-amber-500"
-            />
-            <p className="text-[10px] text-slate-500 mt-1.5 italic">
-              "{nextMilestone.description}"
-            </p>
+          </div>
+          <Button variant="danger" size="sm" onClick={handleReset}>Reset</Button>
+        </div>
+
+        {/* Triptyque niveaux */}
+        <div className="grid grid-cols-3" style={{ border: "2px solid var(--border-accent)" }}>
+          {[
+            { label: "GLOBAL",  value: totalLevel,      color: "var(--text-primary)"  },
+            { label: "MARTIAL", value: combatLevel,     color: "var(--color-damage)"  },
+            { label: "MÉTIERS", value: professionLevel, color: "var(--color-xp)"      },
+          ].map((item, i) => (
+            <div
+              key={i}
+              className="text-center py-3"
+              style={{
+                background: "var(--surface-elevated)",
+                borderRight: i < 2 ? "2px solid var(--border-accent)" : "none",
+              }}
+            >
+              <div className="font-cinzel mb-1" style={{ fontSize: "0.4rem", color: "var(--text-muted)" }}>{item.label}</div>
+              <div className="font-cinzel" style={{ fontSize: "1.4rem", color: item.color, lineHeight: 1 }}>{item.value}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Objectif suivant */}
+        {nextMilestone && (
+          <div className="mt-4">
+            <div className="flex justify-between items-center mb-1.5">
+              <span className="font-cinzel" style={{ fontSize: "0.45rem", color: "var(--text-muted)" }}>OBJECTIF</span>
+              <span className="font-cinzel" style={{ fontSize: "0.5rem", color: "var(--gold-light)" }}>{nextMilestone.label.toUpperCase()}</span>
+              <span className="font-cinzel" style={{ fontSize: "0.45rem", color: "var(--text-muted)" }}>{totalLevel}/{nextMilestone.level}</span>
+            </div>
+            <ProgressBar value={totalLevel / nextMilestone.level} height="h-2" color="bg-amber-500" />
           </div>
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Derived Stats */}
-        <div className="game-card">
-          <h3 className="font-bold text-slate-200 mb-4 border-b border-slate-700 pb-2">Attributs de Combat</h3>
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between items-center">
-              <span className="text-slate-400">Style Actif</span>
-              <span className="font-medium text-amber-300 capitalize">{stats.activeStyle || "Mains Nues"}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-400">Points de Vie (Max)</span>
-              <span className="font-medium text-green-400">{Math.floor(stats.maxHp)}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-400">Régénération HP</span>
-              <span className="font-medium text-green-300">{stats.hpRegen.toFixed(1)} /s</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-400">Puissance d'Attaque</span>
-              <span className="font-medium text-red-400">{Math.floor(stats.attack)}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-400">Vitesse d'Attaque</span>
-              <span className="font-medium text-yellow-200">{stats.attackSpeed.toFixed(2)}s</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-400">Chances de Critique</span>
-              <span className="font-medium text-purple-400">{(stats.critChance * 100).toFixed(1)}%</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-400">Armure (Défense)</span>
-              <span className="font-medium text-blue-400">{Math.floor(stats.defense)}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-400">Chances d'Esquive</span>
-              <span className="font-medium text-cyan-400">{(stats.dodgeChance * 100).toFixed(1)}%</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Combat Skills Levels */}
-        <div className="game-card">
-          <h3 className="font-bold text-slate-200 mb-4 border-b border-slate-700 pb-2">Niveaux Martiaux</h3>
-          <div className="space-y-4">
-            {COMBAT_SKILL_IDS.map((skillId) => {
-              const skill = skills[skillId] || { level: 1, xp: 0 };
-              const level = getLevelForXp(skill.xp);
-              const progress = getLevelProgress(skill.xp);
-              return (
-                <div key={skillId}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="flex items-center gap-1.5 capitalize text-slate-300">
-                      {skillId}
-                    </span>
-                    <span className="font-bold text-slate-200">Lvl. {level}</span>
-                  </div>
-                  <ProgressBar
-                    value={progress}
-                    height="h-1.5"
-                    color={
-                      skillId === "constitution" ? "bg-red-500" :
-                      skillId === "magic" ? "bg-purple-500" :
-                      skillId === "ranged" ? "bg-green-500" :
-                      skillId === "defense" ? "bg-blue-500" :
-                      "bg-amber-500"
-                    }
-                  />
-                </div>
-              );
-            })}
-          </div>
-        </div>
+      {/* Tab Navigation */}
+      <div className="flex gap-2 border-b" style={{ borderColor: "var(--border-subtle)" }}>
+        <button
+          className={`px-4 py-2 font-cinzel text-sm transition-colors ${
+            activeTab === "stats" 
+              ? "border-b-2" 
+              : "opacity-60 hover:opacity-80"
+          }`}
+          style={{
+            borderBottomColor: activeTab === "stats" ? "var(--gold-light)" : "transparent",
+            color: activeTab === "stats" ? "var(--gold-light)" : "var(--text-secondary)"
+          }}
+          onClick={() => setActiveTab("stats")}
+        >
+          Stats
+        </button>
+        <button
+          className={`px-4 py-2 font-cinzel text-sm transition-colors ${
+            activeTab === "equipment" 
+              ? "border-b-2" 
+              : "opacity-60 hover:opacity-80"
+          }`}
+          style={{
+            borderBottomColor: activeTab === "equipment" ? "var(--gold-light)" : "transparent",
+            color: activeTab === "equipment" ? "var(--gold-light)" : "var(--text-secondary)"
+          }}
+          onClick={() => setActiveTab("equipment")}
+        >
+          Équipement
+        </button>
       </div>
+
+      {/* Tab Content */}
+      {activeTab === "stats" ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Stats de combat */}
+          <div className="game-card">
+            <div className="section-title mb-4">Attributs de Combat</div>
+            <div>
+              <StatRow label="Style actif"        value={stats.activeStyle || "Mains Nues"}           color="var(--gold-light)"   />
+              <StatRow label="Points de vie"       value={`${Math.floor(stats.maxHp)}`}                color="var(--color-heal)"   />
+              <StatRow label="Regen. HP"           value={`${stats.hpRegen.toFixed(1)}/s`}             color="var(--color-heal)"   />
+              <StatRow label="Attaque"             value={`${Math.floor(stats.attack)}`}               color="var(--color-damage)" />
+              <StatRow label="Vitesse d'attaque"   value={`${stats.attackSpeed.toFixed(2)}s`}          color="var(--gold-light)"   />
+              <StatRow label="Chance de critique"  value={`${(stats.critChance * 100).toFixed(1)}%`}   color="var(--color-crit)"   />
+              <StatRow label="Armure"              value={`${Math.floor(stats.defense)}`}              color="var(--color-xp)"     />
+              <StatRow label="Chance d'esquive"    value={`${(stats.dodgeChance * 100).toFixed(1)}%`}  color="var(--color-magic)"  />
+            </div>
+          </div>
+
+          {/* Maîtrises martiales */}
+          <div className="game-card">
+            <div className="section-title mb-4">Maîtrises Martiales</div>
+            <div className="space-y-3">
+              {COMBAT_SKILL_IDS.map((skillId) => {
+                const skill    = skills[skillId] || { xp: 0 };
+                const level    = getLevelForXp(skill.xp);
+                const progress = getLevelProgress(skill.xp);
+                const meta     = SKILL_META[skillId];
+                return (
+                  <div key={skillId}>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="pixel-icon-sm">{meta.icon}</span>
+                      <span className="font-crimson text-sm flex-1" style={{ color: "var(--text-secondary)" }}>{meta.name}</span>
+                      <span className="font-cinzel" style={{ fontSize: "0.5rem", color: "var(--text-primary)" }}>{level}</span>
+                    </div>
+                    <ProgressBar value={progress} height="h-1.5" color={meta.bar} />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <EquipmentPanel />
+      )}
     </div>
   );
 }

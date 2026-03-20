@@ -2,13 +2,15 @@
 
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import type {
-  GameState,
-  SkillId,
-  SlotId,
-  PlayerClass,
-  FarmPlot,
-  QuestProgress,
+import type { 
+  GameState, 
+  SkillId, 
+  SlotId, 
+  PlayerClass, 
+  PlantPlot, 
+  FarmingSpot,
+  QuestProgress, 
+  GameLogEntry 
 } from "@/types/game";
 import { PROFESSION_SKILL_IDS } from "@/types/game";
 import { getLevelForXp } from "@/lib/xp-calc";
@@ -37,6 +39,7 @@ function defaultGameState(): GameState {
       woodcutting: { ...DEFAULT_SKILL_STATE },
       mining: { ...DEFAULT_SKILL_STATE },
       fishing: { ...DEFAULT_SKILL_STATE },
+      planting: { ...DEFAULT_SKILL_STATE },
       farming: { ...DEFAULT_SKILL_STATE },
       smithing: { ...DEFAULT_SKILL_STATE },
       cooking: { ...DEFAULT_SKILL_STATE },
@@ -50,7 +53,7 @@ function defaultGameState(): GameState {
       constitution: { ...DEFAULT_SKILL_STATE, level: 10, xp: 1154 }, // start with 10 const -> 200 hp (assuming 100+10*10)
       prayer: { ...DEFAULT_SKILL_STATE },
     },
-    inventory: {},
+    inventory: { seed_wheat: 5, seed_healing: 3 },
     equipment: {
       head: null,
       chest: null,
@@ -80,8 +83,14 @@ function defaultGameState(): GameState {
       trainingStyle: "attack",
       log: [],
     },
-    farmPlots: [
+    gameLogs: [],
+    plantPlots: [
       { seedId: null, plantedAt: null, readyAt: null },
+    ],
+    farmingSpots: [
+      { id: "plains_herb_1", herbId: "herb_healing", lastGatheredAt: null, respawnAt: null },
+      { id: "plains_herb_2", herbId: "herb_healing", lastGatheredAt: null, respawnAt: null },
+      { id: "forest_herb_1", herbId: "herb_aquatic", lastGatheredAt: null, respawnAt: null },
     ],
     upgrades: {},
     unlockedZones: ["plains_start"],
@@ -114,6 +123,10 @@ interface GameActions {
   addSkillXp: (skillId: SkillId, xp: number) => void;
   setSkillLevel: (skillId: SkillId, level: number) => void;
 
+  // Game logs
+  addLogEntry: (entry: GameLogEntry) => void;
+  getLogs: (limit?: number) => GameLogEntry[];
+
   // Inventory
   addItems: (items: Record<string, number>) => void;
   removeItems: (items: Record<string, number>) => boolean;
@@ -131,9 +144,12 @@ interface GameActions {
   updateCombatState: (update: Partial<GameState["combat"]>) => void;
   updatePlayerHp: (hp: number) => void;
 
-  // Farming
+  // Planting
   plantSeed: (plotIndex: number, seedId: string, growthTimeMs: number) => void;
   harvestPlot: (plotIndex: number) => void;
+
+  // Farming
+  gatherHerb: (spotId: string) => void;
 
   // Upgrades & flags
   applyUpgrade: (upgradeId: string) => void;
@@ -217,9 +233,45 @@ export const useGameStore = create<GameStore>()(
 
       addSkillXp: (skillId, xp) =>
         set((s) => {
-          const skill = s.skills[skillId];
+          const skill = s.skills[skillId] ?? { ...DEFAULT_SKILL_STATE };
+          const oldLevel = skill.level;
           const newXp = skill.xp + xp;
           const newLevel = getLevelForXp(newXp);
+          const logs: GameLogEntry[] = [];
+          
+          // Log level up
+          if (newLevel > oldLevel) {
+            logs.push({
+              type: "skill_level",
+              message: `Niveau ${newLevel} atteint en ${skillId}!`,
+              timestamp: Date.now()
+            });
+          }
+          
+          // Log significant XP gains
+          if (xp >= 100) {
+            logs.push({
+              type: "skill_level", 
+              message: `+${xp} XP en ${skillId}`,
+              timestamp: Date.now()
+            });
+          }
+          
+          // Add logs if any
+          if (logs.length > 0) {
+            const currentLogs = [...s.gameLogs];
+            for (const log of logs) {
+              currentLogs.push(log);
+            }
+            return {
+              skills: {
+                ...s.skills,
+                [skillId]: { ...skill, xp: newXp, level: newLevel },
+              },
+              gameLogs: currentLogs.slice(-200),
+            };
+          }
+          
           return {
             skills: {
               ...s.skills,
@@ -236,17 +288,63 @@ export const useGameStore = create<GameStore>()(
           },
         })),
 
+      addLogEntry: (entry: GameLogEntry) =>
+        set((s) => {
+          const logs = [...s.gameLogs];
+          logs.push(entry);
+          return {
+            gameLogs: logs.slice(-200), // Keep last 200 entries
+          };
+        }),
+
+      getLogs: (limit = 50): GameLogEntry[] => {
+        const s = get();
+        return s.gameLogs.slice(-limit);
+      },
+
       addItems: (items) =>
         set((s) => {
           const inv = { ...s.inventory };
           let discoveredSet: Set<string> | null = null;
+          const logs: GameLogEntry[] = [];
           
           for (const [id, qty] of Object.entries(items)) {
             inv[id] = (inv[id] ?? 0) + qty;
             if (!s.discoveredItems.includes(id)) {
               if (!discoveredSet) discoveredSet = new Set(s.discoveredItems);
               discoveredSet.add(id);
+              
+              // Log first discovery
+              logs.push({
+                type: "loot",
+                itemId: id,
+                message: `Nouvel objet découvert: ${id} x${qty}`,
+                timestamp: Date.now()
+              });
             }
+            
+            // Log rare items (qty > 10 for common resources)
+            if (qty >= 10) {
+              logs.push({
+                type: "loot",
+                itemId: id,
+                message: `Récolte importante: ${id} x${qty}`,
+                timestamp: Date.now()
+              });
+            }
+          }
+          
+          // Add logs if any
+          if (logs.length > 0) {
+            const currentLogs = [...s.gameLogs];
+            for (const log of logs) {
+              currentLogs.push(log);
+            }
+            return { 
+              inventory: inv, 
+              gameLogs: currentLogs.slice(-200),
+              discoveredItems: discoveredSet ? Array.from(discoveredSet) : s.discoveredItems
+            };
           }
           
           if (discoveredSet) {
@@ -320,17 +418,33 @@ export const useGameStore = create<GameStore>()(
 
       plantSeed: (plotIndex, seedId, growthTimeMs) =>
         set((s) => {
-          const plots = [...s.farmPlots];
+          const plots = [...s.plantPlots];
           const now = Date.now();
           plots[plotIndex] = { seedId, plantedAt: now, readyAt: now + growthTimeMs };
-          return { farmPlots: plots };
+          return { plantPlots: plots };
         }),
 
       harvestPlot: (plotIndex) =>
         set((s) => {
-          const plots = [...s.farmPlots];
+          const plots = [...s.plantPlots];
           plots[plotIndex] = { seedId: null, plantedAt: null, readyAt: null };
-          return { farmPlots: plots };
+          return { plantPlots: plots };
+        }),
+
+      gatherHerb: (spotId) =>
+        set((s) => {
+          const spots = [...s.farmingSpots];
+          const spotIndex = spots.findIndex(spot => spot.id === spotId);
+          if (spotIndex === -1) return s;
+          
+          const now = Date.now();
+          const respawnTime = 30000; // 30 seconds respawn
+          spots[spotIndex] = { 
+            ...spots[spotIndex], 
+            lastGatheredAt: now, 
+            respawnAt: now + respawnTime 
+          };
+          return { farmingSpots: spots };
         }),
 
       applyUpgrade: (upgradeId) =>
@@ -407,7 +521,9 @@ export const useGameStore = create<GameStore>()(
         inventoryMax: s.inventoryMax,
         gold: s.gold,
         combat: s.combat,
-        farmPlots: s.farmPlots,
+        gameLogs: s.gameLogs,
+        plantPlots: s.plantPlots,
+        farmingSpots: s.farmingSpots,
         upgrades: s.upgrades,
         unlockedZones: s.unlockedZones,
         unlockedFlags: s.unlockedFlags,

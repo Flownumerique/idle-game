@@ -7,17 +7,36 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: "sm" | "md" | "lg";
 }
 
-const variants = {
-  primary: "bg-blue-600 hover:bg-blue-500 text-white border border-blue-500",
-  secondary: "bg-slate-700 hover:bg-slate-600 text-slate-200 border border-slate-600",
-  danger: "bg-red-700 hover:bg-red-600 text-white border border-red-600",
-  ghost: "bg-transparent hover:bg-slate-700 text-slate-300 border border-transparent",
+const variantStyles: Record<string, React.CSSProperties> = {
+  primary: {
+    background: "var(--surface-elevated)",
+    border: "2px solid var(--gold)",
+    color: "var(--gold-light)",
+    textShadow: "0 0 8px rgba(200,136,42,0.3)",
+    boxShadow: "inset 0 1px 0 rgba(240,200,80,0.1)",
+  },
+  secondary: {
+    background: "var(--surface-card)",
+    border: "2px solid var(--border-default)",
+    color: "var(--text-secondary)",
+  },
+  danger: {
+    background: "var(--surface-elevated)",
+    border: "2px solid var(--color-damage)",
+    color: "var(--color-damage)",
+    textShadow: "0 0 6px rgba(212,88,58,0.3)",
+  },
+  ghost: {
+    background: "transparent",
+    border: "2px solid transparent",
+    color: "var(--text-secondary)",
+  },
 };
 
 const sizes = {
-  sm: "px-2 py-1 text-xs",
-  md: "px-4 py-2 text-sm",
-  lg: "px-6 py-3 text-base",
+  sm: "px-2 py-1 text-[7px]",
+  md: "px-3 py-1.5 text-[8px]",
+  lg: "px-5 py-2.5 text-[9px]",
 };
 
 export default function Button({
@@ -26,17 +45,19 @@ export default function Button({
   className = "",
   children,
   disabled,
+  style,
   ...props
 }: ButtonProps) {
   return (
     <button
       className={`
-        rounded font-medium transition-colors cursor-pointer
-        ${variants[variant]}
+        font-cinzel tracking-widest uppercase cursor-pointer
+        transition-all duration-100
         ${sizes[size]}
-        ${disabled ? "opacity-40 cursor-not-allowed" : ""}
+        ${disabled ? "opacity-40 cursor-not-allowed" : "hover:brightness-125 active:scale-[0.97]"}
         ${className}
       `}
+      style={{ borderRadius: 0, ...variantStyles[variant], ...style }}
       disabled={disabled}
       {...props}
     >

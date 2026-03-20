@@ -105,6 +105,52 @@
       "lore": "Les mineurs qui travaillaient ici ont disparu il y a dix ans. On entend encore les coups de pioche dans les profondeurs, la nuit."
     },
     {
+      "id": "dark_forest",
+      "name": "Forêt Sombre",
+      "icon": "🌲",
+      "description": "Une forêt ancestrale où la lumière peine à pénétrer. Abrite des créatures nocturnes dangereuses.",
+      "reqLevel": {
+        "combat": 20
+      },
+      "reqUnlock": null,
+      "theme": "dark_forest",
+      "bgColor": "#1B4332",
+      "monsters": [
+        "shadow_wolf",
+        "dark_fairy",
+        "corrupted_treant",
+        "night_stalker"
+      ],
+      "bossId": "shadow_lord",
+      "bossChance": 0.02,
+      "combatXpMultiplier": 8,
+      "goldMultiplier": 6,
+      "lore": "Les arbres ici semblent vivants et hostiles. Les voyageurs disent que la forêt elle-même se nourrit des perdus."
+    },
+    {
+      "id": "ancient_ruins",
+      "name": "Ruines Anciennes",
+      "icon": "🏛️",
+      "description": "Restes d'une civilisation oubliée. Gardiens mécaniques et esprits anciens patrouillent encore.",
+      "reqLevel": {
+        "combat": 25
+      },
+      "reqUnlock": null,
+      "theme": "ruins",
+      "bgColor": "#4A148C",
+      "monsters": [
+        "ancient_golem",
+        "spirit_guardian",
+        "clockwork_sentinel",
+        "cursed_specter"
+      ],
+      "bossId": "time_keeper",
+      "bossChance": 0.018,
+      "combatXpMultiplier": 11,
+      "goldMultiplier": 9,
+      "lore": "Ces ruines datent d'une époque antérieure à la fondation du royaume. La technologie qui y sommeille dépasse l'entendement."
+    },
+    {
       "id": "cursed_swamps",
       "name": "Marécages Maudits",
       "icon": "🌿",
@@ -126,6 +172,144 @@
       "combatXpMultiplier": 10,
       "goldMultiplier": 8,
       "lore": "Autrefois un village prospère, les Marécages furent engloutis par une malédiction lancée par un mage fou il y a un siècle. La corruption s'étend."
+    },
+    {
+      "id": "frozen_wastes",
+      "name": "Étendues Gelées",
+      "icon": "❄️",
+      "description": "Désert de glace où le gel est permanent. Seules les créatures adaptées au froid survivent.",
+      "reqLevel": {
+        "combat": 35
+      },
+      "reqUnlock": null,
+      "theme": "frozen",
+      "bgColor": "#0277BD",
+      "monsters": [
+        "ice_wraith",
+        "frost_giant_small",
+        "polar_bear_demonic",
+        "blizzard_elemental"
+      ],
+      "bossId": "frost_jotun",
+      "bossChance": 0.02,
+      "combatXpMultiplier": 12,
+      "goldMultiplier": 10,
+      "lore": "Une tempête de gel magique ravage ces terres depuis des siècles. Personne ne sait ce qui se cache au cœur de la tempête."
+    },
+    {
+      "id": "volcanic_peaks",
+      "name": "Pics Volcaniques",
+      "icon": "🌋",
+      "description": "Montagnes en éruption permanentes. L'air est brûlant, les créatures de feu y règnent.",
+      "reqLevel": {
+        "combat": 40
+      },
+      "reqUnlock": null,
+      "theme": "volcanic",
+      "bgColor": "#B71C1C",
+      "monsters": [
+        "fire_salamander",
+        "magma_elemental",
+        "ash_demon",
+        "lava_beast"
+      ],
+      "bossId": "inferno_dragon",
+      "bossChance": 0.015,
+      "combatXpMultiplier": 15,
+      "goldMultiplier": 12,
+      "lore": "Les légendes parlent d'un dragon endormi sous le volcan. Chaque éruption le réveille un peu plus."
+    },
+    {
+      "id": "crystal_caves",
+      "name": "Cavernes de Cristal",
+      "icon": "💎",
+      "description": "Souterrains scintillants où les cristaux absorbent la magie. Créatures élémentaires et gardiens cristallins.",
+      "reqLevel": {
+        "combat": 45
+      },
+      "reqUnlock": null,
+      "theme": "crystal",
+      "bgColor": "#00695C",
+      "monsters": [
+        "crystal_golem",
+        "lightning_elemental",
+        "prism_beast",
+        "shard_colossus"
+      ],
+      "bossId": "crystal_titan",
+      "bossChance": 0.012,
+      "combatXpMultiplier": 18,
+      "goldMultiplier": 15,
+      "lore": "Les cristaux ici chantent une mélodie étrange. Ceux qui écoutent trop longtemps perdent la raison."
+    },
+    {
+      "id": "shadow_realm",
+      "name": "Royaume des Ombres",
+      "icon": "🌑",
+      "description": "Dimension parallèle où les ombres prennent vie. Seuls les plus courageux osent s'aventurer ici.",
+      "reqLevel": {
+        "combat": 50
+      },
+      "reqUnlock": "quest_shadow_key",
+      "theme": "shadow",
+      "bgColor": "#212121",
+      "monsters": [
+        "shadow_assassin",
+        "void_walker",
+        "nightmare_twin",
+        "darkness_incarnate"
+      ],
+      "bossId": "shadow_emperor",
+      "bossChance": 0.01,
+      "combatXpMultiplier": 25,
+      "goldMultiplier": 20,
+      "lore": "Le voile entre les mondes est mince ici. Les ombres qui errent sont les reflets de ceux qui ont échoué à conquérir ce royaume."
+    },
+    {
+      "id": "dragon_peaks",
+      "name": "Sommet des Dragons",
+      "icon": "🐉",
+      "description": "Montagne sacrée où les dragons font leurs nids. L'air est chargé de magie draconique.",
+      "reqLevel": {
+        "combat": 60
+      },
+      "reqUnlock": "quest_dragon_ally",
+      "theme": "dragon",
+      "bgColor": "#FF6F00",
+      "monsters": [
+        "drake_young",
+        "dragon_guardian",
+        "wyvern_pack",
+        "dragon_spirit"
+      ],
+      "bossId": "ancient_dragon",
+      "bossChance": 0.008,
+      "combatXpMultiplier": 35,
+      "goldMultiplier": 30,
+      "lore": "Les dragons considèrent ce lieu comme sacré. Seuls les dignes peuvent espérer gagner leur respect... et survivre."
+    },
+    {
+      "id": "abyssal_depths",
+      "name": "Profondeurs Abyssales",
+      "icon": "🕳️",
+      "description": "Fosse sans fond menant aux royaumes infernaux. Démones et horreurs cosmiques y règnent.",
+      "reqLevel": {
+        "combat": 75
+      },
+      "reqUnlock": "quest_abyss_seal",
+      "theme": "abyss",
+      "bgColor": "#4A0E4E",
+      "monsters": [
+        "abyssal_demon",
+        "void_tentacle",
+        "chaos_spawn",
+        "hellhound_pack"
+      ],
+      "bossId": "abyssal_lord",
+      "bossChance": 0.005,
+      "combatXpMultiplier": 50,
+      "goldMultiplier": 40,
+      "lore": "Ce qui se cache au fond de l'abîme est mieux ignoré. Mais les aventuriers sont curieux par nature... et stupides."
     }
   ],
   "monsters": [
@@ -194,906 +378,142 @@
       "description": "Une créature gélatineuse inoffensive en apparence. Sa gelée est très recherchée."
     },
     {
-      "id": "slime_blue",
-      "name": "Slime Bleu",
-      "icon": "🔵",
-      "zone": "plains_start",
-      "rarity": "uncommon",
-      "stats": {
-        "hp": 50,
-        "attack": 8,
-        "defense": 4,
-        "attackSpeed": 2.5
-      },
-      "combatXp": 15,
-      "goldDrop": {
-        "min": 4,
-        "max": 12
-      },
-      "drops": [
-        {
-          "itemId": "slime_gel",
-          "chance": 1,
-          "qty": 3
-        },
-        {
-          "itemId": "essence_magic",
-          "chance": 0.08,
-          "qty": 1
-        }
-      ],
-      "attackStyle": "melee",
-      "description": "Un slime plus ancien et plus puissant. Sa gelée contient des traces de magie."
-    },
-    {
-      "id": "goblin_scout",
-      "name": "Éclaireur Gobelin",
-      "icon": "👺",
-      "zone": "plains_start",
-      "rarity": "common",
-      "stats": {
-        "hp": 35,
-        "attack": 10,
-        "defense": 3,
-        "attackSpeed": 2
-      },
-      "combatXp": 12,
-      "goldDrop": {
-        "min": 3,
-        "max": 10
-      },
-      "drops": [
-        {
-          "itemId": "fang_goblin",
-          "chance": 0.6,
-          "qty": 1
-        },
-        {
-          "itemId": "hide_rat",
-          "chance": 0.3,
-          "qty": 1
-        }
-      ],
-      "attackStyle": "melee",
-      "description": "Un éclaireur envoyé depuis la forêt voisine. Agile mais fragile."
-    },
-    {
-      "id": "goblin_chieftain_small",
-      "name": "Chef de Clan Gobelin",
-      "icon": "👿",
-      "zone": "plains_start",
-      "rarity": "boss",
-      "stats": {
-        "hp": 300,
-        "attack": 22,
-        "defense": 10,
-        "attackSpeed": 2
-      },
-      "combatXp": 150,
-      "goldDrop": {
-        "min": 40,
-        "max": 90
-      },
-      "drops": [
-        {
-          "itemId": "fang_goblin",
-          "chance": 1,
-          "qty": 5
-        },
-        {
-          "itemId": "hide_wolf",
-          "chance": 0.5,
-          "qty": 2
-        },
-        {
-          "itemId": "sword_copper",
-          "chance": 0.25,
-          "qty": 1
-        },
-        {
-          "itemId": "chest_common",
-          "chance": 1,
-          "qty": 1
-        }
-      ],
-      "specialAttack": {
-        "name": "Rugissement Tribal",
-        "effect": "reducePlayerDefense",
-        "value": 0.2,
-        "duration": 10,
-        "chance": 0.25
-      },
-      "introCombatText": "La terre tremble... Un gobelin plus large que les autres s'avance, arborant un casque orné de crânes de rats.",
-      "description": "Le chef d'un clan de la plaine. Plus malin et coriace que ses sbires."
-    },
-    {
-      "id": "goblin_warrior",
-      "name": "Guerrier Gobelin",
-      "icon": "👺",
-      "zone": "goblin_forest",
-      "rarity": "common",
-      "stats": {
-        "hp": 80,
-        "attack": 18,
-        "defense": 8,
-        "attackSpeed": 2.2
-      },
-      "combatXp": 30,
-      "goldDrop": {
-        "min": 8,
-        "max": 20
-      },
-      "drops": [
-        {
-          "itemId": "fang_goblin",
-          "chance": 0.7,
-          "qty": 2
-        },
-        {
-          "itemId": "bar_copper",
-          "chance": 0.2,
-          "qty": 1
-        },
-        {
-          "itemId": "sword_copper",
-          "chance": 0.05,
-          "qty": 1
-        }
-      ],
-      "attackStyle": "melee",
-      "description": "Un gobelin armé et équipé d'une armure rudimentaire. Dangereux en groupe."
-    },
-    {
-      "id": "goblin_archer",
-      "name": "Archer Gobelin",
-      "icon": "🏹",
-      "zone": "goblin_forest",
-      "rarity": "common",
-      "stats": {
-        "hp": 60,
-        "attack": 22,
-        "defense": 5,
-        "attackSpeed": 3
-      },
-      "combatXp": 28,
-      "goldDrop": {
-        "min": 6,
-        "max": 18
-      },
-      "drops": [
-        {
-          "itemId": "fang_goblin",
-          "chance": 0.6,
-          "qty": 1
-        },
-        {
-          "itemId": "wood_yew",
-          "chance": 0.15,
-          "qty": 1
-        }
-      ],
-      "attackStyle": "ranged",
-      "description": "Tire de loin avec une précision redoutable. Cibler en priorité."
-    },
-    {
-      "id": "wolf",
-      "name": "Loup des Bois",
+      "id": "shadow_wolf",
+      "name": "Loup des Ombres",
       "icon": "🐺",
-      "zone": "goblin_forest",
+      "zone": "dark_forest",
       "rarity": "common",
       "stats": {
-        "hp": 90,
-        "attack": 25,
-        "defense": 6,
-        "attackSpeed": 1.8
+        "hp": 180,
+        "attack": 75,
+        "defense": 25,
+        "attackSpeed": 2.8
       },
-      "combatXp": 35,
-      "goldDrop": {
-        "min": 5,
-        "max": 15
-      },
-      "drops": [
-        {
-          "itemId": "hide_wolf",
-          "chance": 0.8,
-          "qty": 1
-        },
-        {
-          "itemId": "fang_goblin",
-          "chance": 0.1,
-          "qty": 1
-        }
-      ],
-      "attackStyle": "melee",
-      "description": "Un loup solitaire à la fourrure sombre. Sa morsure laisse des plaies profondes."
-    },
-    {
-      "id": "wolf_alpha",
-      "name": "Loup Alpha",
-      "icon": "🐺",
-      "zone": "goblin_forest",
-      "rarity": "uncommon",
-      "stats": {
-        "hp": 160,
-        "attack": 38,
-        "defense": 12,
-        "attackSpeed": 1.6
-      },
-      "combatXp": 75,
+      "combatXp": 180,
       "goldDrop": {
         "min": 20,
         "max": 50
       },
       "drops": [
         {
-          "itemId": "hide_wolf",
-          "chance": 1,
-          "qty": 2
-        },
-        {
-          "itemId": "essence_magic",
-          "chance": 0.12,
-          "qty": 1
-        }
-      ],
-      "attackStyle": "melee",
-      "specialAttack": {
-        "name": "Charge Brutale",
-        "effect": "stun",
-        "duration": 2,
-        "chance": 0.15
-      },
-      "description": "Le chef de meute. Plus grand, plus fort, ses crocs peuvent transpercer le métal."
-    },
-    {
-      "id": "goblin_king",
-      "name": "Le Roi Gobelin",
-      "icon": "👑",
-      "zone": "goblin_forest",
-      "rarity": "boss",
-      "stats": {
-        "hp": 500,
-        "attack": 42,
-        "defense": 18,
-        "attackSpeed": 2
-      },
-      "combatXp": 500,
-      "goldDrop": {
-        "min": 150,
-        "max": 350
-      },
-      "drops": [
-        {
-          "itemId": "fang_goblin",
-          "chance": 1,
-          "qty": 8
-        },
-        {
-          "itemId": "hide_wolf",
-          "chance": 1,
-          "qty": 3
-        },
-        {
-          "itemId": "sword_iron",
-          "chance": 0.4,
-          "qty": 1
-        },
-        {
-          "itemId": "chest_iron",
-          "chance": 0.2,
-          "qty": 1
-        },
-        {
-          "itemId": "gem_ruby",
-          "chance": 0.15,
-          "qty": 1
-        },
-        {
-          "itemId": "chest_rare",
-          "chance": 1,
-          "qty": 1
-        }
-      ],
-      "specialAttack": {
-        "name": "Appel des Sous-Fifres",
-        "effect": "spawnMinions",
-        "minionId": "goblin_warrior",
-        "count": 2,
-        "chance": 0.3
-      },
-      "introCombatText": "Un tremblement agite le sol... Des torches s'allument une à une. Le Roi Gobelin émerge de l'ombre, brandissant un sceptre taillé dans un os de dragon.",
-      "description": "Le souverain incontesté de la forêt. Sa couronne rouillée ne diminue en rien sa férocité."
-    },
-    {
-      "id": "bandit",
-      "name": "Bandit",
-      "icon": "🗡️",
-      "zone": "plains_south",
-      "rarity": "common",
-      "stats": {
-        "hp": 130,
-        "attack": 35,
-        "defense": 15,
-        "attackSpeed": 2
-      },
-      "combatXp": 65,
-      "goldDrop": {
-        "min": 20,
-        "max": 60
-      },
-      "drops": [
-        {
-          "itemId": "bar_iron",
-          "chance": 0.3,
-          "qty": 1
-        },
-        {
-          "itemId": "helm_copper",
-          "chance": 0.1,
-          "qty": 1
-        },
-        {
-          "itemId": "dust_bone",
-          "chance": 0.4,
-          "qty": 2
-        }
-      ],
-      "attackStyle": "melee",
-      "description": "Un brigand endurci par la route. Il n'hésite pas à frapper dans le dos."
-    },
-    {
-      "id": "boar_giant",
-      "name": "Sanglier Géant",
-      "icon": "🐗",
-      "zone": "plains_south",
-      "rarity": "uncommon",
-      "stats": {
-        "hp": 250,
-        "attack": 50,
-        "defense": 20,
-        "attackSpeed": 3
-      },
-      "combatXp": 120,
-      "goldDrop": {
-        "min": 15,
-        "max": 45
-      },
-      "drops": [
-        {
-          "itemId": "hide_bear",
-          "chance": 0.6,
-          "qty": 1
-        },
-        {
-          "itemId": "essence_magic",
-          "chance": 0.08,
-          "qty": 1
-        }
-      ],
-      "attackStyle": "melee",
-      "specialAttack": {
-        "name": "Charge Dévastatrice",
-        "effect": "doubleHit",
-        "chance": 0.2
-      },
-      "description": "Une bête monstrueuse. Ses défenses peuvent transpercer une armure de fer."
-    },
-    {
-      "id": "scarecrow_animated",
-      "name": "Épouvantail Animé",
-      "icon": "🌾",
-      "zone": "plains_south",
-      "rarity": "uncommon",
-      "stats": {
-        "hp": 180,
-        "attack": 40,
-        "defense": 8,
-        "attackSpeed": 2.8
-      },
-      "combatXp": 90,
-      "goldDrop": {
-        "min": 10,
-        "max": 30
-      },
-      "drops": [
-        {
-          "itemId": "essence_magic",
-          "chance": 0.25,
-          "qty": 1
-        },
-        {
-          "itemId": "dust_bone",
-          "chance": 0.5,
-          "qty": 2
-        }
-      ],
-      "attackStyle": "magic",
-      "description": "Une construction de paille animée par une magie oubliée. Vulnérable au feu."
-    },
-    {
-      "id": "bandit_lord",
-      "name": "Seigneur des Bandits",
-      "icon": "⚔️",
-      "zone": "plains_south",
-      "rarity": "boss",
-      "stats": {
-        "hp": 800,
-        "attack": 65,
-        "defense": 30,
-        "attackSpeed": 1.8
-      },
-      "combatXp": 900,
-      "goldDrop": {
-        "min": 300,
-        "max": 600
-      },
-      "drops": [
-        {
-          "itemId": "bar_steel",
-          "chance": 1,
-          "qty": 5
-        },
-        {
-          "itemId": "sword_steel",
-          "chance": 0.35,
-          "qty": 1
-        },
-        {
-          "itemId": "chest_steel",
-          "chance": 0.2,
-          "qty": 1
-        },
-        {
-          "itemId": "gem_ruby",
-          "chance": 0.25,
-          "qty": 1
-        },
-        {
-          "itemId": "rune_power",
-          "chance": 0.1,
-          "qty": 1
-        },
-        {
-          "itemId": "chest_rare",
-          "chance": 1,
-          "qty": 1
-        }
-      ],
-      "introCombatText": "Un homme au regard glacial se retourne lentement. « Un autre héros... Combien vous êtes-vous déjà venus mourir ici ? »",
-      "description": "Chef des bandits du sud. Ancien soldat de la garde royale tombé dans la corruption."
-    },
-    {
-      "id": "spider_giant",
-      "name": "Araignée Géante",
-      "icon": "🕷️",
-      "zone": "abandoned_mines",
-      "rarity": "common",
-      "stats": {
-        "hp": 200,
-        "attack": 55,
-        "defense": 15,
-        "attackSpeed": 2
-      },
-      "combatXp": 120,
-      "goldDrop": {
-        "min": 15,
-        "max": 40
-      },
-      "drops": [
-        {
-          "itemId": "slime_gel",
+          "itemId": "hide_shadow",
           "chance": 0.8,
           "qty": 2
         },
         {
-          "itemId": "herb_aquatic",
-          "chance": 0.2,
-          "qty": 1
-        }
-      ],
-      "specialAttack": {
-        "name": "Venin Paralysant",
-        "effect": "slowAttackSpeed",
-        "value": 0.3,
-        "duration": 8,
-        "chance": 0.2
-      },
-      "attackStyle": "melee",
-      "description": "Elle tisse ses toiles dans les couloirs obscurs. Son venin paralyse les muscles."
-    },
-    {
-      "id": "skeleton_miner",
-      "name": "Squelette Mineur",
-      "icon": "💀",
-      "zone": "abandoned_mines",
-      "rarity": "common",
-      "stats": {
-        "hp": 160,
-        "attack": 48,
-        "defense": 20,
-        "attackSpeed": 2.4
-      },
-      "combatXp": 100,
-      "goldDrop": {
-        "min": 10,
-        "max": 35
-      },
-      "drops": [
-        {
-          "itemId": "dust_bone",
-          "chance": 1,
-          "qty": 3
-        },
-        {
-          "itemId": "ore_iron",
-          "chance": 0.4,
-          "qty": 2
-        },
-        {
-          "itemId": "ore_silver",
-          "chance": 0.05,
-          "qty": 1
-        }
-      ],
-      "attackStyle": "melee",
-      "description": "L'esprit d'un mineur mort il y a dix ans. Il continue de creuser pour l'éternité."
-    },
-    {
-      "id": "bat_cave",
-      "name": "Chauve-Souris Géante",
-      "icon": "🦇",
-      "zone": "abandoned_mines",
-      "rarity": "common",
-      "stats": {
-        "hp": 140,
-        "attack": 52,
-        "defense": 8,
-        "attackSpeed": 1.5
-      },
-      "combatXp": 85,
-      "goldDrop": {
-        "min": 8,
-        "max": 25
-      },
-      "drops": [
-        {
-          "itemId": "dust_bone",
-          "chance": 0.5,
-          "qty": 1
-        },
-        {
-          "itemId": "essence_magic",
-          "chance": 0.06,
-          "qty": 1
-        }
-      ],
-      "attackStyle": "melee",
-      "description": "Se déplace en essaims. Difficile à toucher, mais fragile."
-    },
-    {
-      "id": "stone_golem_small",
-      "name": "Golem de Pierre",
-      "icon": "🗿",
-      "zone": "abandoned_mines",
-      "rarity": "uncommon",
-      "stats": {
-        "hp": 400,
-        "attack": 70,
-        "defense": 40,
-        "attackSpeed": 3.5
-      },
-      "combatXp": 250,
-      "goldDrop": {
-        "min": 30,
-        "max": 80
-      },
-      "drops": [
-        {
-          "itemId": "stone_cut",
-          "chance": 1,
-          "qty": 5
-        },
-        {
-          "itemId": "ore_iron",
-          "chance": 0.6,
-          "qty": 3
-        },
-        {
-          "itemId": "essence_magic",
+          "itemId": "essence_dark",
           "chance": 0.15,
           "qty": 1
         }
       ],
       "attackStyle": "melee",
-      "description": "Lent mais dévastateur. Sa peau de pierre résiste aux armes normales."
+      "description": "Un loup qui s'est nourri des ombres de la forêt. Ses griffes laissent des traces de ténèbres."
     },
     {
-      "id": "stone_golem_king",
-      "name": "Le Gardien de Pierre",
-      "icon": "⛰️",
-      "zone": "abandoned_mines",
+      "id": "fire_salamander",
+      "name": "Salamandre de Feu",
+      "icon": "🦎",
+      "zone": "volcanic_peaks",
+      "rarity": "common",
+      "stats": {
+        "hp": 300,
+        "attack": 120,
+        "defense": 40,
+        "attackSpeed": 2.6
+      },
+      "combatXp": 400,
+      "goldDrop": {
+        "min": 50,
+        "max": 120
+      },
+      "drops": [
+        {
+          "itemId": "scale_fire",
+          "chance": 0.9,
+          "qty": 3
+        },
+        {
+          "itemId": "essence_fire",
+          "chance": 0.4,
+          "qty": 2
+        }
+      ],
+      "attackStyle": "fire",
+      "description": "Un reptile qui vit dans la lave. Sa peau est assez chaude pour fondre le fer."
+    },
+    {
+      "id": "shadow_lord",
+      "name": "Seigneur des Ombres",
+      "icon": "👹",
+      "zone": "dark_forest",
       "rarity": "boss",
       "stats": {
-        "hp": 1500,
-        "attack": 90,
-        "defense": 55,
-        "attackSpeed": 3
+        "hp": 2000,
+        "attack": 180,
+        "defense": 80,
+        "attackSpeed": 2.5
       },
       "combatXp": 2000,
       "goldDrop": {
-        "min": 600,
+        "min": 500,
         "max": 1200
       },
       "drops": [
         {
-          "itemId": "stone_cut",
-          "chance": 1,
-          "qty": 20
-        },
-        {
-          "itemId": "ore_mithril",
-          "chance": 0.6,
-          "qty": 3
-        },
-        {
-          "itemId": "core_golem",
-          "chance": 1,
-          "qty": 1
-        },
-        {
-          "itemId": "essence_fire",
-          "chance": 0.3,
-          "qty": 1
-        },
-        {
-          "itemId": "gem_ruby",
-          "chance": 0.35,
-          "qty": 2
-        },
-        {
-          "itemId": "amulet_miner",
-          "chance": 0.2,
-          "qty": 1
-        },
-        {
-          "itemId": "chest_rare",
-          "chance": 1,
-          "qty": 1
-        }
-      ],
-      "specialAttack": {
-        "name": "Séisme",
-        "effect": "reducePlayerAttack",
-        "value": 0.3,
-        "duration": 15,
-        "chance": 0.25
-      },
-      "introCombatText": "Les murs de la mine tremblent. Des débris tombent du plafond. Dans un fracas assourdissant, une masse de pierre prend forme devant vous. L'ancienne sentinelle s'éveille.",
-      "description": "Créé par les mages anciens pour garder les minerais les plus précieux. Indestructible... en apparence."
-    },
-    {
-      "id": "zombie",
-      "name": "Zombie",
-      "icon": "🧟",
-      "zone": "cursed_swamps",
-      "rarity": "common",
-      "stats": {
-        "hp": 300,
-        "attack": 75,
-        "defense": 25,
-        "attackSpeed": 3
-      },
-      "combatXp": 200,
-      "goldDrop": {
-        "min": 20,
-        "max": 60
-      },
-      "drops": [
-        {
-          "itemId": "dust_bone",
-          "chance": 1,
-          "qty": 4
-        },
-        {
-          "itemId": "essence_dark",
-          "chance": 0.03,
-          "qty": 1
-        }
-      ],
-      "specialAttack": {
-        "name": "Morsure Putride",
-        "effect": "poison",
-        "damagePerSec": 5,
-        "duration": 10,
-        "chance": 0.25
-      },
-      "attackStyle": "melee",
-      "description": "Un ancien villageois revenu sous forme morte-vivante. Inarrêtable sans décapitation."
-    },
-    {
-      "id": "skeleton_warrior",
-      "name": "Guerrier Squelette",
-      "icon": "💀",
-      "zone": "cursed_swamps",
-      "rarity": "common",
-      "stats": {
-        "hp": 250,
-        "attack": 90,
-        "defense": 35,
-        "attackSpeed": 2.2
-      },
-      "combatXp": 220,
-      "goldDrop": {
-        "min": 25,
-        "max": 70
-      },
-      "drops": [
-        {
-          "itemId": "dust_bone",
-          "chance": 1,
-          "qty": 5
-        },
-        {
-          "itemId": "rune_defense",
-          "chance": 0.05,
-          "qty": 1
-        },
-        {
-          "itemId": "bar_iron",
-          "chance": 0.2,
-          "qty": 1
-        }
-      ],
-      "attackStyle": "melee",
-      "description": "Un soldat tombé qui continue de se battre par instinct magique."
-    },
-    {
-      "id": "witch_hag",
-      "name": "Sorcière des Marais",
-      "icon": "🧙",
-      "zone": "cursed_swamps",
-      "rarity": "uncommon",
-      "stats": {
-        "hp": 220,
-        "attack": 100,
-        "defense": 20,
-        "attackSpeed": 2.5
-      },
-      "combatXp": 300,
-      "goldDrop": {
-        "min": 40,
-        "max": 100
-      },
-      "drops": [
-        {
-          "itemId": "herb_night",
-          "chance": 0.4,
-          "qty": 1
-        },
-        {
-          "itemId": "mushroom_magic",
-          "chance": 0.3,
-          "qty": 2
-        },
-        {
-          "itemId": "essence_dark",
-          "chance": 0.06,
-          "qty": 1
-        }
-      ],
-      "specialAttack": {
-        "name": "Malédiction",
-        "effect": "reduceCritChance",
-        "value": 0.5,
-        "duration": 20,
-        "chance": 0.3
-      },
-      "attackStyle": "magic",
-      "description": "Une vieille femme corrompue par la magie noire du marécage."
-    },
-    {
-      "id": "will_o_wisp",
-      "name": "Feu Follet",
-      "icon": "✨",
-      "zone": "cursed_swamps",
-      "rarity": "uncommon",
-      "stats": {
-        "hp": 180,
-        "attack": 85,
-        "defense": 5,
-        "attackSpeed": 1.8
-      },
-      "combatXp": 280,
-      "goldDrop": {
-        "min": 30,
-        "max": 90
-      },
-      "drops": [
-        {
-          "itemId": "essence_magic",
+          "itemId": "blade_shadow",
           "chance": 0.8,
-          "qty": 2
-        },
-        {
-          "itemId": "essence_dark",
-          "chance": 0.1,
           "qty": 1
         },
         {
-          "itemId": "rune_power",
-          "chance": 0.05,
+          "itemId": "armor_shadow",
+          "chance": 0.6,
+          "qty": 1
+        },
+        {
+          "itemId": "ring_shadow",
+          "chance": 0.3,
           "qty": 1
         }
       ],
-      "attackStyle": "magic",
-      "description": "Entité lumineuse et corrompue. Frappe avec de la magie pure. Très difficile à bloquer."
+      "introCombatText": "Les ombres autour de vous s'agitent et fusionnent. Une forme humanoïde émerge, entièrement faite de ténèbres concentrées.",
+      "description": "Le maître de la Forêt Sombre. Il contrôle toutes les ombres de la forêt."
     },
     {
-      "id": "lich_apprentice",
-      "name": "Apprenti Liche",
-      "icon": "💀",
-      "zone": "cursed_swamps",
+      "id": "inferno_dragon",
+      "name": "Dragon des Enfers",
+      "icon": "🐲",
+      "zone": "volcanic_peaks",
       "rarity": "boss",
       "stats": {
-        "hp": 2500,
-        "attack": 130,
-        "defense": 60,
-        "attackSpeed": 2
+        "hp": 5000,
+        "attack": 300,
+        "defense": 120,
+        "attackSpeed": 1.8
       },
       "combatXp": 5000,
       "goldDrop": {
-        "min": 1000,
-        "max": 2000
+        "min": 2000,
+        "max": 5000
       },
       "drops": [
         {
-          "itemId": "dust_bone",
-          "chance": 1,
-          "qty": 20
+          "itemId": "scale_dragon_fire",
+          "chance": 0.9,
+          "qty": 5
         },
         {
-          "itemId": "essence_dark",
-          "chance": 1,
-          "qty": 3
-        },
-        {
-          "itemId": "rune_power",
-          "chance": 0.6,
-          "qty": 2
-        },
-        {
-          "itemId": "rune_defense",
-          "chance": 0.6,
-          "qty": 2
-        },
-        {
-          "itemId": "gem_diamond",
-          "chance": 0.15,
+          "itemId": "sword_inferno",
+          "chance": 0.7,
           "qty": 1
         },
         {
-          "itemId": "chest_rare",
-          "chance": 1,
-          "qty": 2
+          "itemId": "armor_dragon_fire",
+          "chance": 0.5,
+          "qty": 1
         }
       ],
-      "specialAttack": {
-        "name": "Drain de Vie",
-        "effect": "lifeSteal",
-        "value": 0.3,
-        "chance": 0.35
-      },
-      "phase2": {
-        "hpThreshold": 0.4,
-        "name": "Forme Spectrale",
-        "statBoost": {
-          "attack": 1.4,
-          "defense": 1.2
-        },
-        "introCombatText": "La liche rugit et son corps se dissout en fumée noire. Une forme spectrale émerge — plus rapide, plus menaçante."
-      },
-      "introCombatText": "Une silhouette en robe noire se retourne lentement. Des orbites creuses brillent d'une lueur violette. « Tu oses pénétrer mes marécages ? Alors tu mourras comme les autres. »",
-      "description": "L'élève du Liche Suprême. Maîtrise partielle de la nécromancie mais reste redoutable."
+      "introCombatText": "Le sol tremble violemment. Un rugissement fait fondre les roches autour de vous. Un dragon émerge du volcan, ses écailles brillant d'une lueur infernale.",
+      "description": "Un dragon qui a fait du volcan son domaine. Son souffle peut transformer n'importe quoi en lave."
     }
   ]
 }

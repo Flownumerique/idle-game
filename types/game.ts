@@ -6,6 +6,7 @@ export type SkillId =
   | "woodcutting"
   | "mining"
   | "fishing"
+  | "planting"
   | "farming"
   | "smithing"
   | "cooking"
@@ -23,6 +24,7 @@ export const SKILL_IDS = [
   "woodcutting",
   "mining",
   "fishing",
+  "planting",
   "farming",
   "smithing",
   "cooking",
@@ -41,6 +43,7 @@ export const PROFESSION_SKILL_IDS = [
   "woodcutting",
   "mining",
   "fishing",
+  "planting",
   "farming",
   "smithing",
   "cooking",
@@ -144,12 +147,22 @@ export interface CombatState {
 }
 
 // ──────────────────────────────────────────────
-// Farming
+// Planting (parcelles)
 // ──────────────────────────────────────────────
-export interface FarmPlot {
+export interface PlantPlot {
   seedId: string | null;
   plantedAt: number | null; // timestamp ms
   readyAt: number | null; // timestamp ms
+}
+
+// ──────────────────────────────────────────────
+// Farming (récolte d'herbes)
+// ──────────────────────────────────────────────
+export interface FarmingSpot {
+  id: string;
+  herbId: string | null;
+  lastGatheredAt: number | null; // timestamp ms
+  respawnAt: number | null; // timestamp ms
 }
 
 // ──────────────────────────────────────────────
@@ -196,8 +209,14 @@ export interface GameState {
   // Combat
   combat: CombatState;
 
-  // Farming (up to 6 plots)
-  farmPlots: FarmPlot[];
+  // Game logs
+  gameLogs: GameLogEntry[];
+
+  // Planting (up to 6 plots)
+  plantPlots: PlantPlot[];
+
+  // Farming (herb gathering spots)
+  farmingSpots: FarmingSpot[];
 
   // Upgrades
   upgrades: Record<string, number>; // upgradeId → level
@@ -275,6 +294,60 @@ export interface QuestReward {
   gold?: number;
   xp?: Record<SkillId, number>;
   items?: ItemDrop[];
+}
+
+// ──────────────────────────────────────────────
+// Equipment types
+// ──────────────────────────────────────────────
+export interface EquipmentStats {
+  attack?: number;
+  defense?: number;
+  hp?: number;
+  hpRegen?: number;
+  attackSpeed?: number;
+  precision?: number;
+  magicAttack?: number;
+  blockChance?: number;
+  actionSpeedBonus?: number;
+  rareDropBonus?: number;
+}
+
+export interface EquipmentItem {
+  id: string;
+  name: string;
+  category: "equipment";
+  rarity: ItemRarity;
+  icon: string;
+  slot: SlotId;
+  stats: EquipmentStats;
+  requirements?: {
+    level?: number;
+    skill?: SkillId;
+    skillLevel?: number;
+    class?: PlayerClass;
+  };
+  description?: string;
+}
+
+export interface GameLogEntry {
+  type:
+    | "player_hit"
+    | "monster_hit"
+    | "player_death"
+    | "monster_death"
+    | "loot"
+    | "equipment_equipped"
+    | "equipment_unequipped"
+    | "item_crafted"
+    | "skill_level"
+    | "achievement"
+    | "quest";
+  dmg?: number;
+  crit?: boolean;
+  itemId?: string;
+  slot?: SlotId;
+  message?: string;
+  timestamp: number;
 }
 
 export interface OfflineSummary {
