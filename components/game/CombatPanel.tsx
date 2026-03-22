@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useGameStore } from "@/stores/game-store";
-import { getAllZones, spawnMonster, getMonstersInZone, spawnBossForZone } from "@/engine/combat-engine";
+import { getAllZones, getZone, spawnMonster, getMonstersInZone, spawnBossForZone } from "@/engine/combat-engine";
 import { computePlayerStats } from "@/engine/offline-engine";
 import { getLevelForXp, getLevelProgress } from "@/lib/xp-calc";
 import { mulberry32 } from "@/lib/rng";
@@ -40,26 +40,13 @@ const BOSS_KILL_REQUIREMENT = 10;
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function CombatPanel() {
+export default function CombatPanel({ section = "map" }: { section?: "map" | "training" | "mastery" }) {
   const state    = useGameStore((s) => s);
   const skills   = useGameStore((s) => s.skills);
   const zoneKills = useGameStore((s) => s.zoneKills);
   const { combat, unlockedZones, startCombat, stopCombat, setAutoRestart, updateCombatState } = state;
 
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
-
-  // Listen for navigation events
-  useEffect(() => {
-    const handleNavigate = (event: CustomEvent) => {
-      if (event.detail === 'equipment') {
-        // This would be handled by the parent component
-        console.log('Navigate to equipment tab');
-      }
-    };
-
-    window.addEventListener('navigateToTab', handleNavigate as EventListener);
-    return () => window.removeEventListener('navigateToTab', handleNavigate as EventListener);
-  }, []);
 
   const allZones    = getAllZones();
   const playerStats = computePlayerStats(state);
@@ -103,13 +90,12 @@ export default function CombatPanel() {
   }
 
   const recentLog = [...combat.log].reverse().slice(0, 14);
-
   const hpColor = hpPct > 0.5 ? "bg-green-500" : hpPct > 0.25 ? "bg-yellow-500" : "bg-red-500";
 
   return (
     <div className="space-y-4">
 
-      {/* ── 1. Status bar ──────────────────────────────────────────────────── */}
+      {/* ── 1. Status bar (Always visible) ────────────────────────────────── */}
       <div className="game-card">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -138,479 +124,230 @@ export default function CombatPanel() {
         </div>
       </div>
 
-      {/* ── 2. Zone / Fight + Training ─────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
-
-        {/* Left — Zone selection or active fight */}
-        <div className="game-card space-y-4">
-          {combat.active && combat.currentMonster ? (
-            <>
-              <div className="section-title">Combat en cours</div>
-
-              {/* Monster card */}
-              <div
-                className="rounded-sm p-4 relative overflow-hidden"
-                style={{
-                  background: "rgba(130,20,20,0.08)",
-                  border: "1px solid rgba(180,30,30,0.3)",
-                }}
-              >
-                <div
-                  className="absolute left-0 top-0 bottom-0 w-0.5"
-                  style={{ background: "linear-gradient(to bottom, #e83030, rgba(140,20,20,0.2))" }}
-                />
-                <div className="flex justify-between items-start mb-3 pl-3">
-                  <div>
-                    <div className="font-cinzel font-bold" style={{ fontSize: "1rem", color: "var(--text-primary)" }}>
-                      {combat.currentMonster.name}
-                    </div>
-                    <div className="font-cinzel tracking-widest uppercase mt-0.5" style={{ fontSize: "0.5rem", color: "var(--text-muted)" }}>
-                      Entité Hostile
-                    </div>
-                  </div>
-                  <div
-                    className="font-mono font-bold px-2 py-1 rounded-sm"
-                    style={{
-                      background: "rgba(180,20,20,0.2)",
-                      border: "1px solid rgba(180,20,20,0.4)",
-                      color: "var(--color-damage)",
-                      fontSize: "0.85rem",
-                    }}
-                  >
-                    {Math.floor(combat.currentMonster.hp)}
-                    <span style={{ fontSize: "0.65rem", color: "rgba(224,80,80,0.5)" }}>
-                      /{combat.currentMonster.maxHp}
-                    </span>
-                  </div>
-                </div>
-                <div className="pl-3">
-                  <ProgressBar
-                    value={combat.currentMonster.hp / combat.currentMonster.maxHp}
-                    color="bg-red-600"
-                    height="h-2"
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <Button variant="danger" className="flex-1" onClick={stopCombat}>
-                  Fuir
-                </Button>
-                <Button
-                  variant={combat.autoRestart ? "primary" : "secondary"}
-                  className="flex-1 whitespace-nowrap"
-                  onClick={() => setAutoRestart(!combat.autoRestart)}
-                >
-                  Auto {combat.autoRestart ? "✓" : "✗"}
-                </Button>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="section-title">Zones d&apos;exploration</div>
-              <div className="space-y-2">
-                {allZones.map((zone) => {
-                  if (!unlockedZones.includes(zone.id)) return null;
-                  const reqCombat  = zone.reqLevel?.combat ?? 1;
-                  const meetsLevel = playerCombatLevel >= reqCombat;
-                  const isSelected = selectedZoneId === zone.id;
-                  const monsters   = getMonstersInZone(zone.id);
-                  const regulars   = monsters.filter((m) => !m.isBoss);
-                  const boss       = monsters.find((m)  => m.isBoss);
-
+      {/* ── 2. Tab Content ────────────────────────────────────────────────── */}
+      
+      {section === "map" && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+          {/* Left — Zone selection or active fight */}
+          <div className="game-card space-y-4">
+            {combat.active && combat.currentMonster ? (
+              <>
+                <div className="section-title">Combat en cours</div>
+                {(() => {
+                  const m = combat.currentMonster!;
+                  const zone = getZone(combat.zoneId!);
+                  const xpMult = zone?.combatXpMultiplier ?? 1;
+                  const xpOnKill = Math.round(m.combatXp * xpMult);
+                  const rarityColor = RARITY_COLOR[m.rarity ?? "common"] ?? "var(--text-secondary)";
                   return (
                     <div
-                      key={zone.id}
-                      className="rounded-sm overflow-hidden"
-                      style={{ border: "1px solid var(--border-subtle)" }}
+                      className="rounded-sm relative overflow-hidden"
+                      style={{ background: "rgba(130,20,20,0.08)", border: "1px solid rgba(180,30,30,0.3)" }}
                     >
-                      {/* Zone header button */}
-                      <button
-                        className="w-full text-left p-3 flex items-center gap-3 transition-colors"
-                        style={{
-                          background: isSelected ? "var(--surface-elevated)" : "var(--surface-card)",
-                        }}
-                        onClick={() => setSelectedZoneId(isSelected ? null : zone.id)}
-                      >
-                        <span className="pixel-icon flex-shrink-0">{zone.icon ?? "🌍"}</span>
+                      <div
+                        className="absolute left-0 top-0 bottom-0 w-0.5"
+                        style={{ background: "linear-gradient(to bottom, #e83030, rgba(140,20,20,0.2))" }}
+                      />
+                      <div className="flex items-center gap-3 px-4 pt-4 pb-2 pl-5">
+                        <span className="pixel-icon flex-shrink-0" style={{ fontSize: "1.6rem" }}>{m.icon ?? "👾"}</span>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-cinzel text-xs tracking-wide" style={{ color: "var(--text-primary)" }}>
-                              {zone.name}
-                            </span>
-                            {boss && (
-                              <span
-                                className="font-cinzel tracking-widest uppercase px-1 py-px rounded-sm"
-                                style={{
-                                  fontSize: "0.5rem",
-                                  color: "var(--gold-light)",
-                                  background: "rgba(201,146,42,0.1)",
-                                  border: "1px solid rgba(201,146,42,0.3)",
-                                }}
-                              >
-                                Boss
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-1 mt-1">
-                            {regulars.slice(0, 4).map((m) => (
-                              <span key={m.def.id} className="text-sm leading-none" title={m.def.name}>
-                                {m.def.icon ?? "👾"}
-                              </span>
-                            ))}
-                            {boss && (
-                              <span className="text-sm leading-none ml-0.5" title={boss.def.name}
-                                style={{ color: "var(--gold-light)" }}>
-                                {boss.def.icon ?? "👑"}
-                              </span>
-                            )}
+                          <div className="font-cinzel font-bold" style={{ fontSize: "0.9rem", color: rarityColor }}>{m.name}</div>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="font-cinzel uppercase tracking-widest" style={{ fontSize: "0.42rem", color: rarityColor, opacity: 0.8 }}>{m.rarity ?? "commun"}</span>
+                            <span style={{ color: "var(--border-subtle)" }}>·</span>
+                            <span className="font-cinzel tracking-widest" style={{ fontSize: "0.42rem", color: "var(--color-xp)" }}>+{xpOnKill} XP</span>
                           </div>
                         </div>
-                        <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                          <span
-                            className="font-cinzel tracking-widest uppercase px-2 py-0.5 rounded-sm"
-                            style={{
-                              fontSize: "0.5rem",
-                              color: meetsLevel ? "var(--color-heal)" : "var(--color-damage)",
-                              background: meetsLevel ? "rgba(61,214,140,0.08)" : "rgba(224,80,80,0.08)",
-                              border: `1px solid ${meetsLevel ? "rgba(61,214,140,0.2)" : "rgba(224,80,80,0.2)"}`,
-                            }}
-                          >
-                            {meetsLevel ? "✓" : "🔒"} {reqCombat}
-                          </span>
-                          <div className="flex gap-1">
-                            <span
-                              className="font-cinzel tracking-widest px-1.5 rounded-sm"
-                              style={{
-                                fontSize: "0.5rem",
-                                color: "var(--color-xp)",
-                                background: "rgba(34,211,238,0.08)",
-                                border: "1px solid rgba(34,211,238,0.15)",
-                              }}
-                            >
-                              ×{zone.combatXpMultiplier} XP
-                            </span>
-                            <span
-                              className="font-cinzel tracking-widest px-1.5 rounded-sm"
-                              style={{
-                                fontSize: "0.5rem",
-                                color: "var(--gold-light)",
-                                background: "rgba(201,146,42,0.08)",
-                                border: "1px solid rgba(201,146,42,0.15)",
-                              }}
-                            >
-                              ×{zone.goldMultiplier} 🪙
-                            </span>
-                          </div>
+                        <div className="font-mono font-bold px-2 py-1 flex-shrink-0" style={{ background: "rgba(180,20,20,0.2)", border: "1px solid rgba(180,20,20,0.4)", color: "var(--color-damage)", fontSize: "0.85rem" }}>
+                          {Math.floor(m.hp)}<span style={{ fontSize: "0.65rem", color: "rgba(224,80,80,0.5)" }}>/{m.maxHp}</span>
                         </div>
-                      </button>
-
-                      {/* Expanded zone details */}
-                      {isSelected && (
-                        <div
-                          className="p-3 space-y-3"
-                          style={{
-                            borderTop: "1px solid var(--border-subtle)",
-                            background: "rgba(0,0,0,0.3)",
-                          }}
-                        >
-                          {zone.lore && (
-                            <p
-                              className="font-crimson italic text-xs leading-relaxed pl-3"
-                              style={{
-                                color: "var(--text-muted)",
-                                borderLeft: "2px solid var(--border-gold)",
-                              }}
-                            >
-                              &ldquo;{zone.lore}&rdquo;
-                            </p>
-                          )}
-
-                          {/* Monster grid */}
-                          <div className="grid grid-cols-2 gap-1.5">
-                            {regulars.map((m) => (
-                              <div
-                                key={m.def.id}
-                                className="flex items-center gap-2 p-2 rounded-sm"
-                                style={{
-                                  background: "rgba(255,255,255,0.02)",
-                                  border: "1px solid var(--border-subtle)",
-                                  color: RARITY_COLOR[m.def.rarity ?? "common"] ?? "var(--text-secondary)",
-                                }}
-                              >
-                                <span className="pixel-icon-sm flex-shrink-0">{m.def.icon ?? "👾"}</span>
-                                <div className="min-w-0">
-                                  <div className="text-xs font-crimson font-semibold truncate" style={{ color: "var(--text-primary)" }}>
-                                    {m.def.name}
-                                  </div>
-                                  <div className="font-mono" style={{ fontSize: "0.6rem", color: "var(--text-muted)" }}>
-                                    ❤️{m.def.stats.hp} ⚔️{m.def.stats.attack}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Boss unlock */}
-                          {boss && (() => {
-                            const kills = zoneKills[zone.id] ?? 0;
-                            const bossUnlocked = kills >= BOSS_KILL_REQUIREMENT;
-                            return (
-                              <div className="space-y-2">
-                                <div
-                                  className="rounded-sm p-2.5"
-                                  style={{
-                                    border: bossUnlocked
-                                      ? "1px solid rgba(201,146,42,0.4)"
-                                      : "1px solid var(--border-subtle)",
-                                    background: bossUnlocked
-                                      ? "rgba(201,146,42,0.06)"
-                                      : "rgba(255,255,255,0.02)",
-                                  }}
-                                >
-                                  <div className="flex items-center gap-3 mb-2">
-                                    <span className="pixel-icon flex-shrink-0">{boss.def.icon ?? "👑"}</span>
-                                    <div className="flex-1 min-w-0">
-                                      <div
-                                        className="font-cinzel text-xs font-bold tracking-wide"
-                                        style={{ color: bossUnlocked ? "var(--gold-light)" : "var(--text-secondary)" }}
-                                      >
-                                        {boss.def.name}
-                                      </div>
-                                      <div className="font-mono" style={{ fontSize: "0.6rem", color: "var(--text-muted)" }}>
-                                        ❤️{boss.def.stats.hp} ⚔️{boss.def.stats.attack} 🛡️{boss.def.stats.defense}
-                                      </div>
-                                    </div>
-                                    {bossUnlocked && (
-                                      <span
-                                        className="font-cinzel tracking-widest uppercase px-1.5 py-0.5 rounded-sm"
-                                        style={{
-                                          fontSize: "0.5rem",
-                                          color: "var(--gold-light)",
-                                          background: "rgba(201,146,42,0.15)",
-                                          border: "1px solid rgba(201,146,42,0.4)",
-                                        }}
-                                      >
-                                        Disponible
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="flex justify-between mb-1" style={{ fontSize: "0.6rem" }}>
-                                    <span style={{ color: "var(--text-muted)" }}>Monstres vaincus</span>
-                                    <span
-                                      className="font-mono"
-                                      style={{ color: bossUnlocked ? "var(--gold-light)" : "var(--text-secondary)" }}
-                                    >
-                                      {Math.min(kills, BOSS_KILL_REQUIREMENT)}/{BOSS_KILL_REQUIREMENT}
-                                    </span>
-                                  </div>
-                                  <ProgressBar
-                                    value={Math.min(1, kills / BOSS_KILL_REQUIREMENT)}
-                                    height="h-1"
-                                    color={bossUnlocked ? "bg-amber-500" : "bg-slate-600"}
-                                  />
-                                </div>
-                                {bossUnlocked && meetsLevel && (
-                                  <Button variant="danger" className="w-full" onClick={() => handleBossFight(zone.id)}>
-                                    ⚠️ Défier {boss.def.name}
-                                  </Button>
-                                )}
-                              </div>
-                            );
-                          })()}
-
-                          {meetsLevel ? (
-                            <Button className="w-full" onClick={() => handleEnterZone(zone.id)}>
-                              ⚔️ Explorer
-                            </Button>
-                          ) : (
-                            <div
-                              className="text-center font-crimson text-xs rounded-sm py-2.5"
-                              style={{
-                                color: "var(--color-damage)",
-                                background: "rgba(224,80,80,0.05)",
-                                border: "1px solid rgba(224,80,80,0.2)",
-                              }}
-                            >
-                              🔒 Niveau {reqCombat} requis (tu as {playerCombatLevel})
-                            </div>
-                          )}
-                        </div>
-                      )}
+                      </div>
+                      <div className="px-4 pb-3 pl-5">
+                        <ProgressBar value={m.hp / m.maxHp} color="bg-red-600" height="h-2" />
+                      </div>
+                      <div className="flex gap-4 px-4 pb-3 pl-5" style={{ borderTop: "1px solid rgba(180,30,30,0.15)", paddingTop: "0.5rem" }}>
+                        <span className="font-crimson text-xs" style={{ color: "var(--text-muted)" }}>⚔️ <span style={{ color: "var(--text-secondary)" }}>{m.stats.attack}</span></span>
+                        <span className="font-crimson text-xs" style={{ color: "var(--text-muted)" }}>🛡️ <span style={{ color: "var(--text-secondary)" }}>{m.stats.defense}</span></span>
+                        <span className="font-crimson text-xs" style={{ color: "var(--text-muted)" }}>⚡ <span style={{ color: "var(--text-secondary)" }}>{m.stats.attackSpeed}s</span></span>
+                      </div>
                     </div>
+                  );
+                })()}
+
+                <div className="flex gap-2">
+                  <Button variant="danger" className="flex-1" onClick={stopCombat}>Fuir</Button>
+                  <Button variant={combat.autoRestart ? "primary" : "secondary"} className="flex-1 whitespace-nowrap" onClick={() => setAutoRestart(!combat.autoRestart)}>Auto {combat.autoRestart ? "✓" : "✗"}</Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="section-title">Zones d&apos;exploration</div>
+                <div className="space-y-2">
+                  {allZones.map((zone) => {
+                    if (!unlockedZones.includes(zone.id)) return null;
+                    const reqCombat  = zone.reqLevel?.combat ?? 1;
+                    const meetsLevel = playerCombatLevel >= reqCombat;
+                    const isSelected = selectedZoneId === zone.id;
+                    const monsters   = getMonstersInZone(zone.id);
+                    const regulars   = monsters.filter((m) => !m.isBoss);
+                    const boss       = monsters.find((m)  => m.isBoss);
+
+                    return (
+                      <div key={zone.id} className="rounded-sm overflow-hidden" style={{ border: "1px solid var(--border-subtle)" }}>
+                        <button className="w-full text-left p-3 flex items-center gap-3 transition-colors" style={{ background: isSelected ? "var(--surface-elevated)" : "var(--surface-card)" }} onClick={() => setSelectedZoneId(isSelected ? null : zone.id)}>
+                          <span className="pixel-icon flex-shrink-0">{zone.icon ?? "🌍"}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-cinzel text-xs tracking-wide" style={{ color: "var(--text-primary)" }}>{zone.name}</span>
+                              {boss && <span className="font-cinzel tracking-widest uppercase px-1 py-px rounded-sm" style={{ fontSize: "0.5rem", color: "var(--gold-light)", background: "rgba(201,146,42,0.1)", border: "1px solid rgba(201,146,42,0.3)" }}>Boss</span>}
+                            </div>
+                            <div className="flex items-center gap-1 mt-1">
+                              {regulars.slice(0, 4).map((m) => (<span key={m.def.id} className="text-sm leading-none" title={m.def.name}>{m.def.icon ?? "👾"}</span>))}
+                              {boss && <span className="text-sm leading-none ml-0.5" title={boss.def.name} style={{ color: "var(--gold-light)" }}>{boss.def.icon ?? "👑"}</span>}
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                            <span className="font-cinzel tracking-widest uppercase px-2 py-0.5 rounded-sm" style={{ fontSize: "0.5rem", color: meetsLevel ? "var(--color-heal)" : "var(--color-damage)", background: meetsLevel ? "rgba(61,214,140,0.08)" : "rgba(224,80,80,0.08)", border: `1px solid ${meetsLevel ? "rgba(61,214,140,0.2)" : "rgba(224,80,80,0.2)"}` }}>{meetsLevel ? "✓" : "🔒"} {reqCombat}</span>
+                            <div className="flex gap-1">
+                              <span className="font-cinzel tracking-widest px-1.5 rounded-sm" style={{ fontSize: "0.5rem", color: "var(--color-xp)", background: "rgba(34,211,238,0.08)", border: "1px solid rgba(34,211,238,0.15)" }}>×{zone.combatXpMultiplier} XP</span>
+                              <span className="font-cinzel tracking-widest px-1.5 rounded-sm" style={{ fontSize: "0.5rem", color: "var(--gold-light)", background: "rgba(201,146,42,0.08)", border: "1px solid rgba(201,146,42,0.15)" }}>×{zone.goldMultiplier} 🪙</span>
+                            </div>
+                          </div>
+                        </button>
+                        {isSelected && (
+                          <div className="p-3 space-y-3" style={{ borderTop: "1px solid var(--border-subtle)", background: "rgba(0,0,0,0.3)" }}>
+                            {zone.lore && <p className="font-crimson italic text-xs leading-relaxed pl-3" style={{ color: "var(--text-muted)", borderLeft: "2px solid var(--border-gold)" }}>&ldquo;{zone.lore}&rdquo;</p>}
+                            <div className="grid grid-cols-2 gap-1.5">
+                              {regulars.map((m) => (
+                                <div key={m.def.id} className="flex items-center gap-2 p-2 rounded-sm" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid var(--border-subtle)", color: RARITY_COLOR[m.def.rarity ?? "common"] ?? "var(--text-secondary)" }}>
+                                  <span className="pixel-icon-sm flex-shrink-0">{m.def.icon ?? "👾"}</span>
+                                  <div className="min-w-0">
+                                    <div className="text-xs font-crimson font-semibold truncate" style={{ color: "var(--text-primary)" }}>{m.def.name}</div>
+                                    <div className="font-mono" style={{ fontSize: "0.6rem", color: "var(--text-muted)" }}>❤️{m.def.stats.hp} ⚔️{m.def.stats.attack}</div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                            {boss && (() => {
+                              const kills = zoneKills[zone.id] ?? 0;
+                              const bossUnlocked = kills >= BOSS_KILL_REQUIREMENT;
+                              return (
+                                <div className="space-y-2">
+                                  <div className="rounded-sm p-2.5" style={{ border: bossUnlocked ? "1px solid rgba(201,146,42,0.4)" : "1px solid var(--border-subtle)", background: bossUnlocked ? "rgba(201,146,42,0.06)" : "rgba(255,255,255,0.02)" }}>
+                                    <div className="flex items-center gap-3 mb-2">
+                                      <span className="pixel-icon flex-shrink-0">{boss.def.icon ?? "👑"}</span>
+                                      <div className="flex-1 min-w-0">
+                                        <div className="font-cinzel text-xs font-bold tracking-wide" style={{ color: bossUnlocked ? "var(--gold-light)" : "var(--text-secondary)" }}>{boss.def.name}</div>
+                                        <div className="font-mono" style={{ fontSize: "0.6rem", color: "var(--text-muted)" }}>❤️{boss.def.stats.hp} ⚔️{boss.def.stats.attack} 🛡️{boss.def.stats.defense}</div>
+                                      </div>
+                                      {bossUnlocked && <span className="font-cinzel tracking-widest uppercase px-1.5 py-0.5 rounded-sm" style={{ fontSize: "0.5rem", color: "var(--gold-light)", background: "rgba(201,146,42,0.15)", border: "1px solid rgba(201,146,42,0.4)" }}>Disponible</span>}
+                                    </div>
+                                    <div className="flex justify-between mb-1" style={{ fontSize: "0.6rem" }}>
+                                      <span style={{ color: "var(--text-muted)" }}>Monstres vaincus</span>
+                                      <span className="font-mono" style={{ color: bossUnlocked ? "var(--gold-light)" : "var(--text-secondary)" }}>{Math.min(kills, BOSS_KILL_REQUIREMENT)}/{BOSS_KILL_REQUIREMENT}</span>
+                                    </div>
+                                    <ProgressBar value={Math.min(1, kills / BOSS_KILL_REQUIREMENT)} height="h-1" color={bossUnlocked ? "bg-amber-500" : "bg-slate-600"} />
+                                  </div>
+                                  {bossUnlocked && meetsLevel && (<Button variant="danger" className="w-full" onClick={() => handleBossFight(zone.id)}>⚠️ Défier {boss.def.name}</Button>)}
+                                </div>
+                              );
+                            })()}
+                            {meetsLevel ? (<Button className="w-full" onClick={() => handleEnterZone(zone.id)}>⚔️ Explorer</Button>) : (<div className="text-center font-crimson text-xs rounded-sm py-2.5" style={{ color: "var(--color-damage)", background: "rgba(224,80,80,0.05)", border: "1px solid rgba(224,80,80,0.2)" }}>🔒 Niveau {reqCombat} requis (tu as {playerCombatLevel})</div>)}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Right — Combat Log */}
+          <div className="game-card">
+            <div className="section-title mb-3">Journal de Combat</div>
+            <div className="space-y-1 max-h-96 overflow-y-auto pr-1" style={{ scrollbarWidth: "thin" }}>
+              {recentLog.length === 0 ? (<p className="font-crimson italic text-xs" style={{ color: "var(--text-muted)" }}>Prêt pour le combat...</p>) : (
+                recentLog.map((entry, i) => (
+                  <div key={i} className="text-xs leading-relaxed pl-2.5 log-entry-new" style={{ borderLeft: "2px solid var(--border-subtle)" }}>
+                    {entry.type === "player_hit" && entry.crit && (<span className="log-crit"><span className="mr-1.5" style={{ color: "var(--border-accent)" }}>⚔️</span>Frappe critique — {entry.dmg} dégâts !</span>)}
+                    {entry.type === "player_hit" && !entry.crit && (<span style={{ color: "#5a8aac" }}><span className="mr-1.5" style={{ color: "var(--border-accent)" }}>⚔️</span>Vous infligez {entry.dmg} dégâts</span>)}
+                    {entry.type === "monster_hit" && (<span className="log-damage"><span className="mr-1.5" style={{ color: "var(--border-accent)" }}>🩸</span>Vous subissez {entry.dmg} dégâts</span>)}
+                    {entry.type === "monster_death" && (<span className="log-kill"><span className="mr-1.5" style={{ color: "var(--border-accent)" }}>💀</span>Ennemi neutralisé !</span>)}
+                    {entry.type === "player_death" && (<span className="log-death animate-pulse"><span className="mr-1.5" style={{ color: "var(--border-accent)" }}>⚠️</span>Aventurier terrassé...</span>)}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {section === "training" && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+           <CombatEquipment />
+           <div className="game-card space-y-4">
+              <div>
+                <div className="section-title mb-2">Style d&apos;entraînement</div>
+                <p className="font-crimson text-xs" style={{ color: "var(--text-muted)" }}>L&apos;XP de combat est versée au skill sélectionné. La Constitution progresse toujours.</p>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {TRAINABLE_SKILLS.map((skillId) => {
+                  const meta     = SKILL_META[skillId];
+                  const skill    = skills[skillId];
+                  const level    = getLevelForXp(skill.xp);
+                  const progress = getLevelProgress(skill.xp);
+                  const isActive = trainingStyle === skillId;
+                  return (
+                    <button key={skillId} onClick={() => updateCombatState({ trainingStyle: skillId })} className="rounded-sm p-2.5 text-center transition-all" style={{ border: `1px solid ${isActive ? meta.borderColor : "var(--border-subtle)"}`, background: isActive ? `rgba(${meta.borderColor.slice(5,-0.2)}, 0.06)` : "var(--surface-card)", boxShadow: isActive ? `0 0 12px ${meta.borderColor}` : "none" }}>
+                      <div className="text-xl mb-1 leading-none">{meta.icon}</div>
+                      <div className="font-cinzel tracking-wide mb-1.5" style={{ fontSize: "0.6rem", color: isActive ? "var(--text-primary)" : "var(--text-secondary)" }}>{meta.name}</div>
+                      <div className="font-mono mb-1.5" style={{ fontSize: "0.65rem", color: isActive ? "var(--text-primary)" : "var(--text-muted)" }}>Niv.{level}</div>
+                      <ProgressBar value={progress} height="h-1" color={meta.bar} />
+                    </button>
                   );
                 })}
               </div>
-            </>
-          )}
+              <div className="rounded-sm p-2.5 flex items-center gap-2.5" style={{ background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.2)" }}>
+                <span className="text-xl leading-none flex-shrink-0">❤️</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-cinzel text-xs tracking-wide" style={{ color: "var(--text-secondary)" }}>Constitution</span>
+                    <span className="font-mono text-xs" style={{ color: "var(--text-primary)" }}>{getLevelForXp(skills.constitution.xp)}</span>
+                  </div>
+                  <ProgressBar value={getLevelProgress(skills.constitution.xp)} height="h-1" color="bg-red-500" />
+                  <p className="font-crimson mt-1" style={{ fontSize: "0.65rem", color: "var(--text-muted)" }}>Progression passive</p>
+                </div>
+              </div>
+           </div>
         </div>
+      )}
 
-        {/* Right — Equipment & Training style */}
-        <div className="space-y-4">
-          {/* Equipment Overview */}
-          <CombatEquipment />
-          
-          {/* Training style */}
-          <div className="game-card space-y-4">
-          <div>
-            <div className="section-title mb-2">Style d&apos;entraînement</div>
-            <p className="font-crimson text-xs" style={{ color: "var(--text-muted)" }}>
-              L&apos;XP de combat est versée au skill sélectionné. La Constitution progresse toujours.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2">
-            {TRAINABLE_SKILLS.map((skillId) => {
+      {section === "mastery" && (
+        <div className="game-card">
+          <div className="section-title mb-4">Maîtrises Martiales</div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {COMBAT_SKILL_IDS.map((skillId) => {
               const meta     = SKILL_META[skillId];
               const skill    = skills[skillId];
               const level    = getLevelForXp(skill.xp);
               const progress = getLevelProgress(skill.xp);
-              const isActive = trainingStyle === skillId;
-
               return (
-                <button
-                  key={skillId}
-                  onClick={() => updateCombatState({ trainingStyle: skillId })}
-                  className="rounded-sm p-2.5 text-center transition-all"
-                  style={{
-                    border: `1px solid ${isActive ? meta.borderColor : "var(--border-subtle)"}`,
-                    background: isActive ? `rgba(${meta.borderColor.slice(5,-0.2)}, 0.06)` : "var(--surface-card)",
-                    boxShadow: isActive ? `0 0 12px ${meta.borderColor}` : "none",
-                  }}
-                >
-                  <div className="text-xl mb-1 leading-none">{meta.icon}</div>
-                  <div
-                    className="font-cinzel tracking-wide mb-1.5"
-                    style={{
-                      fontSize: "0.6rem",
-                      color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
-                    }}
-                  >
-                    {meta.name}
-                  </div>
-                  <div
-                    className="font-mono mb-1.5"
-                    style={{
-                      fontSize: "0.65rem",
-                      color: isActive ? "var(--text-primary)" : "var(--text-muted)",
-                    }}
-                  >
-                    Niv.{level}
+                <div key={skillId}>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="flex items-center gap-1" style={{ fontSize: "0.65rem", color: "var(--text-secondary)" }}>
+                      <span className="text-xs leading-none">{meta.icon}</span>
+                      <span className="font-cinzel tracking-wide uppercase">{meta.name}</span>
+                    </span>
+                    <span className="font-mono font-bold text-xs" style={{ color: "var(--text-primary)" }}>{level}</span>
                   </div>
                   <ProgressBar value={progress} height="h-1" color={meta.bar} />
-                </button>
+                </div>
               );
             })}
           </div>
-
-          {/* Constitution */}
-          <div
-            className="rounded-sm p-2.5 flex items-center gap-2.5"
-            style={{
-              background: "rgba(239,68,68,0.05)",
-              border: "1px solid rgba(239,68,68,0.2)",
-            }}
-          >
-            <span className="text-xl leading-none flex-shrink-0">❤️</span>
-            <div className="flex-1 min-w-0">
-              <div className="flex justify-between items-center mb-1">
-                <span className="font-cinzel text-xs tracking-wide" style={{ color: "var(--text-secondary)" }}>
-                  Constitution
-                </span>
-                <span className="font-mono text-xs" style={{ color: "var(--text-primary)" }}>
-                  {getLevelForXp(skills.constitution.xp)}
-                </span>
-              </div>
-              <ProgressBar value={getLevelProgress(skills.constitution.xp)} height="h-1" color="bg-red-500" />
-              <p className="font-crimson mt-1" style={{ fontSize: "0.65rem", color: "var(--text-muted)" }}>
-                Progression passive
-              </p>
-            </div>
-          </div>
         </div>
-      </div>
-
-      {/* ── 3. Martial masteries ───────────────────────────────────────────── */}
-      <div className="game-card">
-        <div className="section-title mb-4">Maîtrises Martiales</div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {COMBAT_SKILL_IDS.map((skillId) => {
-            const meta     = SKILL_META[skillId];
-            const skill    = skills[skillId];
-            const level    = getLevelForXp(skill.xp);
-            const progress = getLevelProgress(skill.xp);
-            return (
-              <div key={skillId}>
-                <div className="flex justify-between items-center mb-1.5">
-                  <span className="flex items-center gap-1" style={{ fontSize: "0.65rem", color: "var(--text-secondary)" }}>
-                    <span className="text-xs leading-none">{meta.icon}</span>
-                    <span className="font-cinzel tracking-wide uppercase">{meta.name}</span>
-                  </span>
-                  <span className="font-mono font-bold text-xs" style={{ color: "var(--text-primary)" }}>
-                    {level}
-                  </span>
-                </div>
-                <ProgressBar value={progress} height="h-1" color={meta.bar} />
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ── 4. Combat log ──────────────────────────────────────────────────── */}
-      <div className="game-card">
-        <div className="section-title mb-3">Journal de Combat</div>
-        <div
-          className="space-y-1 max-h-44 overflow-y-auto pr-1"
-          style={{ scrollbarWidth: "thin" }}
-        >
-          {recentLog.length === 0 ? (
-            <p className="font-crimson italic text-xs" style={{ color: "var(--text-muted)" }}>
-              Prêt pour le combat...
-            </p>
-          ) : (
-            recentLog.map((entry, i) => (
-              <div
-                key={i}
-                className="text-xs leading-relaxed pl-2.5 log-entry-new"
-                style={{ borderLeft: "2px solid var(--border-subtle)" }}
-              >
-                {entry.type === "player_hit" && entry.crit && (
-                  <span className="log-crit">
-                    <span className="mr-1.5" style={{ color: "var(--border-accent)" }}>⚔️</span>
-                    Frappe critique — {entry.dmg} dégâts !
-                  </span>
-                )}
-                {entry.type === "player_hit" && !entry.crit && (
-                  <span style={{ color: "#5a8aac" }}>
-                    <span className="mr-1.5" style={{ color: "var(--border-accent)" }}>⚔️</span>
-                    Vous infligez {entry.dmg} dégâts
-                  </span>
-                )}
-                {entry.type === "monster_hit" && (
-                  <span className="log-damage">
-                    <span className="mr-1.5" style={{ color: "var(--border-accent)" }}>🩸</span>
-                    Vous subissez {entry.dmg} dégâts
-                  </span>
-                )}
-                {entry.type === "monster_death" && (
-                  <span className="log-kill">
-                    <span className="mr-1.5" style={{ color: "var(--border-accent)" }}>💀</span>
-                    Ennemi neutralisé !
-                  </span>
-                )}
-                {entry.type === "player_death" && (
-                  <span className="log-death animate-pulse">
-                    <span className="mr-1.5" style={{ color: "var(--border-accent)" }}>⚠️</span>
-                    Aventurier terrassé...
-                  </span>
-                )}
-              </div>
-            ))
-          )}
-        </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

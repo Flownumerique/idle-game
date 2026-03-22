@@ -19,7 +19,7 @@ const sellableItems: ItemDef[] = (itemsData as { items: ItemDef[] }).items.filte
   (i) => (i.sellPrice ?? 0) > 0
 );
 
-export default function MarketPanel() {
+export default function MarketPanel({ section = "sell" }: { section?: "buy" | "sell" }) {
   const { inventory, gold, marketSales, removeItems, addGold, recordSale } = useGameStore((s) => ({
     inventory: s.inventory,
     gold: s.gold,
@@ -28,8 +28,6 @@ export default function MarketPanel() {
     addGold: s.addGold,
     recordSale: s.recordSale,
   }));
-
-  const [tab, setTab] = useState<"sell" | "buy">("sell");
 
   const sellableInventoryItems = useMemo(
     () => sellableItems.filter((item) => (inventory[item.id] ?? 0) > 0),
@@ -46,28 +44,11 @@ export default function MarketPanel() {
 
   return (
     <div className="game-card">
-      <h3 className="font-bold text-slate-200 mb-3 flex items-center gap-2">
-        <span>🏪</span> Marché
+      <h3 className="section-title mb-4">
+        <span>🏪</span> Marché — {section === "sell" ? "Vente" : "Achat"}
       </h3>
 
-      <div className="flex gap-2 mb-4">
-        <Button
-          size="sm"
-          variant={tab === "sell" ? "primary" : "ghost"}
-          onClick={() => setTab("sell")}
-        >
-          Vendre
-        </Button>
-        <Button
-          size="sm"
-          variant={tab === "buy" ? "primary" : "ghost"}
-          onClick={() => setTab("buy")}
-        >
-          Acheter
-        </Button>
-      </div>
-
-      {tab === "sell" && (
+      {section === "sell" && (
         <div className="space-y-1 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
           {sellableInventoryItems.map((item) => {
             const qty = inventory[item.id] ?? 0;
@@ -75,7 +56,7 @@ export default function MarketPanel() {
             return (
               <div
                 key={item.id}
-                className="flex items-center justify-between p-3 bg-[#0d1525] rounded-lg border border-slate-700/50 hover:border-slate-600 transition-colors"
+                className="flex items-center justify-between p-3 bg-[#0d1525] rounded-sm border border-slate-700/50 hover:border-slate-600 transition-colors"
               >
                 <div>
                   <div className="text-sm font-bold text-slate-100">{item.name}</div>
@@ -95,14 +76,14 @@ export default function MarketPanel() {
             );
           })}
           {sellableInventoryItems.length === 0 && (
-            <div className="py-8 text-center bg-[#0d1525]/30 rounded-lg border border-dashed border-slate-800">
+            <div className="py-8 text-center bg-[#0d1525]/30 rounded-sm border border-dashed border-slate-800">
               <p className="text-sm text-slate-500 italic">Votre inventaire est vide d'objets marchands</p>
             </div>
           )}
         </div>
       )}
 
-      {tab === "buy" && (
+      {section === "buy" && (
         <div className="space-y-1 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
           {(itemsData as { items: ItemDef[] }).items
             .filter(i => (i.buyPrice ?? 0) > 0 && i.id !== "gold")
@@ -112,7 +93,7 @@ export default function MarketPanel() {
               return (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-3 bg-[#0d1525] rounded-lg border border-slate-700/50 hover:border-slate-600 transition-colors"
+                  className="flex items-center justify-between p-3 bg-[#0d1525] rounded-sm border border-slate-700/50 hover:border-slate-600 transition-colors"
                 >
                   <div>
                     <div className="text-sm font-bold text-slate-100">{item.name}</div>

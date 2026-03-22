@@ -112,8 +112,11 @@ export interface SkillState {
 export interface MonsterInstance {
   id: string;
   name: string;
+  icon?: string;
   hp: number;
   maxHp: number;
+  combatXp: number;
+  rarity?: string;
   stats: {
     attack: number;
     defense: number;

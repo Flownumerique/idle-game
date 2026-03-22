@@ -34,7 +34,7 @@ function StatRow({ label, value, color }: { label: string; value: string; color?
   );
 }
 
-export default function CharacterSheet() {
+export default function CharacterSheet({ section = "stats" }: { section?: "stats" | "milestones" }) {
   const { player, skills, resetGame } = useGameStore((s) => ({
     player: s.player, skills: s.skills, resetGame: s.resetGame,
   }));
@@ -42,7 +42,6 @@ export default function CharacterSheet() {
   const stats = computePlayerStats(state);
   const { totalLevel, combatLevel, professionLevel } = calculateGlobalLevels(skills);
   const nextMilestone = getNextMilestone(state);
-  const [activeTab, setActiveTab] = useState<"stats" | "equipment">("stats");
 
   function handleReset() {
     if (window.confirm("Créer un nouveau personnage ? La sauvegarde actuelle sera effacée.")) {
@@ -104,40 +103,8 @@ export default function CharacterSheet() {
         )}
       </div>
 
-      {/* Tab Navigation */}
-      <div className="flex gap-2 border-b" style={{ borderColor: "var(--border-subtle)" }}>
-        <button
-          className={`px-4 py-2 font-cinzel text-sm transition-colors ${
-            activeTab === "stats" 
-              ? "border-b-2" 
-              : "opacity-60 hover:opacity-80"
-          }`}
-          style={{
-            borderBottomColor: activeTab === "stats" ? "var(--gold-light)" : "transparent",
-            color: activeTab === "stats" ? "var(--gold-light)" : "var(--text-secondary)"
-          }}
-          onClick={() => setActiveTab("stats")}
-        >
-          Stats
-        </button>
-        <button
-          className={`px-4 py-2 font-cinzel text-sm transition-colors ${
-            activeTab === "equipment" 
-              ? "border-b-2" 
-              : "opacity-60 hover:opacity-80"
-          }`}
-          style={{
-            borderBottomColor: activeTab === "equipment" ? "var(--gold-light)" : "transparent",
-            color: activeTab === "equipment" ? "var(--gold-light)" : "var(--text-secondary)"
-          }}
-          onClick={() => setActiveTab("equipment")}
-        >
-          Équipement
-        </button>
-      </div>
-
       {/* Tab Content */}
-      {activeTab === "stats" ? (
+      {section === "stats" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Stats de combat */}
           <div className="game-card">
@@ -178,7 +145,26 @@ export default function CharacterSheet() {
           </div>
         </div>
       ) : (
-        <EquipmentPanel />
+        <div className="game-card">
+          <div className="section-title mb-4">Milestones & Succès</div>
+          <div className="space-y-6">
+             <div className="p-4 rounded-sm" style={{ background: "rgba(201,146,42,0.05)", border: "1px solid rgba(201,146,42,0.2)" }}>
+                <p className="font-crimson text-sm" style={{ color: "var(--text-secondary)" }}>
+                  Les milestones représentent votre progression globale dans Idle Realms. 
+                  Chaque palier atteint débloque de nouvelles fonctionnalités ou des bonus permanents.
+                </p>
+             </div>
+             
+             {/* Simple placeholder for more milestones if they exist */}
+             <div className="space-y-3 opacity-50">
+                <div className="flex justify-between items-center text-xs font-cinzel">
+                  <span style={{ color: "var(--text-muted)" }}>PROCHAIN PALIER MAJEUR</span>
+                  <span style={{ color: "var(--gold)" }}>LV.100</span>
+                </div>
+                <div className="h-2 bg-void border border-border-subtle" />
+             </div>
+          </div>
+        </div>
       )}
     </div>
   );

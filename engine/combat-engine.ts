@@ -93,8 +93,11 @@ function makeInstance(def: MonsterDef): MonsterInstance {
   return {
     id: def.id,
     name: def.name,
+    icon: def.icon,
     hp: def.stats.hp,
     maxHp: def.stats.hp,
+    combatXp: def.combatXp,
+    rarity: def.rarity,
     stats: {
       attack: def.stats.attack,
       defense: def.stats.defense,

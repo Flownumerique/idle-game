@@ -512,6 +512,22 @@ export const useGameStore = create<GameStore>()(
           removeItem: () => {},
         }
       ),
+      // Deep-merge skills so newly added skills always have default values in old saves
+      merge: (persisted, current) => {
+        const p = persisted as Partial<GameState>;
+        return {
+          ...current,
+          ...p,
+          skills: {
+            ...current.skills,      // all skills with defaults
+            ...(p.skills ?? {}),    // override with saved values (may be partial)
+          },
+          inventory: {
+            ...current.inventory,
+            ...(p.inventory ?? {}),
+          },
+        } as GameStore;
+      },
       // Only persist the game state fields, not actions
       partialize: (s) => ({
         player: s.player,

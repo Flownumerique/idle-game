@@ -94,7 +94,7 @@ export function useGameLoop() {
       // ── Skill ticks ──
       for (const skillId of SKILL_IDS) {
         const skillState = state.skills[skillId];
-        if (!skillState.activeAction) {
+        if (!skillState?.activeAction) {
           delete skillAccRef.current[skillId];
           continue;
         }
@@ -253,7 +253,7 @@ export function useGameLoop() {
 
       for (const skillId of SKILL_IDS) {
         const skillState = state.skills[skillId];
-        if (!skillState.activeAction) continue;
+        if (!skillState?.activeAction) continue;
 
         const acc = skillAccRef.current[skillId];
         if (!acc) continue;

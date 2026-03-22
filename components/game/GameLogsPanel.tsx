@@ -79,28 +79,32 @@ function formatLogMessage(entry: LogEntry): string {
   }
 }
 
-export default function GameLogsPanel() {
+export default function GameLogsPanel({ section = "all" }: { section?: "all" | "combat" | "loot" | "xp" }) {
   const { getLogs } = useGameStore();
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [autoScroll, setAutoScroll] = useState(true);
-  const [filter, setFilter] = useState<string>("all");
 
   useEffect(() => {
     const updateLogs = () => {
       const allLogs = getLogs(100);
-      const filteredLogs = filter === "all" 
-        ? allLogs 
-        : allLogs.filter(log => log.type === filter);
+      let filteredLogs = allLogs;
+
+      if (section === "combat") {
+        filteredLogs = allLogs.filter(log => ["player_hit", "monster_hit", "player_death", "monster_death"].includes(log.type));
+      } else if (section === "loot") {
+        filteredLogs = allLogs.filter(log => log.type === "loot");
+      } else if (section === "xp") {
+        filteredLogs = allLogs.filter(log => log.type === "skill_level");
+      }
+
       setLogs(filteredLogs);
     };
 
     updateLogs();
     const interval = setInterval(updateLogs, 1000);
     return () => clearInterval(interval);
-  }, [getLogs, filter]);
+  }, [getLogs, section]);
 
-  const logTypes = Array.from(new Set(logs.map(log => log.type)));
-  
   const logsEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -111,54 +115,25 @@ export default function GameLogsPanel() {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center bg-[#16213e] p-4 rounded-lg border border-[#0f3460]">
+      <div className="game-card flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-bold text-slate-200">Logs du Jeu</h2>
-          <p className="text-sm text-slate-400">Historique des événements récents</p>
+          <h2 className="section-title mb-1">Journal — {section.toUpperCase()}</h2>
+          <p className="font-crimson text-sm text-[var(--text-muted)]">Historique des événements récents</p>
         </div>
-        <div className="flex items-center gap-2">
-          <label className="text-xs text-slate-400">Auto-scroll:</label>
+        <div className="flex items-center gap-3 bg-[rgba(0,0,0,0.2)] px-3 py-1.5 rounded-sm border border-[var(--border-subtle)]">
+          <label className="font-cinzel text-[0.45rem] text-slate-400 mt-0.5">AUTO-SCROLL</label>
           <input
             type="checkbox"
             checked={autoScroll}
             onChange={(e) => setAutoScroll(e.target.checked)}
-            className="w-4 h-4"
+            className="w-4 h-4 accent-[var(--gold)]"
           />
         </div>
       </div>
 
-      {/* Filtres */}
-      <div className="flex gap-2 flex-wrap">
-        <button
-          onClick={() => setFilter("all")}
-          className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-            filter === "all"
-              ? "bg-blue-600 text-white"
-              : "bg-[#0f3460] text-slate-400 hover:bg-[#1a4d7a]"
-          }`}
-        >
-          Tous
-        </button>
-        {logTypes.map(type => (
-          <button
-            key={type}
-            onClick={() => setFilter(type)}
-            className={`px-3 py-1 rounded text-xs font-medium transition-colors flex items-center gap-1 ${
-              filter === type
-                ? "bg-blue-600 text-white"
-                : "bg-[#0f3460] text-slate-400 hover:bg-[#1a4d7a]"
-            }`}
-          >
-            <span>{LOG_ICONS[type] || "📝"}</span>
-            {type}
-          </button>
-        ))}
-      </div>
-
-      {/* Logs */}
-      <div className="bg-[#0d1525] border border-[#0f3460] rounded-lg p-4 h-96 overflow-y-auto">
+      <div className="bg-[#0d1525] border-2 border-[var(--border-default)] rounded-sm p-4 h-96 overflow-y-auto custom-scrollbar">
         {logs.length === 0 ? (
-          <p className="text-slate-500 text-center italic">Aucun log récent</p>
+          <p className="text-slate-500 text-center italic font-crimson py-10">Aucun log récent pour cette catégorie</p>
         ) : (
           <div className="space-y-1">
             {logs.map((entry, index) => (
@@ -166,13 +141,13 @@ export default function GameLogsPanel() {
                 key={`${entry.timestamp}-${index}`}
                 className={`text-sm flex items-start gap-2 ${LOG_COLORS[entry.type] || "text-slate-400"}`}
               >
-                <span className="text-xs text-slate-500 font-mono whitespace-nowrap">
-                  {formatTimestamp(entry.timestamp)}
+                <span className="text-[0.6rem] text-slate-500 font-mono whitespace-nowrap pt-0.5 opacity-60">
+                  [{formatTimestamp(entry.timestamp)}]
                 </span>
-                <span className="flex-shrink-0">
+                <span className="flex-shrink-0 text-xs">
                   {LOG_ICONS[entry.type] || "📝"}
                 </span>
-                <span className="flex-1">
+                <span className="flex-1 font-crimson text-sm leading-tight">
                   {formatLogMessage(entry)}
                 </span>
               </div>
@@ -182,30 +157,18 @@ export default function GameLogsPanel() {
         )}
       </div>
 
-      {/* Statistiques */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-[#16213e] p-3 rounded border border-[#0f3460]">
-          <div className="text-2xl font-bold text-slate-200">{logs.length}</div>
-          <div className="text-xs text-slate-400">Logs totaux</div>
-        </div>
-        <div className="bg-[#16213e] p-3 rounded border border-[#0f3460]">
-          <div className="text-2xl font-bold text-red-400">
-            {logs.filter(l => l.type.includes("hit")).length}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {[
+          { label: "LOGS TOTAUX", value: logs.length, color: "var(--text-primary)" },
+          { label: "COMBATS", value: logs.filter(l => l.type.includes("hit")).length, color: "var(--color-damage)" },
+          { label: "BUTINS", value: logs.filter(l => l.type === "loot").length, color: "var(--gold-light)" },
+          { label: "NIVEAUX", value: logs.filter(l => l.type === "skill_level").length, color: "var(--color-magic)" },
+        ].map((stat, i) => (
+          <div key={i} className="game-card p-3 text-center">
+            <div className="font-cinzel text-[0.4rem] text-slate-500 mb-1">{stat.label}</div>
+            <div className="font-mono font-bold text-lg" style={{ color: stat.color }}>{stat.value}</div>
           </div>
-          <div className="text-xs text-slate-400">Actions combat</div>
-        </div>
-        <div className="bg-[#16213e] p-3 rounded border border-[#0f3460]">
-          <div className="text-2xl font-bold text-amber-300">
-            {logs.filter(l => l.type === "loot").length}
-          </div>
-          <div className="text-xs text-slate-400">Butins</div>
-        </div>
-        <div className="bg-[#16213e] p-3 rounded border border-[#0f3460]">
-          <div className="text-2xl font-bold text-purple-400">
-            {logs.filter(l => l.type === "item_crafted").length}
-          </div>
-          <div className="text-xs text-slate-400">Crafts</div>
-        </div>
+        ))}
       </div>
     </div>
   );

@@ -49,149 +49,307 @@ export default function GameLayout() {
   useGameLoop();
   const [activeTab, setActiveTab] = useState<Tab>("skills");
   const [selectedSkill, setSelectedSkill] = useState<SkillId>(PROFESSION_SKILL_IDS[0]);
+  
+  // Sub-navigation states
+  const [inventoryFilter, setInventoryFilter] = useState("all");
+  const [combatSection, setCombatSection] = useState("map");
+  const [characterSection, setCharacterSection] = useState("stats");
+  const [marketSection, setMarketSection] = useState("sell");
+  const [encyclopediaSection, setEncyclopediaSection] = useState("items");
+  const [questsSection, setQuestsSection] = useState("active");
+  const [logsSection, setLogsSection] = useState("all");
 
   const skills = useGameStore((s) => s.skills);
   const { totalLevel } = calculateGlobalLevels(skills);
 
-  const visibleTabs = TABS.filter(tab => !tab.minLevel || totalLevel >= tab.minLevel);
+  const visibleTabs = TABS.filter((t) => !t.minLevel || totalLevel >= t.minLevel);
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: "var(--void)" }}>
-      <ResourceBar onNavigate={(tab) => setActiveTab(tab as Tab)} />
-
-      <div className="flex-1 flex overflow-hidden">
-
-        {/* ── Sidebar navigation desktop ─────────────────────────────── */}
-        <nav
-          className="hidden md:flex w-44 flex-shrink-0 flex-col"
-          style={{ background: "var(--abyss)", borderRight: "2px solid var(--border-accent)" }}
-        >
-          <div className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
-            <div className="section-title mb-3 mt-1 px-1">Navigation</div>
-            {visibleTabs.map((tab) => (
+    <div className="flex flex-col h-screen bg-black text-slate-100 overflow-hidden medieval-bg">
+      {/* ── Top Navigation Bar (Desktop) ────────────────────────────── */}
+      <header className="hidden md:flex items-center h-14 border-b-2 border-slate-800 bg-black/80 backdrop-blur-sm z-50 px-4 gap-6">
+        <div className="flex items-center gap-3 pr-6 border-r border-slate-800">
+          <span className="text-2xl">⚔️</span>
+          <h1 className="font-cinzel text-sm tracking-widest text-[var(--gold)]">IDLE REALMS</h1>
+        </div>
+        
+        <nav className="flex items-center h-full gap-1 overflow-x-auto no-scrollbar">
+          {visibleTabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`nav-item ${activeTab === tab.id ? "active" : ""}`}
+                className={`flex items-center gap-2 h-full px-4 transition-all border-b-2 ${
+                  isActive ? "border-[var(--gold)] bg-white/5 text-[var(--gold-light)]" : "border-transparent text-slate-400 hover:text-slate-200"
+                }`}
               >
-                <span className="pixel-icon-sm">{tab.icon}</span>
-                <span className="truncate">{tab.label}</span>
+                <span className="text-lg">{tab.icon}</span>
+                <span className="font-cinzel text-[0.65rem] tracking-wider font-bold">{tab.label.toUpperCase()}</span>
               </button>
-            ))}
-          </div>
-          <div className="px-3 py-2" style={{ borderTop: "1px solid var(--border-subtle)" }}>
-            <span className="font-cinzel" style={{ fontSize: "0.38rem", color: "var(--text-muted)" }}>
-              ▸ SAUVEGARDE AUTO 30S
-            </span>
-          </div>
+            );
+          })}
         </nav>
 
-        {/* ── Contenu principal ───────────────────────────────────────── */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-
-          {activeTab === "skills" ? (
-            <div className="flex-1 flex overflow-hidden">
-              {/* Sous-sidebar métiers */}
-              <aside
-                className="w-40 flex-shrink-0 overflow-y-auto"
-                style={{ background: "var(--void)", borderRight: "2px solid var(--border-default)" }}
-              >
-                <div className="p-2 pt-3 space-y-0.5">
-                  <div className="section-title mb-3 px-1">Métiers</div>
-                  {PROFESSION_SKILL_IDS.map((id) => {
-                    const skillState = skills[id];
-                    const level = getLevelForXp(skillState.xp);
-                    const isActive = !!skillState.activeAction;
-                    const isSelected = selectedSkill === id;
-                    const meta = SKILL_META[id];
-                    return (
-                      <button
-                        key={id}
-                        onClick={() => setSelectedSkill(id)}
-                        className="w-full text-left px-2 py-2 flex items-center gap-2 transition-colors"
-                        style={{
-                          background: isSelected ? "rgba(200,136,42,0.1)" : "transparent",
-                          borderLeft: `3px solid ${isSelected ? "var(--gold)" : "transparent"}`,
-                          color: isSelected ? "var(--gold-light)" : "var(--text-secondary)",
-                        }}
-                      >
-                        <span className="pixel-icon-sm">{meta.icon}</span>
-                        <div className="min-w-0 flex-1">
-                          <div className="font-cinzel truncate" style={{ fontSize: "0.45rem", color: isSelected ? "var(--gold-light)" : "var(--text-secondary)" }}>
-                            {meta.name}
-                          </div>
-                          <div className="font-cinzel" style={{ fontSize: "0.38rem", color: "var(--text-muted)" }}>
-                            LV.{level}
-                          </div>
-                        </div>
-                        {isActive && (
-                          <span className="pixel-blink" style={{ color: "var(--gold)", fontSize: "0.5rem" }}>▶</span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </aside>
-
-              <main className="flex-1 overflow-y-auto p-4 pb-20 md:pb-4">
-                <div className="max-w-2xl mx-auto">
-                  <SkillDetailPage
-                    key={selectedSkill}
-                    skillId={selectedSkill}
-                    skillName={SKILL_META[selectedSkill].name}
-                    skillIcon={SKILL_META[selectedSkill].icon}
-                  />
-                </div>
-              </main>
-            </div>
-          ) : (
-            <main className="flex-1 p-4 pb-20 md:pb-4 overflow-y-auto">
-              {activeTab === "combat"       && <div className="max-w-4xl mx-auto"><CombatPanel /></div>}
-              {activeTab === "inventory"    && <div className="max-w-2xl mx-auto"><InventoryPanel /></div>}
-              {activeTab === "equipment"    && <div className="max-w-4xl mx-auto"><EquipmentPanel /></div>}
-              {activeTab === "planting"     && <div className="max-w-2xl mx-auto"><PlantingPanel /></div>}
-              {activeTab === "farming"      && <div className="max-w-2xl mx-auto"><FarmingPanel /></div>}
-              {activeTab === "market"       && <div className="max-w-lg mx-auto"><MarketPanel /></div>}
-              {activeTab === "character"    && <div className="max-w-lg mx-auto"><CharacterSheet /></div>}
-              {activeTab === "encyclopedia" && <div className="max-w-5xl mx-auto h-full"><EncyclopediaPanel /></div>}
-              {activeTab === "quests"       && <div className="max-w-2xl mx-auto"><QuestPanel /></div>}
-              {activeTab === "logs"         && <div className="max-w-4xl mx-auto"><GameLogsPanel /></div>}
-            </main>
-          )}
+        <div className="ml-auto flex items-center gap-4">
+          <ResourceBar onNavigate={setActiveTab} />
         </div>
+      </header>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* ── Sidebar Gauche (Contenu adaptatif) ───────────────────────── */}
+        <aside className="hidden md:flex flex-col w-64 border-r-2 border-slate-800 bg-[#070b13]/90 backdrop-blur-md">
+          <div className="flex-1 overflow-y-auto p-3 custom-scrollbar">
+            {/* Skills Sidebar */}
+            {activeTab === "skills" && (
+              <>
+                <div className="section-title mb-3 px-1 text-[var(--gold)]">MÉTIERS</div>
+                {PROFESSION_SKILL_IDS.map((id) => {
+                  const skillState = skills[id];
+                  const level = getLevelForXp(skillState.xp);
+                  const isWorking = !!skillState.activeAction;
+                  const isSelected = selectedSkill === id;
+                  const meta = SKILL_META[id];
+                  return (
+                    <button
+                      key={id}
+                      onClick={() => setSelectedSkill(id)}
+                      className={`w-full text-left px-3 py-2.5 flex items-center gap-3 transition-all mb-1 border rounded-sm ${isSelected ? "bg-[var(--gold)]/5 border-[var(--gold)]/30 text-[var(--gold-light)]" : "bg-transparent border-transparent text-slate-500 hover:text-slate-300"}`}
+                    >
+                      <span className={`text-xl ${isWorking ? "animate-pulse" : ""}`}>{meta.icon}</span>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-cinzel truncate font-bold" style={{ fontSize: "0.5rem" }}>
+                          {meta.name.toUpperCase()}
+                        </div>
+                        <div className="font-mono text-[0.6rem] opacity-70">
+                          NIV.{level}
+                        </div>
+                      </div>
+                      {isWorking && (
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
+                      )}
+                    </button>
+                  );
+                })}
+              </>
+            )}
+
+            {/* Inventory Sidebar */}
+            {activeTab === "inventory" && (
+              <>
+                <div className="section-title mb-3 px-1 text-[var(--gold)]">FILTRES</div>
+                {[
+                  { id: "all", label: "TOUT", icon: "📦" },
+                  { id: "resource", label: "RESSOURCES", icon: "💎" },
+                  { id: "equipment", label: "ÉQUIPEMENT", icon: "⚔️" },
+                  { id: "consumable", label: "CONSOMMABLES", icon: "🧪" },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => setInventoryFilter(f.id)}
+                    className={`w-full text-left px-3 py-2.5 flex items-center gap-3 transition-all mb-1 border rounded-sm ${inventoryFilter === f.id ? "bg-[var(--gold)]/5 border-[var(--gold)]/30 text-[var(--gold-light)]" : "bg-transparent border-transparent text-slate-500 hover:text-slate-300"}`}
+                  >
+                    <span>{f.icon}</span>
+                    <span className="font-cinzel font-bold" style={{ fontSize: "0.5rem" }}>{f.label}</span>
+                  </button>
+                ))}
+              </>
+            )}
+
+            {/* Combat Sidebar */}
+            {activeTab === "combat" && (
+              <>
+                <div className="section-title mb-3 px-1 text-[var(--gold)]">COMBAT</div>
+                {[
+                  { id: "map", label: "CARTE DU MONDE", icon: "🗺️" },
+                  { id: "training", label: "ENTRAÎNEMENT", icon: "🎯" },
+                  { id: "mastery", label: "MAÎTRISE", icon: "⚔️" },
+                ].map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => setCombatSection(s.id)}
+                    className={`w-full text-left px-3 py-2.5 flex items-center gap-3 transition-all mb-1 border rounded-sm ${combatSection === s.id ? "bg-[var(--gold)]/5 border-[var(--gold)]/30 text-[var(--gold-light)]" : "bg-transparent border-transparent text-slate-500 hover:text-slate-300"}`}
+                  >
+                    <span>{s.icon}</span>
+                    <span className="font-cinzel font-bold" style={{ fontSize: "0.5rem" }}>{s.label}</span>
+                  </button>
+                ))}
+              </>
+            )}
+
+            {/* Character Sidebar */}
+            {activeTab === "character" && (
+              <>
+                <div className="section-title mb-3 px-1 text-[var(--gold)]">HÉROS</div>
+                {[
+                  { id: "stats", label: "STATISTIQUES", icon: "📊" },
+                  { id: "milestones", label: "HAUTS FAITS", icon: "🏆" },
+                ].map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => setCharacterSection(s.id)}
+                    className={`w-full text-left px-3 py-2.5 flex items-center gap-3 transition-all mb-1 border rounded-sm ${characterSection === s.id ? "bg-[var(--gold)]/5 border-[var(--gold)]/30 text-[var(--gold-light)]" : "bg-transparent border-transparent text-slate-500 hover:text-slate-300"}`}
+                  >
+                    <span>{s.icon}</span>
+                    <span className="font-cinzel font-bold" style={{ fontSize: "0.5rem" }}>{s.label}</span>
+                  </button>
+                ))}
+              </>
+            )}
+
+            {/* Market Sidebar */}
+            {activeTab === "market" && (
+              <>
+                <div className="section-title mb-3 px-1 text-[var(--gold)]">MARCHÉ</div>
+                {[
+                  { id: "sell", label: "VENDRE", icon: "💰" },
+                  { id: "buy", label: "ACHETER", icon: "🛒" },
+                ].map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => setMarketSection(s.id)}
+                    className={`w-full text-left px-3 py-2.5 flex items-center gap-3 transition-all mb-1 border rounded-sm ${marketSection === s.id ? "bg-[var(--gold)]/5 border-[var(--gold)]/30 text-[var(--gold-light)]" : "bg-transparent border-transparent text-slate-500 hover:text-slate-300"}`}
+                  >
+                    <span>{s.icon}</span>
+                    <span className="font-cinzel font-bold" style={{ fontSize: "0.5rem" }}>{s.label}</span>
+                  </button>
+                ))}
+              </>
+            )}
+
+            {/* Encyclopedia Sidebar */}
+            {activeTab === "encyclopedia" && (
+              <>
+                <div className="section-title mb-3 px-1 text-[var(--gold)]">ARCHIVES</div>
+                {[
+                  { id: "items", label: "OBJETS", icon: "💍" },
+                  { id: "monsters", label: "BESTIAIRE", icon: "🐉" },
+                  { id: "zones", label: "LÉGENDES", icon: "🗺️" },
+                ].map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => setEncyclopediaSection(s.id)}
+                    className={`w-full text-left px-3 py-2.5 flex items-center gap-3 transition-all mb-1 border rounded-sm ${encyclopediaSection === s.id ? "bg-[var(--gold)]/5 border-[var(--gold)]/30 text-[var(--gold-light)]" : "bg-transparent border-transparent text-slate-500 hover:text-slate-300"}`}
+                  >
+                    <span>{s.icon}</span>
+                    <span className="font-cinzel font-bold" style={{ fontSize: "0.5rem" }}>{s.label}</span>
+                  </button>
+                ))}
+              </>
+            )}
+
+            {/* Quests Sidebar */}
+            {activeTab === "quests" && (
+              <>
+                <div className="section-title mb-3 px-1 text-[var(--gold)]">AVENTURES</div>
+                {[
+                  { id: "active", label: "EN COURS", icon: "📜" },
+                  { id: "completed", label: "ACHEVÉES", icon: "🏆" },
+                ].map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => setQuestsSection(s.id)}
+                    className={`w-full text-left px-3 py-2.5 flex items-center gap-3 transition-all mb-1 border rounded-sm ${questsSection === s.id ? "bg-[var(--gold)]/5 border-[var(--gold)]/30 text-[var(--gold-light)]" : "bg-transparent border-transparent text-slate-500 hover:text-slate-300"}`}
+                  >
+                    <span>{s.icon}</span>
+                    <span className="font-cinzel font-bold" style={{ fontSize: "0.5rem" }}>{s.label}</span>
+                  </button>
+                ))}
+              </>
+            )}
+
+            {/* Logs Sidebar */}
+            {activeTab === "logs" && (
+              <>
+                <div className="section-title mb-3 px-1 text-[var(--gold)]">HISTORIQUE</div>
+                {[
+                  { id: "all", label: "TOUS LES ÉVÉNEMENTS", icon: "📝" },
+                  { id: "combat", label: "COMBATS", icon: "⚔️" },
+                  { id: "loot", label: "BUTINS", icon: "💰" },
+                  { id: "xp", label: "NIVEAUX", icon: "⬆️" },
+                ].map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => setLogsSection(s.id)}
+                    className={`w-full text-left px-3 py-2.5 flex items-center gap-3 transition-all mb-1 border rounded-sm ${logsSection === s.id ? "bg-[var(--gold)]/5 border-[var(--gold)]/30 text-[var(--gold-light)]" : "bg-transparent border-transparent text-slate-500 hover:text-slate-300"}`}
+                  >
+                    <span>{s.icon}</span>
+                    <span className="font-cinzel font-bold" style={{ fontSize: "0.5rem" }}>{s.label}</span>
+                  </button>
+                ))}
+              </>
+            )}
+          </div>
+          
+          <div className="mt-auto px-4 py-3 bg-black/40 border-t border-slate-800">
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+              <span className="font-cinzel text-[0.4rem] text-slate-500 tracking-wider">SAUVEGARDE AUTO ACTIVE</span>
+            </div>
+          </div>
+        </aside>
+
+        {/* ── Contenu principal ───────────────────────────────────────── */}
+        <main className="flex-1 overflow-y-auto p-4 pb-24 md:pb-6 min-w-0 custom-scrollbar">
+          <div className="max-w-5xl mx-auto h-full">
+            {activeTab === "skills" && (
+              selectedSkill === "planting" ? (
+                <PlantingPanel />
+              ) : selectedSkill === "farming" ? (
+                <FarmingPanel />
+              ) : (
+                <SkillDetailPage
+                  key={selectedSkill}
+                  skillId={selectedSkill}
+                  skillName={SKILL_META[selectedSkill].name}
+                  skillIcon={SKILL_META[selectedSkill].icon}
+                />
+              )
+            )}
+            
+            {activeTab === "inventory" && <InventoryPanel filter={inventoryFilter as any} />}
+            {activeTab === "combat" && <CombatPanel section={combatSection as any} />}
+            {activeTab === "character" && <CharacterSheet section={characterSection as any} />}
+            
+            {activeTab === "equipment"    && <EquipmentPanel />}
+            {activeTab === "market"       && <MarketPanel section={marketSection as any} />}
+            {activeTab === "encyclopedia" && <EncyclopediaPanel section={encyclopediaSection as any} />}
+            {activeTab === "quests"       && <QuestPanel section={questsSection as any} />}
+            {activeTab === "logs"         && <GameLogsPanel section={logsSection as any} />}
+
+            {/* Backwards compatibility for top-level planting/farming if tabs are clicked directly */}
+            {activeTab === "planting"     && <PlantingPanel />}
+            {activeTab === "farming"      && <FarmingPanel />}
+          </div>
+        </main>
       </div>
 
       {/* ── Navigation mobile bas d'écran ───────────────────────────── */}
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex"
-        style={{
-          background: "var(--abyss)",
-          borderTop: "2px solid var(--border-accent)",
-          boxShadow: "0 -2px 0 var(--void)",
-        }}
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex h-16 bg-[#070b13] border-t-2 border-[var(--gold)] shadow-[0_-4px_20px_rgba(0,0,0,0.8)]"
       >
-        {visibleTabs.slice(0, 5).map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className="flex-1 flex flex-col items-center justify-center py-2 gap-1"
-              style={{
-                color: isActive ? "var(--gold-light)" : "var(--text-secondary)",
-                background: isActive ? "rgba(200,136,42,0.1)" : "transparent",
-                borderTop: `2px solid ${isActive ? "var(--gold)" : "transparent"}`,
-              }}
-            >
-              <span style={{ width: 28, height: 28, border: `2px solid ${isActive ? "var(--gold)" : "var(--border-default)"}`, background: isActive ? "rgba(200,136,42,0.12)" : "transparent", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>
-                {tab.icon}
-              </span>
-              <span className="font-cinzel" style={{ fontSize: "0.35rem" }}>
-                {tab.label.slice(0, 6).toUpperCase()}
-              </span>
-            </button>
-          );
-        })}
+        <div className="flex w-full overflow-x-auto no-scrollbar">
+          {visibleTabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className="flex-shrink-0 flex flex-col items-center justify-center px-4 min-w-[70px] transition-all relative"
+                style={{
+                  color: isActive ? "var(--gold-light)" : "var(--text-secondary)",
+                  background: isActive ? "rgba(200,136,42,0.12)" : "transparent",
+                }}
+              >
+                {isActive && <div className="absolute top-0 left-0 right-0 h-1 bg-[var(--gold)]" />}
+                <span className="text-xl mb-0.5">{tab.icon}</span>
+                <span className="font-cinzel font-bold" style={{ fontSize: "0.4rem" }}>
+                  {tab.label.slice(0, 8).toUpperCase()}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </nav>
     </div>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useGameStore } from "@/stores/game-store";
 import { formatNumber } from "@/lib/formatters";
 import itemsData from "@/items.json";
@@ -28,22 +29,50 @@ const RARITY_LABEL: Record<string, string> = {
   common: "COMMUN", uncommon: "PEU COMMUN", rare: "RARE", epic: "ÉPIQUE", legendary: "LÉGENDAIRE",
 };
 const RARITY_ORDER = ["legendary", "epic", "rare", "uncommon", "common"];
+const CATEGORY_ORDER = ["equipment", "consumable", "material", "resource", "seed", "currency"];
 
-export default function InventoryPanel() {
+type SortMode = "rarity" | "category";
+
+export default function InventoryPanel({ filter = "all" }: { filter?: "all" | "resource" | "equipment" | "consumable" }) {
   const { inventory, gold } = useGameStore((s) => ({ inventory: s.inventory, gold: s.gold }));
+  const [sortBy, setSortBy] = useState<SortMode>("rarity");
 
   const entries = Object.entries(inventory)
     .filter(([, qty]) => qty > 0)
+    .filter(([itemId]) => {
+      if (filter === "all") return true;
+      const item = itemsById.get(itemId);
+      if (!item) return false;
+      
+      if (filter === "resource") {
+        return ["resource", "material", "seed", "currency"].includes(item.category);
+      }
+      
+      return item.category === filter;
+    })
     .sort(([aId], [bId]) => {
-      const aR = RARITY_ORDER.indexOf(itemsById.get(aId)?.rarity ?? "common");
-      const bR = RARITY_ORDER.indexOf(itemsById.get(bId)?.rarity ?? "common");
-      return aR - bR;
+      const aItem = itemsById.get(aId);
+      const bItem = itemsById.get(bId);
+
+      if (sortBy === "category") {
+        const aCat = CATEGORY_ORDER.indexOf(aItem?.category ?? "resource");
+        const bCat = CATEGORY_ORDER.indexOf(bItem?.category ?? "resource");
+        if (aCat !== bCat) return aCat - bCat;
+      }
+
+      // Default/Secondary sort by rarity
+      const aR = RARITY_ORDER.indexOf(aItem?.rarity ?? "common");
+      const bR = RARITY_ORDER.indexOf(bItem?.rarity ?? "common");
+      if (aR !== bR) return aR - bR;
+
+      // Tertiary sort by name
+      return (aItem?.name ?? aId).localeCompare(bItem?.name ?? bId);
     });
 
   return (
     <div className="space-y-4">
       <div className="game-card">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-3">
             <span className="pixel-icon">🎒</span>
             <div>
@@ -53,9 +82,27 @@ export default function InventoryPanel() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="pixel-icon">🪙</span>
-            <span className="font-cinzel" style={{ fontSize: "0.6rem", color: "var(--gold-light)" }}>{formatNumber(gold)}</span>
+          
+          <div className="flex flex-wrap items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+            <div className="flex items-center gap-1 bg-[rgba(0,0,0,0.2)] p-1 rounded border border-[rgba(255,255,255,0.05)]">
+              <button 
+                onClick={() => setSortBy("rarity")}
+                className={`px-2 py-1 font-cinzel text-[0.35rem] transition-all ${sortBy === "rarity" ? "bg-[var(--gold-light)] text-black" : "text-[var(--text-muted)] hover:text-white"}`}
+              >
+                RARETÉ
+              </button>
+              <button 
+                onClick={() => setSortBy("category")}
+                className={`px-2 py-1 font-cinzel text-[0.35rem] transition-all ${sortBy === "category" ? "bg-[var(--gold-light)] text-black" : "text-[var(--text-muted)] hover:text-white"}`}
+              >
+                CATÉGORIE
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="pixel-icon">🪙</span>
+              <span className="font-cinzel" style={{ fontSize: "0.6rem", color: "var(--gold-light)" }}>{formatNumber(gold)}</span>
+            </div>
           </div>
         </div>
       </div>
