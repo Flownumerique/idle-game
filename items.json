@@ -1234,6 +1234,109 @@
         "duration": 1800
       },
       "description": "+50% XP dans tous les métiers pendant 30 min."
+    },
+    {
+      "id": "goblin_map",
+      "name": "Carte Gobeline",
+      "category": "material",
+      "rarity": "rare",
+      "icon": "🗺️",
+      "stackMax": 1,
+      "sellPrice": 50,
+      "buyPrice": 0,
+      "description": "Une carte détaillée griffonnée par un chef de chantier gobelin. Permet de trouver le Village Gobelin."
+    },
+    {
+      "id": "alpha_pelt",
+      "name": "Peau d'Alpha",
+      "category": "material",
+      "rarity": "uncommon",
+      "icon": "🐺",
+      "stackMax": 99,
+      "sellPrice": 25,
+      "buyPrice": 0,
+      "description": "Une peau épaisse et robuste provenant d'un loup alpha."
+    },
+    {
+      "id": "cursed_bone",
+      "name": "Os Maudit",
+      "category": "material",
+      "rarity": "uncommon",
+      "icon": "🦴",
+      "stackMax": 99,
+      "sellPrice": 30,
+      "buyPrice": 0,
+      "description": "Un os imprégné d'énergie nécromantique."
+    },
+    {
+      "id": "winter_coat",
+      "name": "Manteau d'Hiver",
+      "category": "equipment",
+      "rarity": "rare",
+      "icon": "🧥",
+      "stackMax": 1,
+      "sellPrice": 150,
+      "buyPrice": 0,
+      "equipmentSlot": "chest",
+      "stats": {
+        "defense": 5
+      },
+      "description": "Un manteau chaud cousu avec de la peau d'alpha. Indispensable pour survivre aux Pics du Yéti."
+    },
+    {
+      "id": "bone_key",
+      "name": "Clé en Os",
+      "category": "material",
+      "rarity": "rare",
+      "icon": "🗝️",
+      "stackMax": 1,
+      "sellPrice": 100,
+      "buyPrice": 0,
+      "description": "Une clé sinistre taillée dans un os maudit. Ouvre les portes de la Crypte des Morts-Vivants."
+    },
+    {
+      "id": "yeti_horn",
+      "name": "Corne de Yéti",
+      "category": "material",
+      "rarity": "rare",
+      "icon": "🦏",
+      "stackMax": 99,
+      "sellPrice": 80,
+      "buyPrice": 0,
+      "description": "Une corne glaciale arrachée à un yéti ancien."
+    },
+    {
+      "id": "slime_core",
+      "name": "Noyau de Slime",
+      "category": "material",
+      "rarity": "uncommon",
+      "icon": "🔮",
+      "stackMax": 99,
+      "sellPrice": 15,
+      "buyPrice": 0,
+      "description": "Le cœur palpitant d'un slime géant."
+    },
+    {
+      "id": "strange_key",
+      "name": "Clé Étrange",
+      "category": "material",
+      "rarity": "rare",
+      "icon": "🗝️",
+      "stackMax": 1,
+      "sellPrice": 120,
+      "buyPrice": 0,
+      "description": "Une clé volée par le chef de guerre gobelin. À quoi peut-elle bien servir ?"
+    },
+    {
+      "id": "bandit_signet",
+      "name": "Chevalière de Bandit",
+      "category": "material",
+      "rarity": "rare",
+      "icon": "💍",
+      "stackMax": 99,
+      "sellPrice": 150,
+      "buyPrice": 0,
+      "description": "L'anneau porté par le capitaine du camp des bandits."
     }
   ]
 }

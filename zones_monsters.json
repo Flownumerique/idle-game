@@ -35,6 +35,28 @@
       "lore": "Les plaines entourant le village semblaient sûres autrefois. Mais depuis que les créatures des bois s'enhardissent, les paysans n'osent plus s'y aventurer seuls."
     },
     {
+      "id": "slimes_meadow",
+      "name": "Plaines des Slimes",
+      "icon": "🟢",
+      "description": "Des plaines gélatineuses où les slimes pullulent.",
+      "reqLevel": {
+        "combat": 3
+      },
+      "reqUnlock": null,
+      "theme": "plains",
+      "bgColor": "#8BC34A",
+      "monsters": [
+        "slime_green",
+        "slime_blue",
+        "slime_red"
+      ],
+      "bossId": "slime_king",
+      "bossChance": 0.05,
+      "combatXpMultiplier": 1.2,
+      "goldMultiplier": 1.2,
+      "lore": "Les premières épreuves pour un jeune aventurier."
+    },
+    {
       "id": "goblin_forest",
       "name": "Forêt des Gobelins",
       "icon": "🌲",
@@ -58,6 +80,27 @@
       "lore": "Le Roi Gobelin a établi son trône dans les ruines d'un ancien avant-poste militaire. Ses troupes s'étendent chaque jour un peu plus loin."
     },
     {
+      "id": "goblin_caves",
+      "name": "Grottes des Gobelins",
+      "icon": "🕳️",
+      "description": "Un réseau souterrain grouillant de gobelins. Le premier pas vers leur village.",
+      "reqLevel": {
+        "combat": 8
+      },
+      "reqUnlock": null,
+      "theme": "underground",
+      "bgColor": "#5D4037",
+      "monsters": [
+        "goblin_miner",
+        "bat_cave"
+      ],
+      "bossId": "goblin_overseer",
+      "bossChance": 0.04,
+      "combatXpMultiplier": 2.5,
+      "goldMultiplier": 2.0,
+      "lore": "L'air est lourd et sent la terre et la sueur."
+    },
+    {
       "id": "plains_south",
       "name": "Plaines du Sud",
       "icon": "🌻",
@@ -79,6 +122,27 @@
       "combatXpMultiplier": 4,
       "goldMultiplier": 3.5,
       "lore": "Ces terres étaient autrefois prospères. Depuis que des bandits ont pris le contrôle du pont, les marchands évitent la route du sud."
+    },
+    {
+      "id": "bandit_camp",
+      "name": "Camp des Bandits",
+      "icon": "🗡️",
+      "description": "Un repaire de voleurs et d'assassins.",
+      "reqLevel": {
+        "combat": 12
+      },
+      "reqUnlock": null,
+      "theme": "plains",
+      "bgColor": "#F57F17",
+      "monsters": [
+        "bandit",
+        "bandit_thief"
+      ],
+      "bossId": "bandit_captain",
+      "bossChance": 0.03,
+      "combatXpMultiplier": 3.5,
+      "goldMultiplier": 4.0,
+      "lore": "La route principale n'est plus sûre à cause d'eux."
     },
     {
       "id": "abandoned_mines",
@@ -105,6 +169,28 @@
       "lore": "Les mineurs qui travaillaient ici ont disparu il y a dix ans. On entend encore les coups de pioche dans les profondeurs, la nuit."
     },
     {
+      "id": "goblin_village",
+      "name": "Village Gobelin",
+      "icon": "⛺",
+      "description": "Le cœur du territoire gobelin, bien gardé par leurs meilleurs guerriers.",
+      "reqLevel": {
+        "combat": 15
+      },
+      "reqUnlock": "goblin_map",
+      "theme": "forest",
+      "bgColor": "#3E2723",
+      "monsters": [
+        "goblin_evolved",
+        "goblin_warrior",
+        "goblin_archer"
+      ],
+      "bossId": "goblin_warchief",
+      "bossChance": 0.03,
+      "combatXpMultiplier": 4.5,
+      "goldMultiplier": 3.5,
+      "lore": "Les gobelins ont construit un village rudimentaire au cœur de la forêt."
+    },
+    {
       "id": "dark_forest",
       "name": "Forêt Sombre",
       "icon": "🌲",
@@ -126,6 +212,28 @@
       "combatXpMultiplier": 8,
       "goldMultiplier": 6,
       "lore": "Les arbres ici semblent vivants et hostiles. Les voyageurs disent que la forêt elle-même se nourrit des perdus."
+    },
+    {
+      "id": "wolf_mountain",
+      "name": "Montagne des Loups",
+      "icon": "⛰️",
+      "description": "Un relief escarpé habité par des meutes de loups féroces.",
+      "reqLevel": {
+        "combat": 22
+      },
+      "reqUnlock": null,
+      "theme": "mountain",
+      "bgColor": "#607D8B",
+      "monsters": [
+        "wolf",
+        "wolf_alpha",
+        "wolf_mountain"
+      ],
+      "bossId": "alpha_dire_wolf",
+      "bossChance": 0.025,
+      "combatXpMultiplier": 6.5,
+      "goldMultiplier": 5.0,
+      "lore": "Les hurlements dans la nuit annoncent la mort."
     },
     {
       "id": "ancient_ruins",
@@ -151,6 +259,28 @@
       "lore": "Ces ruines datent d'une époque antérieure à la fondation du royaume. La technologie qui y sommeille dépasse l'entendement."
     },
     {
+      "id": "yeti_peaks",
+      "name": "Pics du Yéti",
+      "icon": "🏔️",
+      "description": "Le sommet glacé de la montagne. Le froid est mortel.",
+      "reqLevel": {
+        "combat": 28
+      },
+      "reqUnlock": "winter_coat",
+      "theme": "frozen",
+      "bgColor": "#81D4FA",
+      "monsters": [
+        "snow_leopard",
+        "yeti",
+        "ice_wraith"
+      ],
+      "bossId": "ancient_yeti",
+      "bossChance": 0.02,
+      "combatXpMultiplier": 9.0,
+      "goldMultiplier": 7.0,
+      "lore": "Seuls ceux équipés d'un manteau d'hiver peuvent survivre ici."
+    },
+    {
       "id": "cursed_swamps",
       "name": "Marécages Maudits",
       "icon": "🌿",
@@ -174,6 +304,27 @@
       "lore": "Autrefois un village prospère, les Marécages furent engloutis par une malédiction lancée par un mage fou il y a un siècle. La corruption s'étend."
     },
     {
+      "id": "forgotten_graveyard",
+      "name": "Cimetière Oublié",
+      "icon": "🪦",
+      "description": "Un vieux cimetière abandonné aux portes de la crypte.",
+      "reqLevel": {
+        "combat": 32
+      },
+      "reqUnlock": null,
+      "theme": "dark_forest",
+      "bgColor": "#37474F",
+      "monsters": [
+        "skeleton_warrior_basic",
+        "zombie"
+      ],
+      "bossId": "skeleton_king",
+      "bossChance": 0.02,
+      "combatXpMultiplier": 11.0,
+      "goldMultiplier": 9.0,
+      "lore": "Les tombes ont été profanées, et les morts marchent."
+    },
+    {
       "id": "frozen_wastes",
       "name": "Étendues Gelées",
       "icon": "❄️",
@@ -195,6 +346,28 @@
       "combatXpMultiplier": 12,
       "goldMultiplier": 10,
       "lore": "Une tempête de gel magique ravage ces terres depuis des siècles. Personne ne sait ce qui se cache au cœur de la tempête."
+    },
+    {
+      "id": "undead_crypt",
+      "name": "Crypte des Morts-Vivants",
+      "icon": "⚰️",
+      "description": "Les catacombes sous le vieux cimetière.",
+      "reqLevel": {
+        "combat": 38
+      },
+      "reqUnlock": "bone_key",
+      "theme": "dark_forest",
+      "bgColor": "#263238",
+      "monsters": [
+        "skeleton_warrior_basic",
+        "zombie",
+        "cursed_specter"
+      ],
+      "bossId": "lich_lord",
+      "bossChance": 0.015,
+      "combatXpMultiplier": 14.0,
+      "goldMultiplier": 11.0,
+      "lore": "Les morts ne dorment pas ici."
     },
     {
       "id": "volcanic_peaks",
@@ -241,6 +414,26 @@
       "combatXpMultiplier": 18,
       "goldMultiplier": 15,
       "lore": "Les cristaux ici chantent une mélodie étrange. Ceux qui écoutent trop longtemps perdent la raison."
+    },
+    {
+      "id": "orc_stronghold",
+      "name": "Forteresse Orc",
+      "icon": "🏰",
+      "description": "Une citadelle imprenable défendue par des orcs brutaux.",
+      "reqLevel": {
+        "combat": 45
+      },
+      "reqUnlock": null,
+      "theme": "ruins",
+      "bgColor": "#BF360C",
+      "monsters": [
+        "orc_grunt"
+      ],
+      "bossId": "orc_chieftain",
+      "bossChance": 0.01,
+      "combatXpMultiplier": 18.0,
+      "goldMultiplier": 15.0,
+      "lore": "Un avant-poste menaçant pour tout le royaume."
     },
     {
       "id": "shadow_realm",
@@ -514,6 +707,579 @@
       ],
       "introCombatText": "Le sol tremble violemment. Un rugissement fait fondre les roches autour de vous. Un dragon émerge du volcan, ses écailles brillant d'une lueur infernale.",
       "description": "Un dragon qui a fait du volcan son domaine. Son souffle peut transformer n'importe quoi en lave."
+    },
+    {
+      "id": "slime_blue",
+      "name": "Slime Bleu",
+      "icon": "🔵",
+      "zone": "slimes_meadow",
+      "rarity": "common",
+      "stats": {
+        "hp": 40,
+        "attack": 8,
+        "defense": 3,
+        "attackSpeed": 2.4
+      },
+      "combatXp": 12,
+      "goldDrop": {
+        "min": 3,
+        "max": 8
+      },
+      "drops": [
+        {
+          "itemId": "slime_gel",
+          "chance": 1.0,
+          "qty": 3
+        }
+      ],
+      "attackStyle": "melee",
+      "description": "Un slime bleu gélatineux, légèrement plus résistant."
+    },
+    {
+      "id": "slime_red",
+      "name": "Slime Rouge",
+      "icon": "🔴",
+      "zone": "slimes_meadow",
+      "rarity": "uncommon",
+      "stats": {
+        "hp": 60,
+        "attack": 12,
+        "defense": 4,
+        "attackSpeed": 2.3
+      },
+      "combatXp": 18,
+      "goldDrop": {
+        "min": 5,
+        "max": 12
+      },
+      "drops": [
+        {
+          "itemId": "slime_gel",
+          "chance": 1.0,
+          "qty": 4
+        }
+      ],
+      "attackStyle": "melee",
+      "description": "Un slime rouge agressif et brûlant."
+    },
+    {
+      "id": "goblin_miner",
+      "name": "Mineur Gobelin",
+      "icon": "⛏️",
+      "zone": "goblin_caves",
+      "rarity": "common",
+      "stats": {
+        "hp": 75,
+        "attack": 15,
+        "defense": 8,
+        "attackSpeed": 2.2
+      },
+      "combatXp": 25,
+      "goldDrop": {
+        "min": 8,
+        "max": 15
+      },
+      "drops": [
+        {
+          "itemId": "ore_copper",
+          "chance": 0.4,
+          "qty": 2
+        },
+        {
+          "itemId": "dust_bone",
+          "chance": 0.3,
+          "qty": 1
+        }
+      ],
+      "attackStyle": "melee",
+      "description": "Un gobelin équipé d'une pioche rouillée."
+    },
+    {
+      "id": "goblin_evolved",
+      "name": "Guerrier Gobelin Évolué",
+      "icon": "👺",
+      "zone": "goblin_village",
+      "rarity": "uncommon",
+      "stats": {
+        "hp": 120,
+        "attack": 25,
+        "defense": 15,
+        "attackSpeed": 2.0
+      },
+      "combatXp": 45,
+      "goldDrop": {
+        "min": 15,
+        "max": 30
+      },
+      "drops": [
+        {
+          "itemId": "bar_iron",
+          "chance": 0.2,
+          "qty": 1
+        },
+        {
+          "itemId": "dust_bone",
+          "chance": 0.5,
+          "qty": 2
+        }
+      ],
+      "attackStyle": "melee",
+      "description": "Un gobelin plus grand et plus fort que la moyenne, équipé d'une armure sommaire."
+    },
+    {
+      "id": "bandit_thief",
+      "name": "Voleur",
+      "icon": "🥷",
+      "zone": "bandit_camp",
+      "rarity": "common",
+      "stats": {
+        "hp": 100,
+        "attack": 22,
+        "defense": 10,
+        "attackSpeed": 1.8
+      },
+      "combatXp": 35,
+      "goldDrop": {
+        "min": 12,
+        "max": 25
+      },
+      "drops": [
+        {
+          "itemId": "cloth_linen",
+          "chance": 0.5,
+          "qty": 1
+        }
+      ],
+      "attackStyle": "melee",
+      "description": "Un voleur agile et rapide."
+    },
+    {
+      "id": "wolf_mountain",
+      "name": "Loup des Montagnes",
+      "icon": "🐺",
+      "zone": "wolf_mountain",
+      "rarity": "common",
+      "stats": {
+        "hp": 200,
+        "attack": 45,
+        "defense": 20,
+        "attackSpeed": 2.1
+      },
+      "combatXp": 80,
+      "goldDrop": {
+        "min": 25,
+        "max": 50
+      },
+      "drops": [
+        {
+          "itemId": "hide_wolf",
+          "chance": 0.7,
+          "qty": 1
+        }
+      ],
+      "attackStyle": "melee",
+      "description": "Un grand loup adapté au froid des montagnes."
+    },
+    {
+      "id": "snow_leopard",
+      "name": "Léopard des Neiges",
+      "icon": "🐆",
+      "zone": "yeti_peaks",
+      "rarity": "uncommon",
+      "stats": {
+        "hp": 300,
+        "attack": 65,
+        "defense": 30,
+        "attackSpeed": 1.9
+      },
+      "combatXp": 120,
+      "goldDrop": {
+        "min": 35,
+        "max": 70
+      },
+      "drops": [
+        {
+          "itemId": "hide_wolf",
+          "chance": 0.8,
+          "qty": 2
+        }
+      ],
+      "attackStyle": "melee",
+      "description": "Un félin mortel camouflé dans la neige."
+    },
+    {
+      "id": "yeti",
+      "name": "Yéti",
+      "icon": "🦍",
+      "zone": "yeti_peaks",
+      "rarity": "uncommon",
+      "stats": {
+        "hp": 450,
+        "attack": 80,
+        "defense": 45,
+        "attackSpeed": 2.8
+      },
+      "combatXp": 180,
+      "goldDrop": {
+        "min": 50,
+        "max": 100
+      },
+      "drops": [
+        {
+          "itemId": "hide_wolf",
+          "chance": 1.0,
+          "qty": 3
+        },
+        {
+          "itemId": "essence_ice",
+          "chance": 0.2,
+          "qty": 1
+        }
+      ],
+      "attackStyle": "melee",
+      "description": "Une créature massive et terrifiante des montagnes."
+    },
+    {
+      "id": "skeleton_warrior_basic",
+      "name": "Guerrier Squelette",
+      "icon": "💀",
+      "zone": "undead_crypt",
+      "rarity": "common",
+      "stats": {
+        "hp": 600,
+        "attack": 110,
+        "defense": 60,
+        "attackSpeed": 2.3
+      },
+      "combatXp": 250,
+      "goldDrop": {
+        "min": 70,
+        "max": 150
+      },
+      "drops": [
+        {
+          "itemId": "dust_bone",
+          "chance": 0.9,
+          "qty": 4
+        },
+        {
+          "itemId": "cursed_bone",
+          "chance": 0.1,
+          "qty": 1
+        }
+      ],
+      "attackStyle": "melee",
+      "description": "Un guerrier ramené à la vie, armé d'une épée rouillée."
+    },
+    {
+      "id": "orc_grunt",
+      "name": "Fantassin Orc",
+      "icon": "👹",
+      "zone": "orc_stronghold",
+      "rarity": "common",
+      "stats": {
+        "hp": 1000,
+        "attack": 160,
+        "defense": 90,
+        "attackSpeed": 2.5
+      },
+      "combatXp": 400,
+      "goldDrop": {
+        "min": 120,
+        "max": 250
+      },
+      "drops": [
+        {
+          "itemId": "bar_iron",
+          "chance": 0.5,
+          "qty": 2
+        }
+      ],
+      "attackStyle": "melee",
+      "description": "Un guerrier orc brutal et résistant."
+    },
+    {
+      "id": "slime_king",
+      "name": "Roi Slime",
+      "icon": "👑",
+      "zone": "slimes_meadow",
+      "rarity": "boss",
+      "stats": {
+        "hp": 300,
+        "attack": 25,
+        "defense": 10,
+        "attackSpeed": 3.0
+      },
+      "combatXp": 150,
+      "goldDrop": {
+        "min": 50,
+        "max": 150
+      },
+      "drops": [
+        {
+          "itemId": "slime_core",
+          "chance": 1.0,
+          "qty": 1
+        },
+        {
+          "itemId": "slime_gel",
+          "chance": 1.0,
+          "qty": 10
+        }
+      ],
+      "introCombatText": "Le sol tremble alors qu'un slime colossal absorbe ses congénères et se dresse devant vous.",
+      "description": "Le souverain incontesté des slimes."
+    },
+    {
+      "id": "goblin_overseer",
+      "name": "Chef de Chantier Gobelin",
+      "icon": "👷",
+      "zone": "goblin_caves",
+      "rarity": "boss",
+      "stats": {
+        "hp": 500,
+        "attack": 40,
+        "defense": 20,
+        "attackSpeed": 2.5
+      },
+      "combatXp": 300,
+      "goldDrop": {
+        "min": 100,
+        "max": 250
+      },
+      "drops": [
+        {
+          "itemId": "goblin_map",
+          "chance": 1.0,
+          "qty": 1
+        },
+        {
+          "itemId": "bar_copper",
+          "chance": 1.0,
+          "qty": 5
+        }
+      ],
+      "introCombatText": "Un grand gobelin vous remarque et lève son marteau avec un cri guttural.",
+      "description": "Il supervise les opérations minières des gobelins."
+    },
+    {
+      "id": "goblin_warchief",
+      "name": "Chef de Guerre Gobelin",
+      "icon": "🦹",
+      "zone": "goblin_village",
+      "rarity": "boss",
+      "stats": {
+        "hp": 800,
+        "attack": 60,
+        "defense": 35,
+        "attackSpeed": 2.2
+      },
+      "combatXp": 500,
+      "goldDrop": {
+        "min": 200,
+        "max": 400
+      },
+      "drops": [
+        {
+          "itemId": "strange_key",
+          "chance": 1.0,
+          "qty": 1
+        },
+        {
+          "itemId": "bar_iron",
+          "chance": 0.8,
+          "qty": 3
+        }
+      ],
+      "introCombatText": "Le chef de guerre gobelin descend de son trône d'os, son énorme hache à la main.",
+      "description": "Le chef suprême du village gobelin."
+    },
+    {
+      "id": "bandit_captain",
+      "name": "Capitaine des Bandits",
+      "icon": "🏴‍☠️",
+      "zone": "bandit_camp",
+      "rarity": "boss",
+      "stats": {
+        "hp": 650,
+        "attack": 55,
+        "defense": 25,
+        "attackSpeed": 2.0
+      },
+      "combatXp": 400,
+      "goldDrop": {
+        "min": 300,
+        "max": 600
+      },
+      "drops": [
+        {
+          "itemId": "bandit_signet",
+          "chance": 1.0,
+          "qty": 1
+        },
+        {
+          "itemId": "gold",
+          "chance": 1.0,
+          "qty": 200
+        }
+      ],
+      "introCombatText": "Un bandit richement vêtu dégaine deux dagues empoisonnées.",
+      "description": "Le meneur du camp des bandits."
+    },
+    {
+      "id": "alpha_dire_wolf",
+      "name": "Loup Alpha Féroce",
+      "icon": "🐺",
+      "zone": "wolf_mountain",
+      "rarity": "boss",
+      "stats": {
+        "hp": 1200,
+        "attack": 90,
+        "defense": 45,
+        "attackSpeed": 1.8
+      },
+      "combatXp": 800,
+      "goldDrop": {
+        "min": 350,
+        "max": 800
+      },
+      "drops": [
+        {
+          "itemId": "alpha_pelt",
+          "chance": 1.0,
+          "qty": 1
+        },
+        {
+          "itemId": "dust_bone",
+          "chance": 1.0,
+          "qty": 10
+        }
+      ],
+      "introCombatText": "Un hurlement à glacer le sang retentit. Un loup géant, aux yeux rouges luisants, bondit de l'ombre.",
+      "description": "L'alpha de la meute des montagnes."
+    },
+    {
+      "id": "ancient_yeti",
+      "name": "Yéti Ancien",
+      "icon": "❄️",
+      "zone": "yeti_peaks",
+      "rarity": "boss",
+      "stats": {
+        "hp": 2500,
+        "attack": 140,
+        "defense": 70,
+        "attackSpeed": 2.8
+      },
+      "combatXp": 1500,
+      "goldDrop": {
+        "min": 800,
+        "max": 1500
+      },
+      "drops": [
+        {
+          "itemId": "yeti_horn",
+          "chance": 1.0,
+          "qty": 1
+        },
+        {
+          "itemId": "essence_ice",
+          "chance": 1.0,
+          "qty": 3
+        }
+      ],
+      "introCombatText": "La neige se soulève. Un yéti colossal, couvert de cicatrices, se dresse en se frappant le torse.",
+      "description": "Un monstre légendaire vivant au sommet des pics."
+    },
+    {
+      "id": "lich_lord",
+      "name": "Seigneur Liche",
+      "icon": "💀",
+      "zone": "undead_crypt",
+      "rarity": "boss",
+      "stats": {
+        "hp": 4000,
+        "attack": 220,
+        "defense": 100,
+        "attackSpeed": 2.5
+      },
+      "combatXp": 2500,
+      "goldDrop": {
+        "min": 1500,
+        "max": 3000
+      },
+      "drops": [
+        {
+          "itemId": "cursed_bone",
+          "chance": 1.0,
+          "qty": 1
+        },
+        {
+          "itemId": "essence_dark",
+          "chance": 1.0,
+          "qty": 5
+        }
+      ],
+      "introCombatText": "Une aura de mort glace l'air de la crypte. La liche lève son bâton corrompu vers vous.",
+      "description": "Un puissant nécromancien ayant échappé à la mort."
+    },
+    {
+      "id": "orc_chieftain",
+      "name": "Chef de Clan Orc",
+      "icon": "👹",
+      "zone": "orc_stronghold",
+      "rarity": "boss",
+      "stats": {
+        "hp": 6000,
+        "attack": 280,
+        "defense": 150,
+        "attackSpeed": 2.4
+      },
+      "combatXp": 4000,
+      "goldDrop": {
+        "min": 2500,
+        "max": 5000
+      },
+      "drops": [
+        {
+          "itemId": "bar_gold",
+          "chance": 1.0,
+          "qty": 3
+        }
+      ],
+      "introCombatText": "Le chef orc s'avance, couvert de trophées de ses victimes précédentes.",
+      "description": "Le guerrier le plus fort et le plus brutal du clan orc."
+    },
+    {
+      "id": "skeleton_king",
+      "name": "Roi Squelette",
+      "icon": "👑",
+      "zone": "forgotten_graveyard",
+      "rarity": "boss",
+      "stats": {
+        "hp": 3000,
+        "attack": 180,
+        "defense": 80,
+        "attackSpeed": 2.2
+      },
+      "combatXp": 1800,
+      "goldDrop": {
+        "min": 1000,
+        "max": 2000
+      },
+      "drops": [
+        {
+          "itemId": "cursed_bone",
+          "chance": 1.0,
+          "qty": 4
+        },
+        {
+          "itemId": "dust_bone",
+          "chance": 1.0,
+          "qty": 15
+        }
+      ],
+      "introCombatText": "Un squelette couronné se lève de sa tombe, son épée scintillante d'une lueur maléfique.",
+      "description": "Le souverain déchu de ce cimetière."
     }
   ]
 }
