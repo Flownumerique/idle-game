@@ -3,17 +3,17 @@
 import { useGameStore } from "@/stores/game-store";
 import { type PlantPlot } from "@/types/game";
 import { useEffect, useState } from "react";
-import { getLevelForXp } from "@/lib/xp-calc";
+import { getLevelForXp, getXpForLevel } from "@/lib/xp-calc";
 import Button from "@/components/ui/Button";
 import ProgressBar from "@/components/ui/ProgressBar";
 
 // Seed definitions aligned with skills.json farming actions
 const SEEDS = [
-  { id: "seed_wheat",   name: "Blé",              icon: "🌾", resultId: "wheat",        durationMs: 90_000,  xp: 12, reqLevel: 1  },
-  { id: "seed_healing", name: "Herbe Guérisseuse", icon: "🌿", resultId: "herb_healing", durationMs: 120_000, xp: 20, reqLevel: 1  },
-  { id: "seed_golden",  name: "Rose Dorée",        icon: "🌹", resultId: "flower_golden", durationMs: 300_000, xp: 65, reqLevel: 20 },
-  { id: "seed_night",   name: "Herbe Nocturne",    icon: "🌑", resultId: "herb_night",   durationMs: 600_000, xp: 180, reqLevel: 40 },
-  { id: "seed_dawn",    name: "Fleur de Lumière",  icon: "✨", resultId: "flower_dawn",  durationMs: 480_000, xp: 120, reqLevel: 40 },
+  { id: "seed_wheat",   name: "Blé",              icon: "🌾", resultId: "wheat",        enchantedId: "wheat_enchanted",         durationMs: 90_000,  xp: 12, reqLevel: 1  },
+  { id: "seed_healing", name: "Herbe Guérisseuse", icon: "🌿", resultId: "herb_healing", enchantedId: "herb_healing_enchanted",  durationMs: 120_000, xp: 20, reqLevel: 1  },
+  { id: "seed_golden",  name: "Rose Dorée",        icon: "🌹", resultId: "flower_golden", enchantedId: "flower_golden_enchanted", durationMs: 300_000, xp: 65, reqLevel: 20 },
+  { id: "seed_night",   name: "Herbe Nocturne",    icon: "🌑", resultId: "herb_night",   enchantedId: "herb_night_enchanted",    durationMs: 600_000, xp: 180, reqLevel: 40 },
+  { id: "seed_dawn",    name: "Fleur de Lumière",  icon: "✨", resultId: "flower_dawn",  enchantedId: "flower_dawn_enchanted",   durationMs: 480_000, xp: 120, reqLevel: 40 },
 ];
 
 const PERFECT_WINDOW_MS = 300_000;
@@ -46,7 +46,13 @@ export default function PlantingPanel() {
     return () => clearInterval(timer);
   }, []);
 
-  const plantingLevel = getLevelForXp(skills.planting?.xp ?? 0);
+  const plantingXp = skills.planting?.xp ?? 0;
+  const plantingLevel = getLevelForXp(plantingXp);
+  const currentLevelXp = getXpForLevel(plantingLevel);
+  const nextLevelXp = getXpForLevel(plantingLevel + 1);
+  const xpProgress = nextLevelXp > currentLevelXp
+    ? (plantingXp - currentLevelXp) / (nextLevelXp - currentLevelXp)
+    : 1;
 
   const handlePlant = (plotIndex: number) => {
     const seedId = selectedSeed[plotIndex];
@@ -60,6 +66,8 @@ export default function PlantingPanel() {
     }
   };
 
+  const [harvestMessages, setHarvestMessages] = useState<Record<number, string>>({});
+
   const handleHarvest = (plotIndex: number) => {
     const plot = plantPlots[plotIndex];
     if (!plot.seedId || !plot.readyAt || now < plot.readyAt) return;
@@ -70,7 +78,26 @@ export default function PlantingPanel() {
     const isPerfect = now <= plot.readyAt + PERFECT_WINDOW_MS;
     const yieldAmount = isPerfect ? 2 : 1;
 
-    addItems({ [seed.resultId]: yieldAmount });
+    // 1% chance for an enchanted harvest
+    const isEnchanted = Math.random() < 0.01;
+
+    if (isEnchanted && seed.enchantedId) {
+      addItems({ [seed.resultId]: yieldAmount, [seed.enchantedId]: 1 });
+      setHarvestMessages((prev) => ({
+        ...prev,
+        [plotIndex]: `✦ Récolte enchantée ! +1 ${seed.name} Enchanté(e)`
+      }));
+      setTimeout(() => {
+        setHarvestMessages((prev) => {
+          const newMessages = { ...prev };
+          delete newMessages[plotIndex];
+          return newMessages;
+        });
+      }, 5000);
+    } else {
+      addItems({ [seed.resultId]: yieldAmount });
+    }
+
     addSkillXp("planting", seed.xp * yieldAmount);
     harvestPlot(plotIndex);
   };
@@ -105,6 +132,14 @@ export default function PlantingPanel() {
               <div className="font-cinzel text-center" style={{ fontSize: "0.4rem", color: "var(--text-muted)" }}>LVL</div>
             </div>
           </div>
+        </div>
+
+        <div className="mb-3">
+          <div className="flex justify-between font-cinzel text-[0.45rem] text-[var(--text-muted)] mb-1">
+            <span>XP: {Math.floor(plantingXp)}</span>
+            <span>{nextLevelXp > currentLevelXp ? `Prochain: ${nextLevelXp}` : "Max"}</span>
+          </div>
+          <ProgressBar value={xpProgress} color="bg-[var(--color-xp)]" height="h-2" />
         </div>
 
         <div className="font-cinzel" style={{ fontSize: "0.45rem", color: "var(--text-muted)" }}>
@@ -207,6 +242,12 @@ export default function PlantingPanel() {
                     {isPerfect
                       ? `✦ Récolte parfaite ! +${seed!.xp * 2} XP · ×2 récolte`
                       : `+${seed!.xp} XP à la récolte`}
+                  </div>
+                )}
+
+                {harvestMessages[i] && !isReady && !isGrowing && !plot.seedId && (
+                  <div className="mb-3 font-crimson text-xs animate-pulse" style={{ color: "var(--color-rare)" }}>
+                    {harvestMessages[i]}
                   </div>
                 )}
 
