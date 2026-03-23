@@ -1266,6 +1266,50 @@
         "itemId": "key_dungeon",
         "qty": 1
       }
+    },
+    {
+      "id": "craft_winter_coat",
+      "name": "Manteau d'Hiver",
+      "skill": "crafting",
+      "reqLevel": 20,
+      "craftTime": 15,
+      "xpPerCraft": 100,
+      "inputs": [
+        {
+          "itemId": "alpha_pelt",
+          "qty": 5
+        },
+        {
+          "itemId": "thread",
+          "qty": 10
+        }
+      ],
+      "output": {
+        "itemId": "winter_coat",
+        "qty": 1
+      }
+    },
+    {
+      "id": "craft_bone_key",
+      "name": "Clé en Os",
+      "skill": "crafting",
+      "reqLevel": 35,
+      "craftTime": 10,
+      "xpPerCraft": 150,
+      "inputs": [
+        {
+          "itemId": "cursed_bone",
+          "qty": 8
+        },
+        {
+          "itemId": "bar_iron",
+          "qty": 2
+        }
+      ],
+      "output": {
+        "itemId": "bone_key",
+        "qty": 1
+      }
     }
   ]
 }
