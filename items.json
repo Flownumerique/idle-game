@@ -449,6 +449,61 @@
       "description": "S'épanouit à l'aube. Composant de l'Essence d'Aube."
     },
     {
+      "id": "wheat_enchanted",
+      "name": "Blé Enchanté",
+      "category": "resource",
+      "rarity": "rare",
+      "icon": "✨",
+      "stackMax": 999,
+      "sellPrice": 50,
+      "buyPrice": 180,
+      "description": "Un épi de blé qui brille d'une lueur magique."
+    },
+    {
+      "id": "herb_healing_enchanted",
+      "name": "Herbe Guérisseuse Enchantée",
+      "category": "resource",
+      "rarity": "rare",
+      "icon": "✨",
+      "stackMax": 999,
+      "sellPrice": 80,
+      "buyPrice": 250,
+      "description": "Une herbe dont les propriétés curatives sont décuplées par la magie."
+    },
+    {
+      "id": "flower_golden_enchanted",
+      "name": "Rose Dorée Enchantée",
+      "category": "resource",
+      "rarity": "epic",
+      "icon": "✨",
+      "stackMax": 999,
+      "sellPrice": 200,
+      "buyPrice": 650,
+      "description": "Ses pétales semblent forgés dans de l'or pur et magique."
+    },
+    {
+      "id": "herb_night_enchanted",
+      "name": "Herbe Nocturne Enchantée",
+      "category": "resource",
+      "rarity": "epic",
+      "icon": "✨",
+      "stackMax": 999,
+      "sellPrice": 350,
+      "buyPrice": 1100,
+      "description": "Une herbe qui absorbe la lumière environnante."
+    },
+    {
+      "id": "flower_dawn_enchanted",
+      "name": "Fleur de Lumière Enchantée",
+      "category": "resource",
+      "rarity": "epic",
+      "icon": "✨",
+      "stackMax": 999,
+      "sellPrice": 350,
+      "buyPrice": 1100,
+      "description": "Une fleur qui illumine les ténèbres les plus profondes."
+    },
+    {
       "id": "wheat",
       "name": "Blé",
       "category": "resource",
