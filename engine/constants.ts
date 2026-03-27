@@ -42,3 +42,12 @@ export const UI_TICK_INTERVAL_MS = 250;
 
 /** Supabase sync interval (ms) */
 export const SUPABASE_SYNC_INTERVAL_MS = 5 * 60_000;
+
+/** Maximum entries kept in the game log */
+export const GAME_LOG_MAX = 200;
+
+/** Maximum entries kept in the combat log */
+export const COMBAT_LOG_MAX = 50;
+
+/** Average fight duration used in offline estimation (ms) */
+export const AVG_FIGHT_DURATION_MS = 15_000;

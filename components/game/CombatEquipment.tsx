@@ -5,6 +5,8 @@ import { GameData } from "@/engine/data-loader";
 import { equipItem, unequipItem, getSlotDisplayName } from "@/engine/equipment-engine";
 import type { SlotId } from "@/types/game";
 import Button from "@/components/ui/Button";
+import { getRarityColor } from "@/lib/rarity";
+import { SLOT_ICONS } from "@/lib/equipment-meta";
 
 interface CombatEquipmentProps {
   className?: string;
@@ -28,33 +30,6 @@ export default function CombatEquipment({ className }: CombatEquipmentProps) {
     }
   };
 
-  const getRarityColor = (rarity: string) => {
-    const colors: Record<string, string> = {
-      common: "var(--text-secondary)",
-      uncommon: "var(--color-xp)",
-      rare: "var(--color-magic)",
-      epic: "var(--color-crit)",
-      legendary: "var(--gold-light)"
-    };
-    return colors[rarity] || "var(--text-primary)";
-  };
-
-  const slotIcons: Record<SlotId, string> = {
-    head: "👑",
-    chest: "🦺",
-    legs: "👖",
-    hands: "🧤",
-    feet: "👞",
-    mainhand: "⚔️",
-    offhand: "🛡️",
-    neck: "📿",
-    ring1: "💍",
-    ring2: "💍",
-    cape: "🦸",
-    tool_woodcutting: "🪓",
-    tool_mining: "⛏️",
-    tool_fishing: "🎣"
-  };
 
   // Only show combat-relevant slots (exclude tools)
   const combatSlots: SlotId[] = ["head", "chest", "legs", "hands", "feet", "mainhand", "offhand", "neck", "ring1", "ring2", "cape"];
@@ -105,7 +80,7 @@ export default function CombatEquipment({ className }: CombatEquipmentProps) {
               title={itemData ? `${itemData.name} - ${getSlotDisplayName(slot)}` : getSlotDisplayName(slot)}
             >
               <div className="text-lg mb-1">
-                {itemData ? itemData.icon : slotIcons[slot]}
+                {itemData ? itemData.icon : SLOT_ICONS[slot]}
               </div>
               <div className="text-xs font-cinzel" style={{ color: "var(--text-muted)" }}>
                 {getSlotDisplayName(slot).slice(0, 8)}

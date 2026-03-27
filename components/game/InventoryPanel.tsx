@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useGameStore } from "@/stores/game-store";
 import { formatNumber } from "@/lib/formatters";
+import { RARITY_COLOR, RARITY_BORDER, RARITY_LABEL, RARITY_ORDER } from "@/lib/rarity";
 import itemsData from "@/items.json";
 
 interface ItemDef {
@@ -10,25 +11,6 @@ interface ItemDef {
 }
 const itemsById = new Map<string, ItemDef>();
 for (const item of (itemsData as { items: ItemDef[] }).items) itemsById.set(item.id, item);
-
-const RARITY_COLOR: Record<string, string> = {
-  common:    "var(--rarity-common)",
-  uncommon:  "var(--rarity-uncommon)",
-  rare:      "var(--rarity-rare)",
-  epic:      "var(--rarity-epic)",
-  legendary: "var(--rarity-legendary)",
-};
-const RARITY_BORDER: Record<string, string> = {
-  common:    "var(--border-default)",
-  uncommon:  "rgba(114,184,96,0.35)",
-  rare:      "rgba(96,168,212,0.35)",
-  epic:      "rgba(152,112,200,0.35)",
-  legendary: "rgba(240,200,80,0.45)",
-};
-const RARITY_LABEL: Record<string, string> = {
-  common: "COMMUN", uncommon: "PEU COMMUN", rare: "RARE", epic: "ÉPIQUE", legendary: "LÉGENDAIRE",
-};
-const RARITY_ORDER = ["legendary", "epic", "rare", "uncommon", "common"];
 const CATEGORY_ORDER = ["equipment", "consumable", "material", "resource", "seed", "currency"];
 
 type SortMode = "rarity" | "category";

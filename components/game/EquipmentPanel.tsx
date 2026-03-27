@@ -5,6 +5,8 @@ import { GameData } from "@/engine/data-loader";
 import { equipItem, unequipItem, getSlotDisplayName, getEquipmentSlots } from "@/engine/equipment-engine";
 import type { SlotId } from "@/types/game";
 import Button from "@/components/ui/Button";
+import { getRarityColor } from "@/lib/rarity";
+import { SLOT_ICONS } from "@/lib/equipment-meta";
 
 interface EquipmentSlotProps {
   slot: SlotId;
@@ -23,34 +25,6 @@ function EquipmentSlot({ slot, equippedItemId, onEquip, onUnequip, position = ""
       item = GameData.item(equippedItemId);
     } catch {}
   }
-
-  const slotIcons: Record<SlotId, string> = {
-    head: "👑",
-    chest: "🦺",
-    legs: "👖",
-    hands: "🧤",
-    feet: "👞",
-    mainhand: "⚔️",
-    offhand: "🛡️",
-    neck: "📿",
-    ring1: "💍",
-    ring2: "💍",
-    cape: "🦸",
-    tool_woodcutting: "🪓",
-    tool_mining: "⛏️",
-    tool_fishing: "🎣"
-  };
-
-  const getRarityColor = (rarity: string) => {
-    const colors: Record<string, string> = {
-      common: "var(--text-secondary)",
-      uncommon: "var(--color-xp)",
-      rare: "var(--color-magic)",
-      epic: "var(--color-crit)",
-      legendary: "var(--gold-light)"
-    };
-    return colors[rarity] || "var(--text-primary)";
-  };
 
   return (
     <div 
@@ -72,7 +46,7 @@ function EquipmentSlot({ slot, equippedItemId, onEquip, onUnequip, position = ""
       }}
     >
       <div className="text-xl mb-1">
-        {item ? item.icon : slotIcons[slot]}
+        {item ? item.icon : SLOT_ICONS[slot]}
       </div>
       <div className="text-xs font-cinzel text-center" style={{ color: "var(--text-muted)" }}>
         {getSlotDisplayName(slot)}
@@ -90,17 +64,6 @@ function EquipmentSlot({ slot, equippedItemId, onEquip, onUnequip, position = ""
 function InventoryEquipmentItem({ itemId, onEquip }: { itemId: string; onEquip: (itemId: string, slot: SlotId) => void }) {
   const item = GameData.item(itemId);
   const equipment = useGameStore((s) => s.equipment);
-
-  const getRarityColor = (rarity: string) => {
-    const colors: Record<string, string> = {
-      common: "var(--text-secondary)",
-      uncommon: "var(--color-xp)",
-      rare: "var(--color-magic)",
-      epic: "var(--color-crit)",
-      legendary: "var(--gold-light)"
-    };
-    return colors[rarity] || "var(--text-primary)";
-  };
 
   const getCompatibleSlot = (item: any): SlotId | null => {
     if (item.slot) return item.slot;

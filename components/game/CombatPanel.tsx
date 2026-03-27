@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useGameStore } from "@/stores/game-store";
 import { getAllZones, getZone, spawnMonster, getMonstersInZone, spawnBossForZone } from "@/engine/combat-engine";
 import { computePlayerStats } from "@/engine/offline-engine";
@@ -11,6 +11,7 @@ import Button from "@/components/ui/Button";
 import CombatEquipment from "./CombatEquipment";
 import { COMBAT_SKILL_IDS } from "@/types/game";
 import type { SkillId } from "@/types/game";
+import { RARITY_COLOR } from "@/lib/rarity";
 
 // ── Metadata ──────────────────────────────────────────────────────────────────
 
@@ -29,12 +30,6 @@ const TRAINABLE_SKILLS = COMBAT_SKILL_IDS.filter(
   (id) => id !== "constitution" && id !== "prayer"
 ) as SkillId[];
 
-const RARITY_COLOR: Record<string, string> = {
-  common:   "var(--rarity-common)",
-  uncommon: "var(--rarity-uncommon)",
-  rare:     "var(--rarity-rare)",
-  boss:     "var(--rarity-legendary)",
-};
 
 const BOSS_KILL_REQUIREMENT = 10;
 

@@ -12,16 +12,9 @@ import {
   getXpToNextLevel,
 } from "@/lib/xp-calc";
 import { formatNumber } from "@/lib/formatters";
+import { RARITY_COLOR as RARITY_COLORS } from "@/lib/rarity";
 import ProgressBar from "@/components/ui/ProgressBar";
 import type { SkillId } from "@/types/game";
-
-const RARITY_COLORS: Record<string, string> = {
-  common:    "var(--rarity-common)",
-  uncommon:  "var(--rarity-uncommon)",
-  rare:      "var(--rarity-rare)",
-  epic:      "var(--rarity-epic)",
-  legendary: "var(--rarity-legendary)",
-};
 
 function getItemSafe(id: string) {
   try { return GameData.item(id); } catch { return null; }
