@@ -8,6 +8,7 @@ import {
   DEATH_REVIVE_HP_PCT,
 } from "./constants";
 import type { CombatState, CombatLogEntry, MonsterInstance, PlayerStats } from "@/types/game";
+import type { ZoneDef } from "@/types/zone";
 
 // ──────────────────────────────────────────────
 // Data types (matching actual zones_monsters.json)
@@ -30,20 +31,6 @@ interface MonsterDef {
   goldDrop: { min: number; max: number };
   drops: MonsterDrop[];
   description?: string;
-}
-
-interface ZoneDef {
-  id: string;
-  name: string;
-  icon?: string;
-  description?: string;
-  lore?: string;
-  reqLevel?: { combat?: number };
-  monsters: string[];
-  bossId?: string;
-  bossChance?: number;
-  combatXpMultiplier?: number;
-  goldMultiplier?: number;
 }
 
 const monstersMap = new Map<string, MonsterDef>();
