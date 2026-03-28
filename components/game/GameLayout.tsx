@@ -5,6 +5,7 @@ import { useGameLoop } from "@/hooks/useGameLoop";
 import { useUnlocks } from "@/hooks/useUnlocks";
 import { useSynergyDiscovery } from "@/hooks/useSynergyDiscovery";
 import { useClassSynergy } from "@/hooks/useClassSynergy";
+import ActiveGoals from "./ActiveGoals";
 import { useGameStore } from "@/stores/game-store";
 import { getLevelForXp, calculateGlobalLevels } from "@/lib/xp-calc";
 import ResourceBar from "./ResourceBar";
@@ -555,6 +556,18 @@ export default function GameLayout() {
             {activeTab === "farming" && <FarmingPanel />}
           </div>
         </main>
+
+        {/* ── Sidebar droite — Objectifs actifs (xl+ only) ─────────────── */}
+        <aside className="hidden xl:flex flex-col w-52 border-l-2 border-border-subtle bg-abyss/90 backdrop-blur-md">
+          <div className="flex-1 overflow-y-auto p-3 custom-scrollbar">
+            <ActiveGoals
+              onNavigate={(tab, section) => {
+                setActiveTab(tab as Tab);
+                if (tab === "character" && section) setCharacterSection(section);
+              }}
+            />
+          </div>
+        </aside>
       </div>
 
       {/* ── Navigation mobile bas d'écran ───────────────────────────── */}
