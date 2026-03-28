@@ -54,7 +54,7 @@ export function useClassSynergy(): void {
       // Find the most-held item in inventory
       let bestItemId  = ''
       let bestQty     = 0
-      for (const [itemId, qty] of Object.entries(state.inventory)) {
+      for (const [itemId, qty] of Object.entries(state.inventory) as [string, number][]) {
         if (qty > bestQty) { bestQty = qty; bestItemId = itemId }
       }
       if (!bestItemId) return

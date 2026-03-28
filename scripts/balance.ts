@@ -55,6 +55,7 @@ function makeDefaultGameState(): GameState {
     lastWeeklyReset: 0,
     marketSales: {},
     discoveredItems: [],
+    synergyState: {},
     lastSaveAt: Date.now(),
     totalPlayTime: 0,
     version: 3,

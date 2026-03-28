@@ -46,7 +46,7 @@ export function useGameLoop() {
       }
     };
     Object.keys(state.inventory).forEach(mark);
-    Object.values(state.equipment).forEach(mark);
+    (Object.values(state.equipment) as (string | null)[]).forEach(mark);
     if (discoveredUpdatedInitial) {
       useGameStore.setState({ discoveredItems: Array.from(discoveredSet) });
     }
