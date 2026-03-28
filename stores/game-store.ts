@@ -103,6 +103,7 @@ function defaultGameState(): GameState {
     lastWeeklyReset: Date.now(),
     marketSales: {},
     discoveredItems: [],
+    synergyState: {},
     lastSaveAt: Date.now(),
     totalPlayTime: 0,
     version: 1,
@@ -161,6 +162,9 @@ interface GameActions {
 
   // Market
   recordSale: (itemId: string, quantity: number) => void;
+
+  // Class synergy runtime state
+  setSynergyState: (update: Record<string, number>) => void;
 
   // Meta
   setSaveTime: (ts: number) => void;
@@ -490,6 +494,9 @@ export const useGameStore = create<GameStore>()(
           };
         }),
 
+      setSynergyState: (update) =>
+        set((s) => ({ synergyState: { ...s.synergyState, ...update } })),
+
       setSaveTime: (ts) => set({ lastSaveAt: ts }),
 
       addPlayTime: (ms) => set((s) => ({ totalPlayTime: s.totalPlayTime + ms })),
@@ -551,6 +558,7 @@ export const useGameStore = create<GameStore>()(
         lastWeeklyReset: s.lastWeeklyReset,
         marketSales: s.marketSales,
         discoveredItems: s.discoveredItems,
+        synergyState: s.synergyState,
         lastSaveAt: s.lastSaveAt,
         totalPlayTime: s.totalPlayTime,
         version: s.version,

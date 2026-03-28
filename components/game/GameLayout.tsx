@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useGameLoop } from "@/hooks/useGameLoop";
 import { useUnlocks } from "@/hooks/useUnlocks";
 import { useSynergyDiscovery } from "@/hooks/useSynergyDiscovery";
+import { useClassSynergy } from "@/hooks/useClassSynergy";
 import { useGameStore } from "@/stores/game-store";
 import { getLevelForXp, calculateGlobalLevels } from "@/lib/xp-calc";
 import ResourceBar from "./ResourceBar";
@@ -51,6 +52,7 @@ export default function GameLayout() {
   useGameLoop();
   useUnlocks();
   useSynergyDiscovery();
+  useClassSynergy();
   const [activeTab, setActiveTab] = useState<Tab>("skills");
   const [selectedSkill, setSelectedSkill] = useState<SkillId>(
     PROFESSION_SKILL_IDS[0]
@@ -198,8 +200,9 @@ export default function GameLayout() {
             <div className="section-title mb-3 px-1 text-gold">HÉROS</div>
             <div className="flex flex-col gap-1 md:gap-1">
               {[
-                { id: "stats", label: "STATISTIQUES", icon: "📊" },
-                { id: "milestones", label: "HAUTS FAITS", icon: "🏆" },
+                { id: "stats",      label: "STATISTIQUES",  icon: "📊" },
+                { id: "milestones", label: "HAUTS FAITS",   icon: "🏆" },
+                { id: "synergies",  label: "SYNERGIES",     icon: "✦"  },
               ].map((s) => (
                 <button
                   key={s.id}
@@ -392,7 +395,7 @@ export default function GameLayout() {
         }`;
       case "character":
         return `Héros: ${
-          characterSection === "stats" ? "Statistiques" : "Hauts Faits"
+          characterSection === "stats" ? "Statistiques" : characterSection === "synergies" ? "Synergies" : "Hauts Faits"
         }`;
       case "market":
         return `Marché: ${marketSection === "sell" ? "Vendre" : "Acheter"}`;

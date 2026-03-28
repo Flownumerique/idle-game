@@ -190,6 +190,8 @@ export interface QuestProgress {
 // Full player game state (persisted)
 // ──────────────────────────────────────────────
 export interface GameState {
+  // Class synergy runtime state (stacks, timestamps, timed bonuses)
+  synergyState: Record<string, number>;
   // Identity
   player: {
     id: string;
@@ -286,6 +288,8 @@ export interface PlayerStats {
   prayerBonus: number;
   activeStyle: 'attack' | 'strength' | 'ranged' | 'magic' | null;
   blockChance: number;
+  furyDamageMultiplier: number; // 1.0 baseline; warrior synergy stacks add to it
+  magicXpMultiplier: number;    // 1.0 baseline; mage synergy potion bonus
 }
 
 export interface ItemDrop {

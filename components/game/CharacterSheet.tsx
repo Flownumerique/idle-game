@@ -8,6 +8,7 @@ import { COMBAT_SKILL_IDS } from "@/types/game";
 import ProgressBar from "@/components/ui/ProgressBar";
 import Button from "@/components/ui/Button";
 import EquipmentPanel from "./EquipmentPanel";
+import ClassSynergyPanel from "./ClassSynergyPanel";
 import { useState } from "react";
 
 const SKILL_META: Record<string, { icon: string; name: string; bar: string }> = {
@@ -34,7 +35,7 @@ function StatRow({ label, value, color }: { label: string; value: string; color?
   );
 }
 
-export default function CharacterSheet({ section = "stats" }: { section?: "stats" | "milestones" }) {
+export default function CharacterSheet({ section = "stats" }: { section?: "stats" | "milestones" | "synergies" }) {
   const { player, skills, resetGame } = useGameStore((s) => ({
     player: s.player, skills: s.skills, resetGame: s.resetGame,
   }));
@@ -144,6 +145,8 @@ export default function CharacterSheet({ section = "stats" }: { section?: "stats
             </div>
           </div>
         </div>
+      ) : section === "synergies" ? (
+        <ClassSynergyPanel />
       ) : (
         <div className="game-card">
           <div className="section-title mb-4">Milestones & Succès</div>
