@@ -97,18 +97,14 @@ export function canCraft(
 
   const skillLevel = getLevelForXp(skills[recipe.skill as SkillId]?.xp ?? 0)
   if (skillLevel < (recipe.reqLevel ?? 1)) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.debug(`CRAFT_FAIL: skill ${recipe.skill} need ${recipe.reqLevel} have ${skillLevel}`)
-    }
+    console.debug(`CRAFT_FAIL: skill ${recipe.skill} need ${recipe.reqLevel} have ${skillLevel}`)
     return false
   }
 
   for (const input of recipe.inputs) {
     const have = inventory[input.itemId] ?? 0
     if (have < input.qty) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.debug(`CRAFT_FAIL: ${input.itemId} need ${input.qty} have ${have}`)
-      }
+      console.debug(`CRAFT_FAIL: ${input.itemId} need ${input.qty} have ${have}`)
       return false
     }
   }
