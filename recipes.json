@@ -1290,6 +1290,56 @@
       }
     },
     {
+      "id": "syn_talisman_des_ames",
+      "type": "synergy",
+      "name": "Talisman des Âmes",
+      "ingredients": [
+        { "itemId": "cursed_bone", "amount": 1 },
+        { "itemId": "rune_power",  "amount": 1 }
+      ],
+      "requiredSkill": { "skillId": "crafting", "level": 15 },
+      "output": { "itemId": "soul_talisman", "amount": 1 },
+      "discovered": false
+    },
+    {
+      "id": "syn_arbalete",
+      "type": "synergy",
+      "name": "Arbalète de Guerre",
+      "ingredients": [
+        { "itemId": "bar_steel", "amount": 3 },
+        { "itemId": "wood_yew",  "amount": 2 }
+      ],
+      "requiredSkill": { "skillId": "smithing", "level": 10 },
+      "output": { "itemId": "crossbow_war", "amount": 1 },
+      "discovered": false
+    },
+    {
+      "id": "syn_potion_regenerante",
+      "type": "synergy",
+      "name": "Potion Régénérante",
+      "ingredients": [
+        { "itemId": "herb_healing", "amount": 5 },
+        { "itemId": "herb_aquatic", "amount": 2 },
+        { "itemId": "herb_night",   "amount": 1 }
+      ],
+      "requiredSkill": { "skillId": "alchemy", "level": 8 },
+      "output": { "itemId": "potion_regenerating", "amount": 1 },
+      "discovered": false
+    },
+    {
+      "id": "syn_armure_legendaire",
+      "type": "synergy",
+      "name": "Armure Légendaire",
+      "ingredients": [
+        { "itemId": "bar_mithril",  "amount": 5 },
+        { "itemId": "hide_bear",    "amount": 3 },
+        { "itemId": "essence_dawn", "amount": 1 }
+      ],
+      "requiredSkill": { "skillId": "smithing", "level": 20 },
+      "output": { "itemId": "armor_legendary", "amount": 1 },
+      "discovered": false
+    },
+    {
       "id": "craft_bone_key",
       "name": "Clé en Os",
       "skill": "crafting",
