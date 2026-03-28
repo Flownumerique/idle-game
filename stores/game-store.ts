@@ -13,7 +13,7 @@ import type {
   GameLogEntry,
   ActiveCraft,
 } from "@/types/game";
-import { getCraftRecipe, canAffordRecipe, craftDurationMs } from "@/engine/crafting-engine";
+import { getCraftRecipe, canCraft, craftDurationMs } from "@/engine/crafting-engine";
 import { PROFESSION_SKILL_IDS } from "@/types/game";
 import { getLevelForXp } from "@/lib/xp-calc";
 
@@ -505,7 +505,7 @@ export const useGameStore = create<GameStore>()(
         const recipe = getCraftRecipe(recipeId);
         if (!recipe) return false;
         const state = get();
-        if (!canAffordRecipe(recipe, state.inventory)) return false;
+        if (!canCraft(recipeId, state.inventory, state.skills)) return false;
         // Stop any active profession action for this skill
         set((s) => ({
           activeCraft: {

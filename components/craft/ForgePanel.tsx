@@ -1,7 +1,7 @@
 'use client';
 
 import { useGameStore }            from '@/stores/game-store';
-import { getCraftRecipesForSkill, canAffordRecipe } from '@/engine/crafting-engine';
+import { getCraftRecipesForSkill, canCraft } from '@/engine/crafting-engine';
 import type { CraftRecipeDef }     from '@/engine/crafting-engine';
 import { getLevelForXp, getLevelProgress } from '@/lib/xp-calc';
 import { GameData }                from '@/engine/data-loader';
@@ -30,15 +30,17 @@ function itemName(itemId: string): string {
 function RecipeRow({
   recipe,
   inventory,
+  skills,
   isActive,
   onStart,
 }: {
   recipe:    CraftRecipeDef;
   inventory: Record<string, number>;
+  skills:    Record<string, { xp: number }>;
   isActive:  boolean;
   onStart:   () => void;
 }) {
-  const affordable = canAffordRecipe(recipe, inventory);
+  const affordable = canCraft(recipe.id, inventory, skills);
 
   return (
     <div
@@ -197,6 +199,7 @@ export default function ForgePanel() {
               key={recipe.id}
               recipe={recipe}
               inventory={inventory}
+              skills={skills}
               isActive={activeCraft?.recipeId === recipe.id && activeCraft.skillId === SKILL_ID}
               onStart={() => handleStart(recipe)}
             />

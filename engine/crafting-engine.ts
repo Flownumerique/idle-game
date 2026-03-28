@@ -71,6 +71,7 @@ export function getCraftRecipesForSkill(
 
 /**
  * Returns true when the inventory holds enough of each ingredient.
+ * Used internally by tickCraft (skill already verified at craft start).
  */
 export function canAffordRecipe(
   recipe: CraftRecipeDef,
@@ -79,6 +80,40 @@ export function canAffordRecipe(
   return recipe.inputs.every(
     input => (inventory[input.itemId] ?? 0) >= input.qty,
   )
+}
+
+/**
+ * Single source of truth for craft availability.
+ * Checks both ingredient quantities AND skill level requirement.
+ * Logs missing ingredients at debug level (dev only).
+ */
+export function canCraft(
+  recipeId: string,
+  inventory: Record<string, number>,
+  skills: Partial<Record<SkillId, { xp: number }>>,
+): boolean {
+  const recipe = recipesById.get(recipeId)
+  if (!recipe) return false
+
+  const skillLevel = getLevelForXp(skills[recipe.skill as SkillId]?.xp ?? 0)
+  if (skillLevel < (recipe.reqLevel ?? 1)) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.debug(`CRAFT_FAIL: skill ${recipe.skill} need ${recipe.reqLevel} have ${skillLevel}`)
+    }
+    return false
+  }
+
+  for (const input of recipe.inputs) {
+    const have = inventory[input.itemId] ?? 0
+    if (have < input.qty) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.debug(`CRAFT_FAIL: ${input.itemId} need ${input.qty} have ${have}`)
+      }
+      return false
+    }
+  }
+
+  return true
 }
 
 // ──────────────────────────────────────────────
