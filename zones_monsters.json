@@ -16,6 +16,7 @@
       "name": "Plaines du Départ",
       "icon": "🌾",
       "description": "Des prairies paisibles aux abords du village. Idéales pour débuter l'aventure.",
+      "lock": { "type": "none" },
       "reqLevel": {
         "combat": 1
       },
@@ -39,6 +40,7 @@
       "name": "Plaines des Slimes",
       "icon": "🟢",
       "description": "Des plaines gélatineuses où les slimes pullulent.",
+      "lock": { "type": "level", "skillId": "combat", "required": 3 },
       "reqLevel": {
         "combat": 3
       },
@@ -61,6 +63,7 @@
       "name": "Forêt des Gobelins",
       "icon": "🌲",
       "description": "Une forêt dense infestée de gobelins et de loups. Dangereux mais lucratif.",
+      "lock": { "type": "craft", "flag": "torch_crafted", "hint": "Fabriquez une torche pour éclairer le sentier forestier" },
       "reqLevel": {
         "combat": 5
       },
@@ -84,6 +87,7 @@
       "name": "Grottes des Gobelins",
       "icon": "🕳️",
       "description": "Un réseau souterrain grouillant de gobelins. Le premier pas vers leur village.",
+      "lock": { "type": "boss_kill", "bossId": "goblin_king", "hint": "Vainquez le Roi Gobelin pour localiser l'entrée de ses grottes" },
       "reqLevel": {
         "combat": 8
       },
@@ -105,6 +109,13 @@
       "name": "Plaines du Sud",
       "icon": "🌻",
       "description": "Terres fertiles au-delà du pont brisé. Monstres plus coriaces, butin plus riche.",
+      "lock": {
+        "type": "AND",
+        "locks": [
+          { "type": "level", "skillId": "combat", "required": 10 },
+          { "type": "item_found", "itemId": "map_southern_plains", "hint": "Trouvez la carte des plaines du sud sur un gobelin" }
+        ]
+      },
       "reqLevel": {
         "combat": 10
       },

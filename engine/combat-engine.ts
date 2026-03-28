@@ -8,6 +8,7 @@ import {
   DEATH_REVIVE_HP_PCT,
 } from "./constants";
 import type { CombatState, CombatLogEntry, MonsterInstance, PlayerStats } from "@/types/game";
+import type { ZoneDef } from "@/types/zone";
 
 // ──────────────────────────────────────────────
 // Data types (matching actual zones_monsters.json)
@@ -30,20 +31,6 @@ interface MonsterDef {
   goldDrop: { min: number; max: number };
   drops: MonsterDrop[];
   description?: string;
-}
-
-interface ZoneDef {
-  id: string;
-  name: string;
-  icon?: string;
-  description?: string;
-  lore?: string;
-  reqLevel?: { combat?: number };
-  monsters: string[];
-  bossId?: string;
-  bossChance?: number;
-  combatXpMultiplier?: number;
-  goldMultiplier?: number;
 }
 
 const monstersMap = new Map<string, MonsterDef>();
@@ -174,6 +161,7 @@ export interface CombatTickResult {
   xpGained: number;
   goldGained: number;
   monstersKilled: number; // regular kills only (not boss)
+  bossKilledId: string | null;  // monster.id when a boss is defeated, else null
 }
 
 export function tickCombat(
@@ -190,6 +178,7 @@ export function tickCombat(
     xpGained: 0,
     goldGained: 0,
     monstersKilled: 0,
+    bossKilledId: null,
   };
 
   if (!state.active || !state.currentMonster || !state.zoneId) {
@@ -273,6 +262,7 @@ export function tickCombat(
 
       // Boss fight always ends after defeat (no auto-restart)
       if (isBoss) {
+        result.bossKilledId = monster.id;
         newState.active = false;
         newState.currentMonster = null;
       } else if (newState.autoRestart && newState.zoneId) {

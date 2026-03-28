@@ -16,6 +16,8 @@ const MOCK_PLAYER_STATS: PlayerStats = {
   prayerBonus: 1.0,
   activeStyle: "attack",
   blockChance: 0.0,
+  furyDamageMultiplier: 1.0,
+  magicXpMultiplier: 1.0,
 };
 
 const SIMULATION_MS = 100 * 3600 * 1000; // 100 hours

@@ -3,6 +3,7 @@
 import { useGameStore } from "@/stores/game-store";
 import itemsData from "@/items.json";
 import zonesData from "@/zones_monsters.json";
+import EncyclopediaItemCard from "./EncyclopediaItemCard";
 
 // We define the Category mapping for nice display
 const CATEGORY_LABELS: Record<string, string> = {
@@ -17,7 +18,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   currency: "Monnaies",
 };
 
-export default function EncyclopediaPanel({ section = "items" }: { section?: "items" | "monsters" | "zones" }) {
+export default function EncyclopediaPanel({ section = "items", onNavigate }: { section?: "items" | "monsters" | "zones"; onNavigate?: (tab: string) => void }) {
   const discoveredItems = useGameStore((s) => s.discoveredItems) || [];
   const zoneKills = useGameStore((s) => s.zoneKills) || {};
 
@@ -47,22 +48,14 @@ export default function EncyclopediaPanel({ section = "items" }: { section?: "it
               <span className="text-xs font-normal text-slate-500">{catDiscovered} / {catItems.length}</span>
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-              {catItems.map((item) => {
-                const isDiscovered = discoveredItems.includes(item.id);
-                return (
-                  <div key={item.id} className={`relative p-3 rounded-sm border flex flex-col items-center text-center transition-all h-full ${isDiscovered ? "bg-[#16213e] border-slate-600" : "bg-[#0d1525] border-slate-800 opacity-70"}`}>
-                    <div className={`text-4xl mb-2 ${!isDiscovered ? "grayscale opacity-30 select-none" : ""}`}>
-                      {isDiscovered ? (item.icon || "📦") : "❓"}
-                    </div>
-                    <div className={`font-cinzel text-[0.55rem] tracking-wide mb-1 leading-tight ${isDiscovered ? "text-slate-200" : "text-slate-600"}`}>
-                      {isDiscovered ? item.name : "INCONNU"}
-                    </div>
-                    {isDiscovered && item.description && (
-                      <div className="font-crimson text-[10px] text-slate-400 mt-2 leading-tight italic">"{item.description}"</div>
-                    )}
-                  </div>
-                );
-              })}
+              {catItems.map((item) => (
+                <EncyclopediaItemCard
+                  key={item.id}
+                  item={item}
+                  isDiscovered={discoveredItems.includes(item.id)}
+                  onNavigate={onNavigate}
+                />
+              ))}
             </div>
           </div>
         );

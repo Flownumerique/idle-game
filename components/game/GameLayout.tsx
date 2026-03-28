@@ -2,6 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useGameLoop } from "@/hooks/useGameLoop";
+import { useUnlocks } from "@/hooks/useUnlocks";
+import { useSynergyDiscovery } from "@/hooks/useSynergyDiscovery";
+import { useClassSynergy } from "@/hooks/useClassSynergy";
+import ActiveGoals from "./ActiveGoals";
 import { useGameStore } from "@/stores/game-store";
 import { getLevelForXp, calculateGlobalLevels } from "@/lib/xp-calc";
 import ResourceBar from "./ResourceBar";
@@ -47,6 +51,9 @@ const SKILL_META: Record<string, { name: string; icon: string }> = {
 
 export default function GameLayout() {
   useGameLoop();
+  useUnlocks();
+  useSynergyDiscovery();
+  useClassSynergy();
   const [activeTab, setActiveTab] = useState<Tab>("skills");
   const [selectedSkill, setSelectedSkill] = useState<SkillId>(
     PROFESSION_SKILL_IDS[0]
@@ -194,8 +201,9 @@ export default function GameLayout() {
             <div className="section-title mb-3 px-1 text-gold">HÉROS</div>
             <div className="flex flex-col gap-1 md:gap-1">
               {[
-                { id: "stats", label: "STATISTIQUES", icon: "📊" },
-                { id: "milestones", label: "HAUTS FAITS", icon: "🏆" },
+                { id: "stats",      label: "STATISTIQUES",  icon: "📊" },
+                { id: "milestones", label: "HAUTS FAITS",   icon: "🏆" },
+                { id: "synergies",  label: "SYNERGIES",     icon: "✦"  },
               ].map((s) => (
                 <button
                   key={s.id}
@@ -388,7 +396,7 @@ export default function GameLayout() {
         }`;
       case "character":
         return `Héros: ${
-          characterSection === "stats" ? "Statistiques" : "Hauts Faits"
+          characterSection === "stats" ? "Statistiques" : characterSection === "synergies" ? "Synergies" : "Hauts Faits"
         }`;
       case "market":
         return `Marché: ${marketSection === "sell" ? "Vendre" : "Acheter"}`;
@@ -534,7 +542,7 @@ export default function GameLayout() {
               <MarketPanel section={marketSection as any} />
             )}
             {activeTab === "encyclopedia" && (
-              <EncyclopediaPanel section={encyclopediaSection as any} />
+              <EncyclopediaPanel section={encyclopediaSection as any} onNavigate={(tab) => setActiveTab(tab as Tab)} />
             )}
             {activeTab === "quests" && (
               <QuestPanel section={questsSection as any} />
@@ -548,6 +556,18 @@ export default function GameLayout() {
             {activeTab === "farming" && <FarmingPanel />}
           </div>
         </main>
+
+        {/* ── Sidebar droite — Objectifs actifs (xl+ only) ─────────────── */}
+        <aside className="hidden xl:flex flex-col w-52 border-l-2 border-border-subtle bg-abyss/90 backdrop-blur-md">
+          <div className="flex-1 overflow-y-auto p-3 custom-scrollbar">
+            <ActiveGoals
+              onNavigate={(tab, section) => {
+                setActiveTab(tab as Tab);
+                if (tab === "character" && section) setCharacterSection(section);
+              }}
+            />
+          </div>
+        </aside>
       </div>
 
       {/* ── Navigation mobile bas d'écran ───────────────────────────── */}

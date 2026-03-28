@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { useGameStore } from "@/stores/game-store";
 import { formatNumber } from "@/lib/formatters";
-import { RARITY_COLOR, RARITY_BORDER, RARITY_LABEL, RARITY_ORDER } from "@/lib/rarity";
+import { RARITY_BORDER, RARITY_LABEL, RARITY_ORDER } from "@/lib/rarity";
 import itemsData from "@/items.json";
+import InventoryItem from "./InventoryItem";
 
 interface ItemDef {
   id: string; name: string; rarity: string; category: string; icon?: string;
@@ -96,35 +97,14 @@ export default function InventoryPanel({ filter = "all" }: { filter?: "all" | "r
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          {entries.map(([itemId, qty]) => {
-            const item   = itemsById.get(itemId);
-            const name   = item?.name ?? itemId;
-            const rarity = item?.rarity ?? "common";
-            const icon   = item?.icon;
-            return (
-              <div
-                key={itemId}
-                className="flex items-center gap-2 p-2"
-                style={{
-                  background: "var(--surface-card)",
-                  border: `2px solid ${RARITY_BORDER[rarity] ?? "var(--border-default)"}`,
-                }}
-                title={`${name} — ${RARITY_LABEL[rarity] ?? rarity}`}
-              >
-                <span
-                  className="flex items-center justify-center flex-shrink-0"
-                  style={{ width: 28, height: 28, border: `1px solid ${RARITY_BORDER[rarity] ?? "var(--border-default)"}`, background: "var(--surface-elevated)", fontSize: 14, imageRendering: "pixelated" }}
-                >
-                  {icon ?? "◻"}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="font-crimson text-xs truncate" style={{ color: RARITY_COLOR[rarity] ?? "var(--text-secondary)" }}>{name}</div>
-                  <div className="font-cinzel" style={{ fontSize: "0.38rem", color: "var(--text-muted)" }}>{RARITY_LABEL[rarity] ?? rarity}</div>
-                </div>
-                <span className="font-cinzel flex-shrink-0" style={{ fontSize: "0.5rem", color: "var(--text-secondary)" }}>×{formatNumber(qty)}</span>
-              </div>
-            );
-          })}
+          {entries.map(([itemId, qty]) => (
+            <InventoryItem
+              key={itemId}
+              itemId={itemId}
+              qty={qty}
+              item={itemsById.get(itemId)}
+            />
+          ))}
         </div>
       )}
     </div>

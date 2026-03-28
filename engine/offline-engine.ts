@@ -286,6 +286,21 @@ export function computePlayerStats(state: GameState): PlayerStats {
 
   if (state.upgrades["class_bonus_warrior"]) totalAttack += totalAttack * 0.1;
 
+  // ── Warrior synergy: Furie Berseker ──────────────────────────────────────
+  let furyDamageMultiplier = 1.0;
+  const synergy = state.synergyState ?? {};
+  const furyStacks    = synergy['fury_stacks']      ?? 0;
+  const furyLastKill  = synergy['fury_last_kill_at'] ?? 0;
+  const furyExpired   = furyLastKill > 0 && (Date.now() - furyLastKill) >= 60_000;
+  if (furyStacks > 0 && !furyExpired) {
+    furyDamageMultiplier = 1 + furyStacks * 0.01;
+    totalAttack *= furyDamageMultiplier;
+  }
+
+  // ── Mage synergy: Catalyse Alchimique ────────────────────────────────────
+  const magicBonusUntil   = synergy['mage_potion_bonus_until'] ?? 0;
+  const magicXpMultiplier = Date.now() < magicBonusUntil ? 1.2 : 1.0;
+
   return {
     maxHp: 100 + (constitutionLevel * 10) + hpBonus,
     attack: Math.max(1, totalAttack),
@@ -297,5 +312,7 @@ export function computePlayerStats(state: GameState): PlayerStats {
     prayerBonus: 1.0,
     activeStyle,
     blockChance,
+    furyDamageMultiplier,
+    magicXpMultiplier,
   };
 }
