@@ -243,6 +243,9 @@ export interface GameState {
   // Market: track sales for dynamic pricing
   marketSales: Record<string, { count: number; windowStart: number }>;
 
+  // Active craft session (null when idle)
+  activeCraft: ActiveCraft | null;
+
   // Encyclopedia
   discoveredItems: string[];
 
@@ -272,6 +275,17 @@ export interface OfflineResult {
     wins: number;
     deaths: number;
   };
+}
+
+// ──────────────────────────────────────────────
+// Active craft session (persisted)
+// ──────────────────────────────────────────────
+export interface ActiveCraft {
+  skillId:        string
+  recipeId:       string
+  startedAt:      number   // timestamp ms
+  duration:       number   // ms (craftTime * 1000)
+  completedCount: number
 }
 
 // ──────────────────────────────────────────────

@@ -1,288 +1,268 @@
-"use client";
+'use client';
 
-import { useGameStore } from "@/stores/game-store";
-import { GameData } from "@/engine/data-loader";
-import { getLevelForXp } from "@/lib/xp-calc";
-import Button from "@/components/ui/Button";
-import ProgressBar from "@/components/ui/ProgressBar";
-import { useState } from "react";
+import { useState, useEffect } from 'react';
+import { useGameStore }            from '@/stores/game-store';
+import { getCraftRecipesForSkill, canAffordRecipe } from '@/engine/crafting-engine';
+import type { CraftRecipeDef }     from '@/engine/crafting-engine';
+import { getLevelForXp, getLevelProgress } from '@/lib/xp-calc';
+import { GameData }                from '@/engine/data-loader';
+import Button                      from '@/components/ui/Button';
+import ProgressBar                 from '@/components/ui/ProgressBar';
 
-export default function ForgePanel() {
-  const { skills, addItems, removeItems, addSkillXp, addLogEntry } = useGameStore((s) => ({
-    skills: s.skills,
-    addItems: s.addItems,
-    removeItems: s.removeItems,
-    addSkillXp: s.addSkillXp,
-    addLogEntry: s.addLogEntry,
-  }));
+const SKILL_ID = 'smithing' as const;
 
-  const [selectedRecipe, setSelectedRecipe] = useState<string | null>(null);
-  const [craftQueue, setCraftQueue] = useState<Array<{ recipeId: string; finishTime: number }>>([]);
+// ──────────────────────────────────────────────
+// Helpers
+// ──────────────────────────────────────────────
 
-  // Get all smithing recipes
-  const smithingRecipes = GameData.recipesForSkill("smithing");
-  const smithingLevel = skills.smithing ? getLevelForXp(skills.smithing.xp) : 1;
+function itemIcon(itemId: string): string {
+  try { return (GameData.item(itemId) as { icon: string }).icon ?? '📦'; } catch { return '📦'; }
+}
+function itemName(itemId: string): string {
+  try { return (GameData.item(itemId) as { name: string }).name ?? itemId; } catch { return itemId; }
+}
 
-  // Filter recipes that can be crafted
-  const availableRecipes = smithingRecipes.filter(recipe => (recipe.reqLevel || 1) <= smithingLevel);
+// ──────────────────────────────────────────────
+// Sub-components
+// ──────────────────────────────────────────────
 
-  const canCraft = (recipe: any) => {
-    if (!recipe.inputs) return true;
-    
-    return recipe.inputs.every((input: any) => {
-      const inventory = useGameStore.getState().inventory;
-      return (inventory[input.itemId] || 0) >= input.qty;
-    });
-  };
+/** Live progress banner shown while a craft is running */
+function ActiveCraftBanner({
+  onStop,
+}: {
+  onStop: () => void;
+}) {
+  const activeCraft  = useGameStore(s => s.activeCraft);
+  const [now, setNow] = useState(Date.now());
 
-  const craftItem = (recipe: any) => {
-    if (!canCraft(recipe)) {
-      // TODO: Show error message
-      console.error("Ressources insuffisantes");
-      return;
-    }
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 100);
+    return () => clearInterval(id);
+  }, []);
 
-    const state = useGameStore.getState();
-    
-    // Remove inputs from inventory
-    const success = removeItems(
-      recipe.inputs.reduce((acc: Record<string, number>, input: any) => {
-        acc[input.itemId] = input.qty;
-        return acc;
-      }, {})
-    );
+  if (!activeCraft || activeCraft.skillId !== SKILL_ID) return null;
 
-    if (!success) {
-      console.error("Impossible de retirer les ressources");
-      return;
-    }
-
-    // Add output to inventory
-    if (recipe.output) {
-      addItems({ [recipe.output.itemId]: recipe.output.qty });
-    }
-
-    // Add skill XP
-    addSkillXp("smithing", recipe.xpPerCraft);
-
-    // Add log entry
-    addLogEntry({
-      type: "item_crafted",
-      itemId: recipe.output?.itemId || "unknown",
-      message: `🔨 ${recipe.name} crafté avec succès`,
-      timestamp: Date.now()
-    });
-
-    console.log(`${recipe.name} crafté avec succès!`);
-  };
-
-  const getRarityColor = (rarity: string) => {
-    const colors: Record<string, string> = {
-      common: "var(--text-secondary)",
-      uncommon: "var(--color-xp)",
-      rare: "var(--color-magic)",
-      epic: "var(--color-crit)",
-      legendary: "var(--gold-light)"
-    };
-    return colors[rarity] || "var(--text-primary)";
-  };
+  const progress  = Math.min((now - activeCraft.startedAt) / activeCraft.duration, 1);
+  const remaining = Math.max(0, Math.ceil((activeCraft.startedAt + activeCraft.duration - now) / 1000));
+  const recipe    = getCraftRecipesForSkill(SKILL_ID, 0).find(r => r.id === activeCraft.recipeId)
+                 ?? { name: activeCraft.recipeId } as Pick<CraftRecipeDef, 'name'>;
 
   return (
-    <div className="space-y-6">
+    <div
+      className="game-card space-y-2"
+      style={{ border: '1px solid rgba(245,158,11,0.4)', background: 'rgba(245,158,11,0.04)' }}
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span style={{ fontSize: '1.1rem' }}>🔨</span>
+          <div>
+            <div className="font-cinzel" style={{ fontSize: '0.55rem', color: 'var(--gold-light)' }}>
+              {recipe.name}
+            </div>
+            <div className="font-cinzel" style={{ fontSize: '0.4rem', color: 'var(--text-muted)' }}>
+              {activeCraft.completedCount > 0 && `${activeCraft.completedCount}× crafté · `}
+              {remaining}s restant
+            </div>
+          </div>
+        </div>
+        <Button size="sm" variant="danger" onClick={onStop}>Arrêter</Button>
+      </div>
+      <ProgressBar value={progress} height="h-2" color="bg-amber-500" />
+    </div>
+  );
+}
+
+/** One recipe row */
+function RecipeRow({
+  recipe,
+  inventory,
+  isActive,
+  onStart,
+}: {
+  recipe:    CraftRecipeDef;
+  inventory: Record<string, number>;
+  isActive:  boolean;
+  onStart:   () => void;
+}) {
+  const affordable = canAffordRecipe(recipe, inventory);
+
+  return (
+    <div
+      className="rounded-sm p-2.5 transition-all"
+      style={{
+        background: isActive
+          ? 'rgba(245,158,11,0.06)'
+          : 'rgba(255,255,255,0.02)',
+        border: `1px solid ${
+          isActive
+            ? 'rgba(245,158,11,0.4)'
+            : affordable
+              ? 'rgba(255,255,255,0.07)'
+              : 'rgba(255,255,255,0.04)'
+        }`,
+        opacity: affordable ? 1 : 0.55,
+      }}
+    >
+      {/* Recipe header */}
+      <div className="flex items-center gap-2 mb-2">
+        <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>{itemIcon(recipe.output.itemId)}</span>
+        <div className="flex-1 min-w-0">
+          <div className="font-cinzel truncate" style={{ fontSize: '0.5rem', color: 'var(--text-primary)' }}>
+            {recipe.name}
+          </div>
+          <div className="font-cinzel" style={{ fontSize: '0.38rem', color: 'var(--text-muted)' }}>
+            Niv. {recipe.reqLevel ?? 1} · {recipe.craftTime}s · +{recipe.xpPerCraft} XP
+          </div>
+        </div>
+        <button
+          disabled={!affordable}
+          onClick={onStart}
+          className="flex-shrink-0 font-cinzel rounded-sm px-2 py-1 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          style={{
+            fontSize: '0.42rem',
+            background: isActive ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.06)',
+            border: `1px solid ${isActive ? 'rgba(245,158,11,0.5)' : 'rgba(255,255,255,0.12)'}`,
+            color: isActive ? 'var(--gold-light)' : 'var(--text-secondary)',
+          }}
+        >
+          {isActive ? '↺ En cours' : 'Lancer'}
+        </button>
+      </div>
+
+      {/* Ingredients */}
+      <div className="flex flex-wrap gap-1.5">
+        {recipe.inputs.map(input => {
+          const have    = inventory[input.itemId] ?? 0;
+          const enough  = have >= input.qty;
+          return (
+            <div
+              key={input.itemId}
+              className="flex items-center gap-1 px-1.5 py-0.5 rounded-sm"
+              style={{
+                background: enough ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.08)',
+                border: `1px solid ${enough ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.25)'}`,
+              }}
+            >
+              <span style={{ fontSize: '0.75rem' }}>{itemIcon(input.itemId)}</span>
+              <span
+                className="font-mono"
+                style={{ fontSize: '0.42rem', color: enough ? 'var(--color-xp)' : 'rgba(239,68,68,0.9)' }}
+              >
+                {have}/{input.qty}
+              </span>
+            </div>
+          );
+        })}
+        {/* Output */}
+        <div
+          className="flex items-center gap-1 px-1.5 py-0.5 rounded-sm ml-auto"
+          style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.2)' }}
+        >
+          <span style={{ fontSize: '0.75rem' }}>→</span>
+          <span style={{ fontSize: '0.75rem' }}>{itemIcon(recipe.output.itemId)}</span>
+          <span className="font-mono" style={{ fontSize: '0.42rem', color: 'var(--gold-light)' }}>
+            ×{recipe.output.qty}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────
+// Panel
+// ──────────────────────────────────────────────
+
+const CATEGORIES: Array<{ label: string; icon: string; match: (id: string) => boolean }> = [
+  { label: 'Fonderie',   icon: '🔥', match: id => id.startsWith('smelt_')   },
+  { label: 'Armes',      icon: '⚔️', match: id => id.startsWith('forge_sword') || id.startsWith('forge_axe') || id.startsWith('forge_bow') },
+  { label: 'Armures',    icon: '🛡️', match: id => id.startsWith('forge_helm') || id.startsWith('forge_chest') || id.startsWith('forge_shield') || id.startsWith('forge_legs') },
+  { label: 'Divers',     icon: '🔩', match: () => true },
+];
+
+export default function ForgePanel() {
+  const skills      = useGameStore(s => s.skills);
+  const inventory   = useGameStore(s => s.inventory);
+  const activeCraft = useGameStore(s => s.activeCraft);
+  const startCraft  = useGameStore(s => s.startCraft);
+  const stopCraft   = useGameStore(s => s.stopCraft);
+  const addItems    = useGameStore(s => s.addItems);
+
+  const smithingXp    = skills.smithing?.xp ?? 0;
+  const smithingLevel = getLevelForXp(smithingXp);
+  const xpProgress    = getLevelProgress(smithingXp);
+
+  const recipes = getCraftRecipesForSkill(SKILL_ID, smithingXp);
+
+  // Assign each recipe to the first matching category
+  const categorised = CATEGORIES.map(cat => ({
+    ...cat,
+    recipes: recipes.filter(r => cat.match(r.id) && !CATEGORIES.slice(0, CATEGORIES.indexOf(cat)).some(c => c.match(r.id))),
+  })).filter(cat => cat.recipes.length > 0);
+
+  function handleStart(recipe: CraftRecipeDef) {
+    if (activeCraft?.recipeId === recipe.id && activeCraft.skillId === SKILL_ID) {
+      stopCraft();
+    } else {
+      startCraft(recipe.id, SKILL_ID);
+    }
+  }
+
+  return (
+    <div className="space-y-4">
       {/* Header */}
       <div className="game-card">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="section-title">Forge</h2>
-            <p className="font-crimson text-sm" style={{ color: "var(--text-secondary)" }}>
-              Niveau de forge: {smithingLevel}
-            </p>
+        <div className="flex items-center gap-3 mb-4">
+          <span style={{ fontSize: '1.5rem' }}>🔨</span>
+          <div className="flex-1">
+            <div className="section-title">Forge</div>
+            <div className="font-cinzel" style={{ fontSize: '0.42rem', color: 'var(--text-muted)' }}>
+              NIVEAU {smithingLevel}
+            </div>
           </div>
-          <div className="text-2xl">🔨</div>
         </div>
-        
-        {/* Smithing XP Progress */}
-        <div>
-          <div className="flex justify-between items-center mb-1.5">
-            <span className="font-crimson text-sm" style={{ color: "var(--text-secondary)" }}>
-              Smithing XP
-            </span>
-            <span className="font-cinzel text-sm" style={{ color: "var(--text-primary)" }}>
-              {skills.smithing?.xp || 0} XP
-            </span>
-          </div>
-          <ProgressBar 
-            value={getLevelForXp(skills.smithing?.xp || 0) / 100} 
-            height="h-2" 
-            color="bg-orange-500" 
-          />
+        <ProgressBar value={xpProgress} height="h-1.5" color="bg-orange-500" />
+        <div className="flex justify-between mt-1">
+          <span className="font-cinzel" style={{ fontSize: '0.38rem', color: 'var(--text-muted)' }}>XP FORGE</span>
+          <span className="font-mono"   style={{ fontSize: '0.4rem',  color: 'var(--text-secondary)' }}>{smithingXp.toLocaleString()}</span>
         </div>
       </div>
 
-      {/* Recipe Categories */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Weapons */}
-        <div className="game-card">
-          <h3 className="section-title mb-4">Armes</h3>
-          <div className="space-y-3">
-            {availableRecipes
-              .filter(recipe => recipe.output && (recipe.output.itemId.includes('sword') || recipe.output.itemId.includes('axe') || recipe.output.itemId.includes('staff')))
-              .map((recipe) => {
-                const item = GameData.item(recipe.output!.itemId);
-                const canCraftRecipe = canCraft(recipe);
-                
-                return (
-                  <div 
-                    key={recipe.id}
-                    className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                      canCraftRecipe 
-                        ? 'hover:bg-gray-800' 
-                        : 'opacity-50 cursor-not-allowed'
-                    }`}
-                    style={{ 
-                      borderColor: canCraftRecipe ? "var(--border-subtle)" : "var(--border-error)",
-                      backgroundColor: "var(--surface-elevated)"
-                    }}
-                    onClick={() => canCraftRecipe && craftItem(recipe)}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl">{item.icon}</span>
-                        <div>
-                          <div className="font-cinzel text-sm" style={{ color: getRarityColor(item.rarity) }}>
-                            {item.name}
-                          </div>
-                          <div className="font-crimson text-xs" style={{ color: "var(--text-muted)" }}>
-                            Niv. {recipe.reqLevel}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-cinzel text-xs" style={{ color: "var(--gold-light)" }}>
-                          +{recipe.xpPerCraft} XP
-                        </div>
-                        <div className="font-crimson text-xs" style={{ color: "var(--text-secondary)" }}>
-                          {recipe.craftTime}s
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Requirements */}
-                    <div className="flex flex-wrap gap-1">
-                      {recipe.inputs?.map((input: any) => {
-                        const inputItem = GameData.item(input.itemId);
-                        const inventory = useGameStore.getState().inventory;
-                        const hasEnough = (inventory[input.itemId] || 0) >= input.qty;
-                        
-                        return (
-                          <div 
-                            key={input.itemId}
-                            className={`px-2 py-1 rounded text-xs font-crimson ${
-                              hasEnough ? 'bg-green-900' : 'bg-red-900'
-                            }`}
-                          >
-                            {inputItem.icon} {input.qty}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-          </div>
-        </div>
+      {/* Active craft banner */}
+      <ActiveCraftBanner onStop={stopCraft} />
 
-        {/* Armor */}
-        <div className="game-card">
-          <h3 className="section-title mb-4">Armure</h3>
-          <div className="space-y-3">
-            {availableRecipes
-              .filter(recipe => recipe.output && (recipe.output.itemId.includes('helm') || recipe.output.itemId.includes('chest') || recipe.output.itemId.includes('shield')))
-              .map((recipe) => {
-                const item = GameData.item(recipe.output!.itemId);
-                const canCraftRecipe = canCraft(recipe);
-                
-                return (
-                  <div 
-                    key={recipe.id}
-                    className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                      canCraftRecipe 
-                        ? 'hover:bg-gray-800' 
-                        : 'opacity-50 cursor-not-allowed'
-                    }`}
-                    style={{ 
-                      borderColor: canCraftRecipe ? "var(--border-subtle)" : "var(--border-error)",
-                      backgroundColor: "var(--surface-elevated)"
-                    }}
-                    onClick={() => canCraftRecipe && craftItem(recipe)}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl">{item.icon}</span>
-                        <div>
-                          <div className="font-cinzel text-sm" style={{ color: getRarityColor(item.rarity) }}>
-                            {item.name}
-                          </div>
-                          <div className="font-crimson text-xs" style={{ color: "var(--text-muted)" }}>
-                            Niv. {recipe.reqLevel}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-cinzel text-xs" style={{ color: "var(--gold-light)" }}>
-                          +{recipe.xpPerCraft} XP
-                        </div>
-                        <div className="font-crimson text-xs" style={{ color: "var(--text-secondary)" }}>
-                          {recipe.craftTime}s
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Requirements */}
-                    <div className="flex flex-wrap gap-1">
-                      {recipe.inputs?.map((input: any) => {
-                        const inputItem = GameData.item(input.itemId);
-                        const inventory = useGameStore.getState().inventory;
-                        const hasEnough = (inventory[input.itemId] || 0) >= input.qty;
-                        
-                        return (
-                          <div 
-                            key={input.itemId}
-                            className={`px-2 py-1 rounded text-xs font-crimson ${
-                              hasEnough ? 'bg-green-900' : 'bg-red-900'
-                            }`}
-                          >
-                            {inputItem.icon} {input.qty}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
+      {/* Recipe categories */}
+      {categorised.map(cat => (
+        <div key={cat.label} className="game-card space-y-2">
+          <div className="flex items-center gap-2 mb-1">
+            <span style={{ fontSize: '1rem' }}>{cat.icon}</span>
+            <div className="section-title">{cat.label}</div>
           </div>
+          {cat.recipes.map(recipe => (
+            <RecipeRow
+              key={recipe.id}
+              recipe={recipe}
+              inventory={inventory}
+              isActive={activeCraft?.recipeId === recipe.id && activeCraft.skillId === SKILL_ID}
+              onStart={() => handleStart(recipe)}
+            />
+          ))}
         </div>
-      </div>
+      ))}
 
-      {/* Debug Section */}
+      {recipes.length === 0 && (
+        <div className="game-card text-center py-8" style={{ color: 'var(--text-muted)' }}>
+          <div style={{ fontSize: '2rem' }}>🔒</div>
+          <p className="font-cinzel mt-2" style={{ fontSize: '0.45rem' }}>Niveau Forge insuffisant</p>
+        </div>
+      )}
+
+      {/* Debug */}
       <div className="game-card">
-        <h3 className="section-title mb-4">Debug - Matériaux de test</h3>
-        <div className="flex gap-2">
-          <Button 
-            size="sm" 
-            onClick={() => {
-              addItems({
-                "bar_copper": 20,
-                "bar_iron": 10,
-                "bar_steel": 5,
-                "wood_common": 50,
-                "charcoal": 20
-              });
-            }}
-          >
-            Ajouter matériaux
-          </Button>
-        </div>
+        <div className="section-title mb-3">Matériaux de test</div>
+        <Button size="sm" onClick={() => addItems({ ore_copper: 30, ore_iron: 20, ore_steel: 10, charcoal: 30, bar_copper: 5, bar_iron: 5 })}>
+          Ajouter matériaux
+        </Button>
       </div>
     </div>
   );
