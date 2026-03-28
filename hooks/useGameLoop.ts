@@ -268,6 +268,19 @@ export function useGameLoop() {
            };
         }
 
+        if (result.xpGains.length > 0) {
+          // Aggregate gains from all kills in this tick for the event
+          const gainMap: Record<string, number> = {}
+          for (const g of result.xpGains) {
+            gainMap[g.skillId] = (gainMap[g.skillId] ?? 0) + g.amount
+          }
+          bus.emit('COMBAT_XP_GAINED', {
+            gains: (Object.entries(gainMap) as [import('@/types/game').SkillId, number][]).map(
+              ([skillId, amount]) => ({ skillId, amount })
+            ),
+          })
+        }
+
         for (const [itemId, qty] of Object.entries(result.loot)) {
           newInventory[itemId] = (newInventory[itemId] ?? 0) + qty;
           markDiscovered(itemId);

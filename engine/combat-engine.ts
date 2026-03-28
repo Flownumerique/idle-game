@@ -7,7 +7,7 @@ import {
   MAX_CRIT_CHANCE,
   DEATH_REVIVE_HP_PCT,
 } from "./constants";
-import type { CombatState, CombatLogEntry, MonsterInstance, PlayerStats } from "@/types/game";
+import type { CombatState, CombatLogEntry, MonsterInstance, PlayerStats, SkillId } from "@/types/game";
 import type { ZoneDef } from "@/types/zone";
 
 // ──────────────────────────────────────────────
@@ -159,6 +159,7 @@ export interface CombatTickResult {
   newPlayerHp: number;
   loot: Record<string, number>;
   xpGained: number;
+  xpGains: Array<{ skillId: SkillId; amount: number }>;  // per-kill breakdown for log/events
   goldGained: number;
   monstersKilled: number; // regular kills only (not boss)
   bossKilledId: string | null;  // monster.id when a boss is defeated, else null
@@ -176,6 +177,7 @@ export function tickCombat(
     newPlayerHp: playerHp,
     loot: {},
     xpGained: 0,
+    xpGains: [],
     goldGained: 0,
     monstersKilled: 0,
     bossKilledId: null,
@@ -251,14 +253,34 @@ export function tickCombat(
           Math.floor(rng() * (monsterDef.goldDrop.max - monsterDef.goldDrop.min + 1));
         result.goldGained += gold;
         result.xpGained += monsterDef.combatXp;
+
+        // Per-kill XP breakdown for log and event
+        const trainingSkill = (newState.trainingStyle ?? 'attack') as SkillId
+        const killXp   = monsterDef.combatXp
+        const constXp  = Math.max(1, Math.floor(killXp / 3))
+        result.xpGains.push({ skillId: trainingSkill, amount: killXp })
+        result.xpGains.push({ skillId: 'constitution', amount: constXp })
+
+        newState.log = [
+          ...newState.log.slice(-49),
+          { type: 'monster_death', monsterName: monster.name, timestamp: Date.now() },
+          {
+            type: 'combat_xp',
+            xpGains: [
+              { skillId: trainingSkill, amount: killXp },
+              { skillId: 'constitution' as SkillId, amount: constXp },
+            ],
+            timestamp: Date.now(),
+          },
+        ]
+      } else {
+        newState.log = [
+          ...newState.log.slice(-49),
+          { type: 'monster_death', timestamp: Date.now() },
+        ]
       }
 
       if (!isBoss) result.monstersKilled++;
-
-      newState.log = [
-        ...newState.log.slice(-49),
-        { type: "monster_death", timestamp: Date.now() },
-      ];
 
       // Boss fight always ends after defeat (no auto-restart)
       if (isBoss) {

@@ -130,10 +130,13 @@ export interface CombatLogEntry {
     | "monster_hit"
     | "player_death"
     | "monster_death"
+    | "combat_xp"
     | "loot";
   dmg?: number;
   crit?: boolean;
   message?: string;
+  monsterName?: string;
+  xpGains?: Array<{ skillId: SkillId; amount: number }>;
   timestamp: number;
 }
 
