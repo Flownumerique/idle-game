@@ -58,7 +58,7 @@ export function getSynergiesForItem(
   const ids = ingredientIndex.get(itemId)
   if (!ids) return []
 
-  return [...ids]
+  return Array.from(ids)
     .map(id => synergiesById.get(id)!)
     .map(recipe => ({
       recipe,
