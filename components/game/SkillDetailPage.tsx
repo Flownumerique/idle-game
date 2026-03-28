@@ -14,6 +14,7 @@ import {
 import { formatNumber } from "@/lib/formatters";
 import { RARITY_COLOR as RARITY_COLORS } from "@/lib/rarity";
 import ProgressBar from "@/components/ui/ProgressBar";
+import ActiveAction from "@/components/game/ActiveAction";
 import type { SkillId } from "@/types/game";
 
 function getItemSafe(id: string) {
@@ -112,18 +113,10 @@ export default function SkillDetailPage({ skillId, skillName, skillIcon }: Props
           label={`XP : ${formatNumber(xpInLevel)} / ${formatNumber(xpToNext)}`}
         />
 
-        {skillState.activeAction && (
-          <div className="mt-3 flex items-center gap-3">
-            <ProgressBar value={skillState.actionProgress} color="bg-green-500" height="h-1.5" className="flex-1" />
-            <span
-              className="font-cinzel whitespace-nowrap pixel-blink"
-              style={{ fontSize: "0.5rem", color: "var(--gold)" }}
-            >
-              ▶ EN COURS
-            </span>
-          </div>
-        )}
       </div>
+
+      {/* ── Active action ──────────────────────────────────────────────────── */}
+      <ActiveAction skillId={skillId} />
 
       {/* ── Actions list ───────────────────────────────────────────────────── */}
       <div className="space-y-2">
@@ -185,7 +178,7 @@ export default function SkillDetailPage({ skillId, skillName, skillIcon }: Props
                 </div>
 
                 {isActive && (
-                  <span className="font-cinzel pixel-blink flex-shrink-0" style={{ fontSize: "0.5rem", color: "var(--color-xp)" }}>
+                  <span className="font-cinzel flex-shrink-0" style={{ fontSize: "0.5rem", color: "var(--color-xp)" }}>
                     ▶ ACTIF
                   </span>
                 )}

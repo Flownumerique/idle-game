@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useGameStore }            from '@/stores/game-store';
 import { getCraftRecipesForSkill, canAffordRecipe } from '@/engine/crafting-engine';
 import type { CraftRecipeDef }     from '@/engine/crafting-engine';
@@ -8,6 +7,7 @@ import { getLevelForXp, getLevelProgress } from '@/lib/xp-calc';
 import { GameData }                from '@/engine/data-loader';
 import Button                      from '@/components/ui/Button';
 import ProgressBar                 from '@/components/ui/ProgressBar';
+import ActiveAction                from '@/components/game/ActiveAction';
 
 const SKILL_ID = 'smithing' as const;
 
@@ -25,52 +25,6 @@ function itemName(itemId: string): string {
 // ──────────────────────────────────────────────
 // Sub-components
 // ──────────────────────────────────────────────
-
-/** Live progress banner shown while a craft is running */
-function ActiveCraftBanner({
-  onStop,
-}: {
-  onStop: () => void;
-}) {
-  const activeCraft  = useGameStore(s => s.activeCraft);
-  const [now, setNow] = useState(Date.now());
-
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 100);
-    return () => clearInterval(id);
-  }, []);
-
-  if (!activeCraft || activeCraft.skillId !== SKILL_ID) return null;
-
-  const progress  = Math.min((now - activeCraft.startedAt) / activeCraft.duration, 1);
-  const remaining = Math.max(0, Math.ceil((activeCraft.startedAt + activeCraft.duration - now) / 1000));
-  const recipe    = getCraftRecipesForSkill(SKILL_ID, 0).find(r => r.id === activeCraft.recipeId)
-                 ?? { name: activeCraft.recipeId } as Pick<CraftRecipeDef, 'name'>;
-
-  return (
-    <div
-      className="game-card space-y-2"
-      style={{ border: '1px solid rgba(245,158,11,0.4)', background: 'rgba(245,158,11,0.04)' }}
-    >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span style={{ fontSize: '1.1rem' }}>🔨</span>
-          <div>
-            <div className="font-cinzel" style={{ fontSize: '0.55rem', color: 'var(--gold-light)' }}>
-              {recipe.name}
-            </div>
-            <div className="font-cinzel" style={{ fontSize: '0.4rem', color: 'var(--text-muted)' }}>
-              {activeCraft.completedCount > 0 && `${activeCraft.completedCount}× crafté · `}
-              {remaining}s restant
-            </div>
-          </div>
-        </div>
-        <Button size="sm" variant="danger" onClick={onStop}>Arrêter</Button>
-      </div>
-      <ProgressBar value={progress} height="h-2" color="bg-amber-500" />
-    </div>
-  );
-}
 
 /** One recipe row */
 function RecipeRow({
@@ -229,7 +183,7 @@ export default function ForgePanel() {
       </div>
 
       {/* Active craft banner */}
-      <ActiveCraftBanner onStop={stopCraft} />
+      <ActiveAction skillId="smithing" />
 
       {/* Recipe categories */}
       {categorised.map(cat => (
