@@ -2,16 +2,18 @@
 
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import type { 
-  GameState, 
-  SkillId, 
-  SlotId, 
-  PlayerClass, 
-  PlantPlot, 
+import type {
+  GameState,
+  SkillId,
+  SlotId,
+  PlayerClass,
+  PlantPlot,
   FarmingSpot,
-  QuestProgress, 
-  GameLogEntry 
+  QuestProgress,
+  GameLogEntry,
+  ActiveCraft,
 } from "@/types/game";
+import { getCraftRecipe, canCraft, craftDurationMs } from "@/engine/crafting-engine";
 import { PROFESSION_SKILL_IDS } from "@/types/game";
 import { getLevelForXp } from "@/lib/xp-calc";
 
@@ -101,6 +103,7 @@ function defaultGameState(): GameState {
     weeklyQuestId: null,
     lastDailyReset: Date.now(),
     lastWeeklyReset: Date.now(),
+    activeCraft: null,
     marketSales: {},
     discoveredItems: [],
     synergyState: {},
@@ -162,6 +165,10 @@ interface GameActions {
 
   // Market
   recordSale: (itemId: string, quantity: number) => void;
+
+  // Crafting loop
+  startCraft: (recipeId: string, skillId: SkillId) => boolean;
+  stopCraft: () => void;
 
   // Class synergy runtime state
   setSynergyState: (update: Record<string, number>) => void;
@@ -494,6 +501,35 @@ export const useGameStore = create<GameStore>()(
           };
         }),
 
+      startCraft: (recipeId, skillId) => {
+        const recipe = getCraftRecipe(recipeId);
+        if (!recipe) return false;
+        const state = get();
+        if (!canCraft(recipeId, state.inventory, state.skills)) return false;
+        // Stop any active profession action for this skill
+        set((s) => ({
+          activeCraft: {
+            skillId,
+            recipeId,
+            startedAt: Date.now(),
+            duration: craftDurationMs(recipe),
+            completedCount: 0,
+          },
+          skills: {
+            ...s.skills,
+            [skillId]: {
+              ...s.skills[skillId],
+              activeAction: null,
+              actionStartedAt: null,
+              actionProgress: 0,
+            },
+          },
+        }));
+        return true;
+      },
+
+      stopCraft: () => set({ activeCraft: null }),
+
       setSynergyState: (update) =>
         set((s) => ({ synergyState: { ...s.synergyState, ...update } })),
 
@@ -556,6 +592,7 @@ export const useGameStore = create<GameStore>()(
         weeklyQuestId: s.weeklyQuestId,
         lastDailyReset: s.lastDailyReset,
         lastWeeklyReset: s.lastWeeklyReset,
+        activeCraft: s.activeCraft,
         marketSales: s.marketSales,
         discoveredItems: s.discoveredItems,
         synergyState: s.synergyState,

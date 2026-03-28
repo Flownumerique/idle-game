@@ -188,8 +188,21 @@ export default function CombatPanel({ section = "map" }: { section?: "map" | "tr
                     {entry.type === "player_hit" && entry.crit && (<span className="log-crit"><span className="mr-1.5" style={{ color: "var(--border-accent)" }}>⚔️</span>Frappe critique — {entry.dmg} dégâts !</span>)}
                     {entry.type === "player_hit" && !entry.crit && (<span style={{ color: "#5a8aac" }}><span className="mr-1.5" style={{ color: "var(--border-accent)" }}>⚔️</span>Vous infligez {entry.dmg} dégâts</span>)}
                     {entry.type === "monster_hit" && (<span className="log-damage"><span className="mr-1.5" style={{ color: "var(--border-accent)" }}>🩸</span>Vous subissez {entry.dmg} dégâts</span>)}
-                    {entry.type === "monster_death" && (<span className="log-kill"><span className="mr-1.5" style={{ color: "var(--border-accent)" }}>💀</span>Ennemi neutralisé !</span>)}
-                    {entry.type === "player_death" && (<span className="log-death animate-pulse"><span className="mr-1.5" style={{ color: "var(--border-accent)" }}>⚠️</span>Aventurier terrassé...</span>)}
+                    {entry.type === "monster_death" && (
+                      <span className="log-kill">
+                        <span className="mr-1.5" style={{ color: "var(--border-accent)" }}>💀</span>
+                        {entry.monsterName ? `Vous tuez ${entry.monsterName}.` : 'Ennemi neutralisé !'}
+                      </span>
+                    )}
+                    {entry.type === "combat_xp" && entry.xpGains && (
+                      <span style={{ color: "var(--color-xp)" }}>
+                        <span className="mr-1.5" style={{ color: "var(--border-accent)" }}>✦</span>
+                        {entry.xpGains.map(g =>
+                          `+${g.amount} XP ${SKILL_META[g.skillId]?.name ?? g.skillId}`
+                        ).join('\u2003')}
+                      </span>
+                    )}
+                    {entry.type === "player_death" && (<span className="log-death"><span className="mr-1.5" style={{ color: "var(--border-accent)" }}>⚠️</span>Aventurier terrassé...</span>)}
                   </div>
                 ))
               )}

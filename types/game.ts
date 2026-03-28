@@ -130,10 +130,13 @@ export interface CombatLogEntry {
     | "monster_hit"
     | "player_death"
     | "monster_death"
+    | "combat_xp"
     | "loot";
   dmg?: number;
   crit?: boolean;
   message?: string;
+  monsterName?: string;
+  xpGains?: Array<{ skillId: SkillId; amount: number }>;
   timestamp: number;
 }
 
@@ -243,6 +246,9 @@ export interface GameState {
   // Market: track sales for dynamic pricing
   marketSales: Record<string, { count: number; windowStart: number }>;
 
+  // Active craft session (null when idle)
+  activeCraft: ActiveCraft | null;
+
   // Encyclopedia
   discoveredItems: string[];
 
@@ -272,6 +278,17 @@ export interface OfflineResult {
     wins: number;
     deaths: number;
   };
+}
+
+// ──────────────────────────────────────────────
+// Active craft session (persisted)
+// ──────────────────────────────────────────────
+export interface ActiveCraft {
+  skillId:        string
+  recipeId:       string
+  startedAt:      number   // timestamp ms
+  duration:       number   // ms (craftTime * 1000)
+  completedCount: number
 }
 
 // ──────────────────────────────────────────────

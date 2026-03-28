@@ -53,6 +53,7 @@ function makeDefaultGameState(): GameState {
     weeklyQuestId: null,
     lastDailyReset: 0,
     lastWeeklyReset: 0,
+    activeCraft: null,
     marketSales: {},
     discoveredItems: [],
     synergyState: {},

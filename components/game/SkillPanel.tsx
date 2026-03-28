@@ -68,7 +68,7 @@ export default function SkillPanel({ skillId }: SkillPanelProps) {
           </div>
         </div>
         {skillState.activeAction && (
-          <span className="text-xs text-green-400 animate-pulse">● Actif</span>
+          <span className="text-xs text-green-400">● Actif</span>
         )}
       </div>
 
@@ -80,17 +80,6 @@ export default function SkillPanel({ skillId }: SkillPanelProps) {
           label={`XP: ${formatNumber(xpInLevel)} / ${formatNumber(xpToNext)}`}
         />
       </div>
-
-      {/* Action progress */}
-      {skillState.activeAction && (
-        <div className="mb-3">
-          <ProgressBar
-            value={skillState.actionProgress}
-            color="bg-green-500"
-            height="h-1"
-          />
-        </div>
-      )}
 
       {/* Actions list */}
       <div className="space-y-2">

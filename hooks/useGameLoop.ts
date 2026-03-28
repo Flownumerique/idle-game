@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { useGameStore } from "@/stores/game-store";
 import { bus } from "@/engine/event-bus";
 import { tickSkill, getAction, getActionDurationMs, getToolBonus } from "@/engine/skill-engine";
+import { tickCraft } from "@/engine/crafting-engine";
 import { tickCombat } from "@/engine/combat-engine";
 import { calculateOfflineProgress, applyOfflineResult, computePlayerStats } from "@/engine/offline-engine";
 import { getLevelForXp } from "@/lib/xp-calc";
@@ -159,6 +160,67 @@ export function useGameLoop() {
         }
       }
 
+      // ── Craft tick ──
+      const ac = state.activeCraft;
+      if (ac) {
+        const craftResult = tickCraft(
+          ac.startedAt,
+          ac.duration,
+          ac.recipeId,
+          newInventory,
+          now,
+        );
+
+        if (craftResult.resourcesExhausted && !craftResult.completed) {
+          // Ingredients vanished mid-cycle — stop immediately
+          updates.activeCraft = null;
+          useGameStore.getState().addLogEntry({
+            type: 'item_crafted',
+            message: '⚠️ Plus assez de ressources — craft arrêté',
+            timestamp: now,
+          });
+        } else if (craftResult.completed) {
+          // Apply this cycle's produce/consume
+          for (const [itemId, qty] of Object.entries(craftResult.consumedItems)) {
+            newInventory[itemId] = Math.max(0, (newInventory[itemId] ?? 0) - qty);
+          }
+          for (const [itemId, qty] of Object.entries(craftResult.producedItems)) {
+            newInventory[itemId] = (newInventory[itemId] ?? 0) + qty;
+            markDiscovered(itemId);
+          }
+          const skillId = ac.skillId as import('@/types/game').SkillId;
+          const newXp = newSkills[skillId].xp + craftResult.xpGained;
+          newSkills[skillId] = {
+            ...newSkills[skillId],
+            xp: newXp,
+            level: getLevelForXp(newXp),
+          };
+          bus.emit('CRAFT_COMPLETED', {
+            recipeId: ac.recipeId,
+            skillId,
+            output: Object.entries(craftResult.producedItems).map(([itemId, qty]) => ({ itemId, qty }))[0] ?? { itemId: '', qty: 0 },
+            xpGained: craftResult.xpGained,
+          });
+
+          if (craftResult.resourcesExhausted) {
+            // Last cycle — not enough for another round
+            updates.activeCraft = null;
+            useGameStore.getState().addLogEntry({
+              type: 'item_crafted',
+              message: '⚠️ Plus assez de ressources pour continuer',
+              timestamp: now,
+            });
+          } else {
+            // Continue loop: reset timer
+            updates.activeCraft = {
+              ...ac,
+              startedAt: now,
+              completedCount: ac.completedCount + 1,
+            };
+          }
+        }
+      }
+
       // ── Combat tick ──
       if (state.combat.active && state.combat.zoneId && state.combat.currentMonster) {
         const playerStats = computePlayerStats(state);
@@ -204,6 +266,19 @@ export function useGameLoop() {
              xp: constXp,
              level: getLevelForXp(constXp)
            };
+        }
+
+        if (result.xpGains.length > 0) {
+          // Aggregate gains from all kills in this tick for the event
+          const gainMap: Record<string, number> = {}
+          for (const g of result.xpGains) {
+            gainMap[g.skillId] = (gainMap[g.skillId] ?? 0) + g.amount
+          }
+          bus.emit('COMBAT_XP_GAINED', {
+            gains: (Object.entries(gainMap) as [import('@/types/game').SkillId, number][]).map(
+              ([skillId, amount]) => ({ skillId, amount })
+            ),
+          })
         }
 
         for (const [itemId, qty] of Object.entries(result.loot)) {

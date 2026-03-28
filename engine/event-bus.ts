@@ -3,6 +3,7 @@ import { SkillId, SlotId, ItemDrop, QuestReward, OfflineSummary } from '../types
 export type GameEventMap = {
   // Combat
   MONSTER_KILLED:    { monsterId: string; zoneId: string; loot: ItemDrop[]; xpGained: number }
+  COMBAT_XP_GAINED:  { gains: Array<{ skillId: SkillId; amount: number }> }
   PLAYER_DAMAGED:    { damage: number; source: string; newHp: number }
   PLAYER_DIED:       { zoneId: string; killedBy: string }
   ATTACK_DODGED:     { attackerId: string }
