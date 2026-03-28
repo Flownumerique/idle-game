@@ -17,13 +17,14 @@ interface ItemDef {
 interface EncyclopediaItemCardProps {
   item:         ItemDef
   isDiscovered: boolean
+  onNavigate?:  (tab: string) => void
 }
 
 // ──────────────────────────────────────────────
 // "Usages connus" — single synergy row
 // ──────────────────────────────────────────────
 
-function DiscoveredUsage({ recipe }: { recipe: SynergyRecipe }) {
+function DiscoveredUsage({ recipe, onNavigate }: { recipe: SynergyRecipe; onNavigate?: (tab: string) => void }) {
   return (
     <div
       className="rounded-sm p-2.5 space-y-1.5"
@@ -69,7 +70,7 @@ function DiscoveredUsage({ recipe }: { recipe: SynergyRecipe }) {
         → {recipe.output.itemId} ×{recipe.output.amount}
       </div>
 
-      {/* Navigate to craft (placeholder — wire to tab navigation) */}
+      {/* Navigate to craft */}
       <button
         className="font-cinzel tracking-widest uppercase w-full text-center py-1 rounded-sm mt-0.5 transition-colors"
         style={{
@@ -78,7 +79,7 @@ function DiscoveredUsage({ recipe }: { recipe: SynergyRecipe }) {
           background: 'rgba(201,146,42,0.12)',
           border: '1px solid rgba(201,146,42,0.3)',
         }}
-        onClick={() => {/* Tab switch handled by parent */}}
+        onClick={() => onNavigate?.('skills')}
       >
         Accéder au craft →
       </button>
@@ -123,7 +124,7 @@ function UnknownUsage() {
 // "Usages connus" section
 // ──────────────────────────────────────────────
 
-function SynergyUsageSection({ itemId }: { itemId: string }) {
+function SynergyUsageSection({ itemId, onNavigate }: { itemId: string; onNavigate?: (tab: string) => void }) {
   const unlockedFlags = useGameStore(s => s.unlockedFlags)
   const synergies     = getSynergiesForItem(itemId, { unlockedFlags })
 
@@ -139,7 +140,7 @@ function SynergyUsageSection({ itemId }: { itemId: string }) {
       </div>
       {synergies.map(({ recipe, isDiscovered }) =>
         isDiscovered
-          ? <DiscoveredUsage key={recipe.id} recipe={recipe} />
+          ? <DiscoveredUsage key={recipe.id} recipe={recipe} onNavigate={onNavigate} />
           : <UnknownUsage    key={recipe.id} />,
       )}
     </div>
@@ -153,6 +154,7 @@ function SynergyUsageSection({ itemId }: { itemId: string }) {
 export default function EncyclopediaItemCard({
   item,
   isDiscovered,
+  onNavigate,
 }: EncyclopediaItemCardProps) {
   const [expanded, setExpanded] = useState(false)
   const hasSynergyRole = isIngredientInAnySynergy(item.id)
@@ -197,7 +199,7 @@ export default function EncyclopediaItemCard({
       {/* ── Expanded: Usages connus ── */}
       {isDiscovered && expanded && (
         <div className="w-full mt-2 text-left" onClick={e => e.stopPropagation()}>
-          <SynergyUsageSection itemId={item.id} />
+          <SynergyUsageSection itemId={item.id} onNavigate={onNavigate} />
         </div>
       )}
 

@@ -12,6 +12,8 @@ import CombatEquipment from "./CombatEquipment";
 import { COMBAT_SKILL_IDS } from "@/types/game";
 import type { SkillId } from "@/types/game";
 import { RARITY_COLOR } from "@/lib/rarity";
+import ZoneCard from "@/components/game/ZoneCard";
+import { computeCombatLevel } from "@/engine/zone-lock";
 
 // ── Metadata ──────────────────────────────────────────────────────────────────
 
@@ -31,31 +33,18 @@ const TRAINABLE_SKILLS = COMBAT_SKILL_IDS.filter(
 ) as SkillId[];
 
 
-const BOSS_KILL_REQUIREMENT = 10;
-
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function CombatPanel({ section = "map" }: { section?: "map" | "training" | "mastery" }) {
   const state    = useGameStore((s) => s);
   const skills   = useGameStore((s) => s.skills);
-  const zoneKills = useGameStore((s) => s.zoneKills);
-  const { combat, unlockedZones, startCombat, stopCombat, setAutoRestart, updateCombatState } = state;
-
-  const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
+  const { combat, startCombat, stopCombat, setAutoRestart, updateCombatState } = state;
 
   const allZones    = getAllZones();
   const playerStats = computePlayerStats(state);
   const hpPct       = combat.playerHp / playerStats.maxHp;
 
-  const playerCombatLevel = Math.floor(
-    ((getLevelForXp(skills.defense.xp) + getLevelForXp(skills.constitution.xp) +
-      Math.floor(getLevelForXp(skills.prayer.xp) / 2)) * 0.25) +
-    Math.max(
-      getLevelForXp(skills.attack.xp) + getLevelForXp(skills.strength.xp),
-      getLevelForXp(skills.magic.xp)  * 1.5,
-      getLevelForXp(skills.ranged.xp) * 1.5,
-    ) * 0.325
-  );
+  const playerCombatLevel = computeCombatLevel(state);
 
   const trainingStyle = (combat.trainingStyle ?? "attack") as SkillId;
 
@@ -69,7 +58,6 @@ export default function CombatPanel({ section = "map" }: { section?: "map" | "tr
       monsterHitCooldown: (monster?.stats.attackSpeed ?? 2) * 1000,
     });
     startCombat(zoneId);
-    setSelectedZoneId(null);
   }
 
   function handleBossFight(zoneId: string) {
@@ -81,7 +69,6 @@ export default function CombatPanel({ section = "map" }: { section?: "map" | "tr
       monsterHitCooldown: boss.stats.attackSpeed * 1000,
     });
     startCombat(zoneId);
-    setSelectedZoneId(null);
   }
 
   const recentLog = [...combat.log].reverse().slice(0, 14);
@@ -178,81 +165,14 @@ export default function CombatPanel({ section = "map" }: { section?: "map" | "tr
               <>
                 <div className="section-title">Zones d&apos;exploration</div>
                 <div className="space-y-2">
-                  {allZones.map((zone) => {
-                    if (!unlockedZones.includes(zone.id)) return null;
-                    const reqCombat  = zone.reqLevel?.combat ?? 1;
-                    const meetsLevel = playerCombatLevel >= reqCombat;
-                    const isSelected = selectedZoneId === zone.id;
-                    const monsters   = getMonstersInZone(zone.id);
-                    const regulars   = monsters.filter((m) => !m.isBoss);
-                    const boss       = monsters.find((m)  => m.isBoss);
-
-                    return (
-                      <div key={zone.id} className="rounded-sm overflow-hidden" style={{ border: "1px solid var(--border-subtle)" }}>
-                        <button className="w-full text-left p-3 flex items-center gap-3 transition-colors" style={{ background: isSelected ? "var(--surface-elevated)" : "var(--surface-card)" }} onClick={() => setSelectedZoneId(isSelected ? null : zone.id)}>
-                          <span className="pixel-icon flex-shrink-0">{zone.icon ?? "🌍"}</span>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-cinzel text-xs tracking-wide" style={{ color: "var(--text-primary)" }}>{zone.name}</span>
-                              {boss && <span className="font-cinzel tracking-widest uppercase px-1 py-px rounded-sm" style={{ fontSize: "0.5rem", color: "var(--gold-light)", background: "rgba(201,146,42,0.1)", border: "1px solid rgba(201,146,42,0.3)" }}>Boss</span>}
-                            </div>
-                            <div className="flex items-center gap-1 mt-1">
-                              {regulars.slice(0, 4).map((m) => (<span key={m.def.id} className="text-sm leading-none" title={m.def.name}>{m.def.icon ?? "👾"}</span>))}
-                              {boss && <span className="text-sm leading-none ml-0.5" title={boss.def.name} style={{ color: "var(--gold-light)" }}>{boss.def.icon ?? "👑"}</span>}
-                            </div>
-                          </div>
-                          <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                            <span className="font-cinzel tracking-widest uppercase px-2 py-0.5 rounded-sm" style={{ fontSize: "0.5rem", color: meetsLevel ? "var(--color-heal)" : "var(--color-damage)", background: meetsLevel ? "rgba(61,214,140,0.08)" : "rgba(224,80,80,0.08)", border: `1px solid ${meetsLevel ? "rgba(61,214,140,0.2)" : "rgba(224,80,80,0.2)"}` }}>{meetsLevel ? "✓" : "🔒"} {reqCombat}</span>
-                            <div className="flex gap-1">
-                              <span className="font-cinzel tracking-widest px-1.5 rounded-sm" style={{ fontSize: "0.5rem", color: "var(--color-xp)", background: "rgba(34,211,238,0.08)", border: "1px solid rgba(34,211,238,0.15)" }}>×{zone.combatXpMultiplier} XP</span>
-                              <span className="font-cinzel tracking-widest px-1.5 rounded-sm" style={{ fontSize: "0.5rem", color: "var(--gold-light)", background: "rgba(201,146,42,0.08)", border: "1px solid rgba(201,146,42,0.15)" }}>×{zone.goldMultiplier} 🪙</span>
-                            </div>
-                          </div>
-                        </button>
-                        {isSelected && (
-                          <div className="p-3 space-y-3" style={{ borderTop: "1px solid var(--border-subtle)", background: "rgba(0,0,0,0.3)" }}>
-                            {zone.lore && <p className="font-crimson italic text-xs leading-relaxed pl-3" style={{ color: "var(--text-muted)", borderLeft: "2px solid var(--border-gold)" }}>&ldquo;{zone.lore}&rdquo;</p>}
-                            <div className="grid grid-cols-2 gap-1.5">
-                              {regulars.map((m) => (
-                                <div key={m.def.id} className="flex items-center gap-2 p-2 rounded-sm" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid var(--border-subtle)", color: RARITY_COLOR[m.def.rarity ?? "common"] ?? "var(--text-secondary)" }}>
-                                  <span className="pixel-icon-sm flex-shrink-0">{m.def.icon ?? "👾"}</span>
-                                  <div className="min-w-0">
-                                    <div className="text-xs font-crimson font-semibold truncate" style={{ color: "var(--text-primary)" }}>{m.def.name}</div>
-                                    <div className="font-mono" style={{ fontSize: "0.6rem", color: "var(--text-muted)" }}>❤️{m.def.stats.hp} ⚔️{m.def.stats.attack}</div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                            {boss && (() => {
-                              const kills = zoneKills[zone.id] ?? 0;
-                              const bossUnlocked = kills >= BOSS_KILL_REQUIREMENT;
-                              return (
-                                <div className="space-y-2">
-                                  <div className="rounded-sm p-2.5" style={{ border: bossUnlocked ? "1px solid rgba(201,146,42,0.4)" : "1px solid var(--border-subtle)", background: bossUnlocked ? "rgba(201,146,42,0.06)" : "rgba(255,255,255,0.02)" }}>
-                                    <div className="flex items-center gap-3 mb-2">
-                                      <span className="pixel-icon flex-shrink-0">{boss.def.icon ?? "👑"}</span>
-                                      <div className="flex-1 min-w-0">
-                                        <div className="font-cinzel text-xs font-bold tracking-wide" style={{ color: bossUnlocked ? "var(--gold-light)" : "var(--text-secondary)" }}>{boss.def.name}</div>
-                                        <div className="font-mono" style={{ fontSize: "0.6rem", color: "var(--text-muted)" }}>❤️{boss.def.stats.hp} ⚔️{boss.def.stats.attack} 🛡️{boss.def.stats.defense}</div>
-                                      </div>
-                                      {bossUnlocked && <span className="font-cinzel tracking-widest uppercase px-1.5 py-0.5 rounded-sm" style={{ fontSize: "0.5rem", color: "var(--gold-light)", background: "rgba(201,146,42,0.15)", border: "1px solid rgba(201,146,42,0.4)" }}>Disponible</span>}
-                                    </div>
-                                    <div className="flex justify-between mb-1" style={{ fontSize: "0.6rem" }}>
-                                      <span style={{ color: "var(--text-muted)" }}>Monstres vaincus</span>
-                                      <span className="font-mono" style={{ color: bossUnlocked ? "var(--gold-light)" : "var(--text-secondary)" }}>{Math.min(kills, BOSS_KILL_REQUIREMENT)}/{BOSS_KILL_REQUIREMENT}</span>
-                                    </div>
-                                    <ProgressBar value={Math.min(1, kills / BOSS_KILL_REQUIREMENT)} height="h-1" color={bossUnlocked ? "bg-amber-500" : "bg-slate-600"} />
-                                  </div>
-                                  {bossUnlocked && meetsLevel && (<Button variant="danger" className="w-full" onClick={() => handleBossFight(zone.id)}>⚠️ Défier {boss.def.name}</Button>)}
-                                </div>
-                              );
-                            })()}
-                            {meetsLevel ? (<Button className="w-full" onClick={() => handleEnterZone(zone.id)}>⚔️ Explorer</Button>) : (<div className="text-center font-crimson text-xs rounded-sm py-2.5" style={{ color: "var(--color-damage)", background: "rgba(224,80,80,0.05)", border: "1px solid rgba(224,80,80,0.2)" }}>🔒 Niveau {reqCombat} requis (tu as {playerCombatLevel})</div>)}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                  {allZones.map((zone) => (
+                    <ZoneCard
+                      key={zone.id}
+                      zone={zone}
+                      onEnter={() => handleEnterZone(zone.id)}
+                      onBossFight={() => handleBossFight(zone.id)}
+                    />
+                  ))}
                 </div>
               </>
             )}

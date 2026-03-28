@@ -18,7 +18,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   currency: "Monnaies",
 };
 
-export default function EncyclopediaPanel({ section = "items" }: { section?: "items" | "monsters" | "zones" }) {
+export default function EncyclopediaPanel({ section = "items", onNavigate }: { section?: "items" | "monsters" | "zones"; onNavigate?: (tab: string) => void }) {
   const discoveredItems = useGameStore((s) => s.discoveredItems) || [];
   const zoneKills = useGameStore((s) => s.zoneKills) || {};
 
@@ -53,6 +53,7 @@ export default function EncyclopediaPanel({ section = "items" }: { section?: "it
                   key={item.id}
                   item={item}
                   isDiscovered={discoveredItems.includes(item.id)}
+                  onNavigate={onNavigate}
                 />
               ))}
             </div>

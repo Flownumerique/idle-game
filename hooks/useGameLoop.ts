@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useGameStore } from "@/stores/game-store";
+import { bus } from "@/engine/event-bus";
 import { tickSkill, getAction, getActionDurationMs, getToolBonus } from "@/engine/skill-engine";
 import { tickCombat } from "@/engine/combat-engine";
 import { calculateOfflineProgress, applyOfflineResult, computePlayerStats } from "@/engine/offline-engine";
@@ -177,6 +178,16 @@ export function useGameLoop() {
             ...state.zoneKills,
             [zid]: (state.zoneKills[zid] ?? 0) + result.monstersKilled,
           };
+        }
+
+        if (result.bossKilledId) {
+          useGameStore.getState().setFlag(`boss_killed_${result.bossKilledId}`);
+          bus.emit('MONSTER_KILLED', {
+            monsterId: result.bossKilledId,
+            zoneId:    state.combat.zoneId ?? '',
+            loot:      Object.entries(result.loot).map(([itemId, qty]) => ({ itemId, qty })),
+            xpGained:  result.xpGained,
+          });
         }
 
         if (result.xpGained > 0) {

@@ -161,6 +161,7 @@ export interface CombatTickResult {
   xpGained: number;
   goldGained: number;
   monstersKilled: number; // regular kills only (not boss)
+  bossKilledId: string | null;  // monster.id when a boss is defeated, else null
 }
 
 export function tickCombat(
@@ -177,6 +178,7 @@ export function tickCombat(
     xpGained: 0,
     goldGained: 0,
     monstersKilled: 0,
+    bossKilledId: null,
   };
 
   if (!state.active || !state.currentMonster || !state.zoneId) {
@@ -260,6 +262,7 @@ export function tickCombat(
 
       // Boss fight always ends after defeat (no auto-restart)
       if (isBoss) {
+        result.bossKilledId = monster.id;
         newState.active = false;
         newState.currentMonster = null;
       } else if (newState.autoRestart && newState.zoneId) {

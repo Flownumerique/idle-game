@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useGameLoop } from "@/hooks/useGameLoop";
+import { useUnlocks } from "@/hooks/useUnlocks";
+import { useSynergyDiscovery } from "@/hooks/useSynergyDiscovery";
 import { useGameStore } from "@/stores/game-store";
 import { getLevelForXp, calculateGlobalLevels } from "@/lib/xp-calc";
 import ResourceBar from "./ResourceBar";
@@ -47,6 +49,8 @@ const SKILL_META: Record<string, { name: string; icon: string }> = {
 
 export default function GameLayout() {
   useGameLoop();
+  useUnlocks();
+  useSynergyDiscovery();
   const [activeTab, setActiveTab] = useState<Tab>("skills");
   const [selectedSkill, setSelectedSkill] = useState<SkillId>(
     PROFESSION_SKILL_IDS[0]
@@ -534,7 +538,7 @@ export default function GameLayout() {
               <MarketPanel section={marketSection as any} />
             )}
             {activeTab === "encyclopedia" && (
-              <EncyclopediaPanel section={encyclopediaSection as any} />
+              <EncyclopediaPanel section={encyclopediaSection as any} onNavigate={(tab) => setActiveTab(tab as Tab)} />
             )}
             {activeTab === "quests" && (
               <QuestPanel section={questsSection as any} />
