@@ -10,7 +10,7 @@ import { bus } from './event-bus'
 // ──────────────────────────────────────────────
 
 const allSynergies: SynergyRecipe[] = (rawRecipes.recipes as unknown[])
-  .filter(isSynergyRecipe)
+  .filter((r): r is SynergyRecipe => isSynergyRecipe(r as { type?: string }))
 
 const synergiesById = new Map<string, SynergyRecipe>(
   allSynergies.map(r => [r.id, r]),
