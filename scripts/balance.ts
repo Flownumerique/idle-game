@@ -54,6 +54,7 @@ function makeDefaultGameState(): GameState {
     lastDailyReset: 0,
     lastWeeklyReset: 0,
     activeCraft: null,
+    activeBuffs: [],
     marketSales: {},
     discoveredItems: [],
     synergyState: {},

@@ -18,6 +18,8 @@ const MOCK_PLAYER_STATS: PlayerStats = {
   blockChance: 0.0,
   furyDamageMultiplier: 1.0,
   magicXpMultiplier: 1.0,
+  xpMultiplier: 1.0,
+  harvestMultiplier: 1.0,
 };
 
 const SIMULATION_MS = 100 * 3600 * 1000; // 100 hours

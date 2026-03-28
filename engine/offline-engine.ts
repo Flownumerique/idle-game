@@ -301,18 +301,36 @@ export function computePlayerStats(state: GameState): PlayerStats {
   const magicBonusUntil   = synergy['mage_potion_bonus_until'] ?? 0;
   const magicXpMultiplier = Date.now() < magicBonusUntil ? 1.2 : 1.0;
 
+  // ── Active consumable buffs ───────────────────────────────────────────────
+  const now = Date.now();
+  let buffAttack = 0;
+  let buffDefense = 0;
+  let buffHpRegen = 0;
+  let xpMultiplier = 1.0;
+  let harvestMultiplier = 1.0;
+  for (const buff of (state.activeBuffs ?? [])) {
+    if (buff.expiresAt <= now) continue;
+    buffAttack        += buff.attackBonus;
+    buffDefense       += buff.defenseBonus;
+    buffHpRegen       += buff.hpRegenBonus;
+    xpMultiplier       = Math.max(xpMultiplier,      buff.xpMultiplier);
+    harvestMultiplier  = Math.max(harvestMultiplier, buff.harvestMultiplier);
+  }
+
   return {
     maxHp: 100 + (constitutionLevel * 10) + hpBonus,
-    attack: Math.max(1, totalAttack),
-    defense: (defenseLevel * 0.7) + equipmentDefense,
+    attack: Math.max(1, totalAttack + buffAttack),
+    defense: (defenseLevel * 0.7) + equipmentDefense + buffDefense,
     dodgeChance: Math.min(dodgeLevel / 300, 0.25),
     attackSpeed,
     critChance: Math.min(precision / 200, 0.4),
-    hpRegen: 2 + (constitutionLevel * 0.1) + equipmentHpRegen,
+    hpRegen: 2 + (constitutionLevel * 0.1) + equipmentHpRegen + buffHpRegen,
     prayerBonus: 1.0,
     activeStyle,
     blockChance,
     furyDamageMultiplier,
     magicXpMultiplier,
+    xpMultiplier,
+    harvestMultiplier,
   };
 }

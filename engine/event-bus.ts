@@ -24,6 +24,7 @@ export type GameEventMap = {
   ITEM_ADDED:        { itemId: string; quantity: number; source: string }
   ITEM_REMOVED:      { itemId: string; quantity: number }
   ITEM_EQUIPPED:     { itemId: string; slot: SlotId }
+  ITEM_CONSUMED:     { itemId: string; healHp: number; buffDuration: number }
   INVENTORY_FULL:    { itemId: string; quantityLost: number }
 
   // Agriculture
