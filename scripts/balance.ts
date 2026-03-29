@@ -55,6 +55,7 @@ function makeDefaultGameState(): GameState {
     lastWeeklyReset: 0,
     activeCraft: null,
     activeBuffs: [],
+    consumableSlots: [null, null],
     marketSales: {},
     discoveredItems: [],
     synergyState: {},

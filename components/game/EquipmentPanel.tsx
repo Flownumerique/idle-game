@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useGameStore } from "@/stores/game-store";
 import { GameData } from "@/engine/data-loader";
 import { equipItem, unequipItem, getSlotDisplayName, getEquipmentSlots } from "@/engine/equipment-engine";
@@ -119,6 +120,158 @@ function InventoryEquipmentItem({ itemId, onEquip }: { itemId: string; onEquip: 
       </div>
       {isEquipped && (
         <div className="text-xs text-green-400">✓</div>
+      )}
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────
+// Consumable hotbar slot
+// ──────────────────────────────────────────────
+
+function ConsumableSlot({ index }: { index: 0 | 1 }) {
+  const [showSelector, setShowSelector] = useState(false);
+  const consumableSlots  = useGameStore((s) => s.consumableSlots);
+  const inventory        = useGameStore((s) => s.inventory);
+  const setConsumableSlot = useGameStore((s) => s.setConsumableSlot);
+  const consumeItem       = useGameStore((s) => s.consumeItem);
+
+  const assignedId = consumableSlots[index];
+
+  let assignedItem: any = null;
+  if (assignedId) {
+    try { assignedItem = GameData.item(assignedId); } catch {}
+  }
+
+  const qty = assignedId ? (inventory[assignedId] ?? 0) : 0;
+
+  // All consumables in inventory (qty > 0)
+  const consumablesInInventory = Object.entries(inventory)
+    .filter(([id, q]) => {
+      if ((q as number) <= 0) return false;
+      try { return GameData.item(id).category === "consumable"; } catch { return false; }
+    })
+    .map(([id]) => { try { return { id, item: GameData.item(id) }; } catch { return null; } })
+    .filter(Boolean) as { id: string; item: any }[];
+
+  return (
+    <div className="relative">
+      <div
+        className="rounded-sm p-2.5 flex flex-col gap-2"
+        style={{
+          background: "var(--surface-elevated)",
+          border: `1px solid ${assignedItem ? getRarityColor(assignedItem.rarity) : "var(--border-subtle)"}`,
+          minWidth: 120,
+        }}
+      >
+        {/* Slot header */}
+        <div className="flex items-center justify-between gap-1">
+          <span className="font-cinzel" style={{ fontSize: "0.42rem", color: "var(--text-muted)" }}>
+            SLOT {index + 1}
+          </span>
+          {assignedId && (
+            <button
+              onClick={() => setConsumableSlot(index, null)}
+              style={{ fontSize: "0.65rem", color: "var(--text-muted)", lineHeight: 1 }}
+              title="Retirer"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
+        {/* Item display */}
+        {assignedItem ? (
+          <div className="flex items-center gap-2">
+            <span style={{ fontSize: "1.4rem", lineHeight: 1 }}>{assignedItem.icon ?? "🧪"}</span>
+            <div className="flex-1 min-w-0">
+              <div className="font-crimson text-xs truncate" style={{ color: getRarityColor(assignedItem.rarity) }}>
+                {assignedItem.name}
+              </div>
+              <div className="font-mono" style={{ fontSize: "0.55rem", color: qty > 0 ? "var(--text-secondary)" : "var(--color-damage)" }}>
+                ×{qty} en inventaire
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center gap-1 py-1">
+            <span style={{ fontSize: "1.4rem", opacity: 0.3 }}>🧪</span>
+            <span className="font-cinzel" style={{ fontSize: "0.4rem", color: "var(--text-muted)" }}>Vide</span>
+          </div>
+        )}
+
+        {/* Action buttons */}
+        <div className="flex gap-1">
+          {assignedItem && (
+            <button
+              disabled={qty <= 0}
+              onClick={() => consumeItem(assignedId!)}
+              className="flex-1 font-cinzel rounded-sm px-1 py-0.5"
+              style={{
+                fontSize: "0.42rem",
+                background: qty > 0 ? "rgba(61,214,140,0.12)" : "rgba(255,255,255,0.04)",
+                border: qty > 0 ? "1px solid rgba(61,214,140,0.35)" : "1px solid var(--border-subtle)",
+                color: qty > 0 ? "var(--color-heal)" : "var(--text-muted)",
+                cursor: qty > 0 ? "pointer" : "not-allowed",
+              }}
+            >
+              Utiliser
+            </button>
+          )}
+          <button
+            onClick={() => setShowSelector((v) => !v)}
+            className="flex-1 font-cinzel rounded-sm px-1 py-0.5"
+            style={{
+              fontSize: "0.42rem",
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid var(--border-subtle)",
+              color: "var(--text-secondary)",
+            }}
+          >
+            {assignedItem ? "Changer" : "Assigner"}
+          </button>
+        </div>
+      </div>
+
+      {/* Consumable selector dropdown */}
+      {showSelector && (
+        <div
+          className="absolute top-full left-0 mt-1 rounded-sm overflow-hidden z-50"
+          style={{
+            background: "var(--surface-elevated)",
+            border: "1px solid var(--border-accent)",
+            minWidth: 180,
+            maxHeight: 220,
+            overflowY: "auto",
+          }}
+        >
+          {consumablesInInventory.length === 0 ? (
+            <div className="px-3 py-4 text-center font-cinzel" style={{ fontSize: "0.42rem", color: "var(--text-muted)" }}>
+              Aucun consommable dans l&apos;inventaire
+            </div>
+          ) : (
+            consumablesInInventory.map(({ id, item }) => (
+              <button
+                key={id}
+                className="w-full text-left flex items-center gap-2 px-2.5 py-2 hover:bg-white/5 transition-colors"
+                onClick={() => {
+                  setConsumableSlot(index, id);
+                  setShowSelector(false);
+                }}
+              >
+                <span style={{ fontSize: "1rem" }}>{item.icon ?? "🧪"}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="font-crimson text-xs truncate" style={{ color: getRarityColor(item.rarity) }}>
+                    {item.name}
+                  </div>
+                  <div className="font-mono" style={{ fontSize: "0.5rem", color: "var(--text-muted)" }}>
+                    ×{inventory[id] ?? 0}
+                  </div>
+                </div>
+              </button>
+            ))
+          )}
+        </div>
       )}
     </div>
   );
@@ -334,6 +487,18 @@ export default function EquipmentPanel() {
                 onEquip={handleEquip}
                 onUnequip={handleUnequip}
               />
+            </div>
+          </div>
+
+          {/* Consumable Slots */}
+          <div className="bg-[#0d1525] border border-[#0f3460] rounded-lg p-4">
+            <h4 className="text-sm font-semibold text-slate-200 mb-1">Consommables</h4>
+            <p className="font-crimson text-xs mb-3" style={{ color: "var(--text-muted)" }}>
+              Assignez des potions ou des plats pour les utiliser rapidement.
+            </p>
+            <div className="flex gap-3">
+              <ConsumableSlot index={0} />
+              <ConsumableSlot index={1} />
             </div>
           </div>
         </div>

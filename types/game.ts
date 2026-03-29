@@ -252,6 +252,9 @@ export interface GameState {
   // Active timed buffs from consumables
   activeBuffs: ActiveBuff[];
 
+  // Consumable hotbar slots (2 slots for quick-use potions/food)
+  consumableSlots: [string | null, string | null];
+
   // Encyclopedia
   discoveredItems: string[];
 
