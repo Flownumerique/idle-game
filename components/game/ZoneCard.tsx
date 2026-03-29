@@ -264,12 +264,15 @@ export default function ZoneCard({ zone, onEnter, onBossFight }: ZoneCardProps) 
                     }}
                   >
                     <span className="pixel-icon-sm flex-shrink-0">{m.def.icon ?? '👾'}</span>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="text-xs font-crimson font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
                         {m.def.name}
                       </div>
                       <div className="font-mono" style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>
                         ❤️{m.def.stats.hp} ⚔️{m.def.stats.attack}
+                      </div>
+                      <div className="font-mono" style={{ fontSize: '0.55rem', color: 'var(--text-muted)' }}>
+                        ~{Math.round(100 / regulars.length)}% rencontre
                       </div>
                     </div>
                   </div>
