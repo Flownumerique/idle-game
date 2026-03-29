@@ -108,6 +108,7 @@ function defaultGameState(): GameState {
     lastWeeklyReset: Date.now(),
     activeCraft: null,
     activeBuffs: [],
+    consumableSlots: [null, null],
     marketSales: {},
     discoveredItems: [],
     synergyState: {},
@@ -176,6 +177,7 @@ interface GameActions {
 
   // Consumables
   consumeItem: (itemId: string) => void;
+  setConsumableSlot: (index: 0 | 1, itemId: string | null) => void;
 
   // Class synergy runtime state
   setSynergyState: (update: Record<string, number>) => void;
@@ -589,6 +591,13 @@ export const useGameStore = create<GameStore>()(
 
         set(updates);
       },
+
+      setConsumableSlot: (index, itemId) =>
+        set((s) => {
+          const slots: [string | null, string | null] = [...s.consumableSlots] as [string | null, string | null];
+          slots[index] = itemId;
+          return { consumableSlots: slots };
+        }),
 
       setSynergyState: (update) =>
         set((s) => ({ synergyState: { ...s.synergyState, ...update } })),

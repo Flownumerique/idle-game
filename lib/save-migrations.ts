@@ -1,6 +1,6 @@
 import { GameState } from '../types/game'
 
-export const SAVE_VERSION = 4
+export const SAVE_VERSION = 5
 
 type MigrationFn = (state: Record<string, any>) => Record<string, any>
 
@@ -29,6 +29,12 @@ const migrations: Record<number, MigrationFn> = {
   3: (s) => ({
     ...s,
     discoveredItems: s.discoveredItems ?? [],
+  }),
+
+  // v4 → v5 : Emplacements de consommables rapides
+  4: (s) => ({
+    ...s,
+    consumableSlots: [null, null] as [null, null],
   }),
 }
 
