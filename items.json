@@ -915,6 +915,39 @@
       "description": "Restaure 200 HP. +10 ATK et +5 DEF pendant 5 min."
     },
     {
+      "id": "meal_harvester",
+      "name": "Repas du Forestier",
+      "category": "consumable",
+      "rarity": "uncommon",
+      "icon": "🥗",
+      "stackMax": 999,
+      "sellPrice": 55,
+      "buyPrice": 185,
+      "effect": {
+        "healHp": 80,
+        "hpRegenBonus": 3,
+        "harvestBonus": 1.3,
+        "buffDuration": 480
+      },
+      "description": "Restaure 80 HP. +3 Rég./s et +30% de récolte pendant 8 min."
+    },
+    {
+      "id": "meal_scholar",
+      "name": "Repas de l'Érudit",
+      "category": "consumable",
+      "rarity": "rare",
+      "icon": "📚",
+      "stackMax": 999,
+      "sellPrice": 120,
+      "buyPrice": 400,
+      "effect": {
+        "healHp": 60,
+        "xpBonus": 1.5,
+        "buffDuration": 600
+      },
+      "description": "Restaure 60 HP. +50% XP toutes compétences pendant 10 min."
+    },
+    {
       "id": "potion_healing_minor",
       "name": "Potion de Soin Mineure",
       "category": "consumable",

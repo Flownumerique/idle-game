@@ -93,6 +93,9 @@ export function useGameLoop() {
         }
       };
 
+      // ── Compute player stats once per tick (for buffs) ──
+      const playerStatsForTick = computePlayerStats(state);
+
       // ── Skill ticks ──
       for (const skillId of SKILL_IDS) {
         const skillState = state.skills[skillId];
@@ -137,14 +140,19 @@ export function useGameLoop() {
         }
 
         if (result.actionsCompleted > 0) {
-          const newXp = skillState.xp + result.xpGained;
+          const xpMult  = playerStatsForTick.xpMultiplier;
+          const newXp = skillState.xp + Math.floor(result.xpGained * xpMult);
           newSkills[skillId] = {
             ...skillState,
             xp: newXp,
             level: getLevelForXp(newXp),
           };
+          // harvestMultiplier applies only to gathering (no inputs = no recipe)
+          const isGathering = !getAction(skillId, skillState.activeAction ?? '')?.inputs?.length;
+          const harvestMult = isGathering ? playerStatsForTick.harvestMultiplier : 1.0;
           for (const [itemId, qty] of Object.entries(result.loot)) {
-            newInventory[itemId] = (newInventory[itemId] ?? 0) + qty;
+            const finalQty = isGathering ? Math.max(1, Math.floor(qty * harvestMult)) : qty;
+            newInventory[itemId] = (newInventory[itemId] ?? 0) + finalQty;
             markDiscovered(itemId);
           }
           
@@ -223,7 +231,7 @@ export function useGameLoop() {
 
       // ── Combat tick ──
       if (state.combat.active && state.combat.zoneId && state.combat.currentMonster) {
-        const playerStats = computePlayerStats(state);
+        const playerStats = playerStatsForTick;
         const result = tickCombat(
           state.combat,
           playerStats,

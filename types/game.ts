@@ -249,6 +249,9 @@ export interface GameState {
   // Active craft session (null when idle)
   activeCraft: ActiveCraft | null;
 
+  // Active timed buffs from consumables
+  activeBuffs: ActiveBuff[];
+
   // Encyclopedia
   discoveredItems: string[];
 
@@ -292,6 +295,20 @@ export interface ActiveCraft {
 }
 
 // ──────────────────────────────────────────────
+// Consumable buffs (timed)
+// ──────────────────────────────────────────────
+export interface ActiveBuff {
+  id:                string   // itemId + '_' + timestamp
+  itemId:            string
+  attackBonus:       number
+  defenseBonus:      number
+  hpRegenBonus:      number
+  xpMultiplier:      number   // 1.0 = no bonus; 1.5 = +50% XP
+  harvestMultiplier: number   // 1.0 = no bonus; 1.3 = +30% yield
+  expiresAt:         number   // timestamp ms
+}
+
+// ──────────────────────────────────────────────
 // Player computed stats (derived, not stored)
 // ──────────────────────────────────────────────
 export interface PlayerStats {
@@ -307,6 +324,8 @@ export interface PlayerStats {
   blockChance: number;
   furyDamageMultiplier: number; // 1.0 baseline; warrior synergy stacks add to it
   magicXpMultiplier: number;    // 1.0 baseline; mage synergy potion bonus
+  xpMultiplier:      number;    // 1.0 baseline; food/scroll buffs
+  harvestMultiplier: number;    // 1.0 baseline; food buffs for gathering yield
 }
 
 export interface ItemDrop {

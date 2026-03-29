@@ -660,6 +660,35 @@
       }
     },
     {
+      "id": "cook_harvester_meal",
+      "name": "Repas du Forestier",
+      "skill": "cooking",
+      "reqLevel": 25,
+      "craftTime": 10,
+      "xpPerCraft": 120,
+      "inputs": [
+        { "itemId": "fish_trout", "qty": 2 },
+        { "itemId": "herb_healing", "qty": 1 },
+        { "itemId": "wheat", "qty": 2 }
+      ],
+      "output": { "itemId": "meal_harvester", "qty": 1 }
+    },
+    {
+      "id": "cook_scholar_meal",
+      "name": "Repas de l'Érudit",
+      "skill": "cooking",
+      "reqLevel": 40,
+      "craftTime": 15,
+      "xpPerCraft": 250,
+      "inputs": [
+        { "itemId": "fish_salmon", "qty": 1 },
+        { "itemId": "flower_golden", "qty": 2 },
+        { "itemId": "herb_healing_enchanted", "qty": 1 },
+        { "itemId": "wheat", "qty": 2 }
+      ],
+      "output": { "itemId": "meal_scholar", "qty": 1 }
+    },
+    {
       "id": "brew_potion_minor",
       "name": "Potion de Soin Mineure",
       "skill": "alchemy",

@@ -12,7 +12,10 @@ import type {
   QuestProgress,
   GameLogEntry,
   ActiveCraft,
+  ActiveBuff,
 } from "@/types/game";
+import { getConsumableEffect } from "@/engine/consumable-engine";
+import { computePlayerStats } from "@/engine/offline-engine";
 import { getCraftRecipe, canCraft, craftDurationMs } from "@/engine/crafting-engine";
 import { PROFESSION_SKILL_IDS } from "@/types/game";
 import { getLevelForXp } from "@/lib/xp-calc";
@@ -104,6 +107,7 @@ function defaultGameState(): GameState {
     lastDailyReset: Date.now(),
     lastWeeklyReset: Date.now(),
     activeCraft: null,
+    activeBuffs: [],
     marketSales: {},
     discoveredItems: [],
     synergyState: {},
@@ -169,6 +173,9 @@ interface GameActions {
   // Crafting loop
   startCraft: (recipeId: string, skillId: SkillId) => boolean;
   stopCraft: () => void;
+
+  // Consumables
+  consumeItem: (itemId: string) => void;
 
   // Class synergy runtime state
   setSynergyState: (update: Record<string, number>) => void;
@@ -530,6 +537,53 @@ export const useGameStore = create<GameStore>()(
 
       stopCraft: () => set({ activeCraft: null }),
 
+      consumeItem: (itemId) => {
+        const state = get();
+        const qty = state.inventory[itemId] ?? 0;
+        if (qty <= 0) return;
+
+        const effect = getConsumableEffect(itemId);
+        if (!effect) return;
+
+        const now = Date.now();
+        const newInventory = { ...state.inventory, [itemId]: qty - 1 };
+        const updates: Partial<GameState> = { inventory: newInventory };
+
+        // Instant heal
+        if (effect.healHp) {
+          const stats = computePlayerStats(state);
+          const newHp = Math.min(stats.maxHp, state.combat.playerHp + effect.healHp);
+          updates.combat = { ...state.combat, playerHp: newHp };
+        }
+
+        // Timed buff
+        const hasBuff =
+          (effect.attackBonus       ?? 0) > 0 ||
+          (effect.defenseBonus      ?? 0) > 0 ||
+          (effect.hpRegenBonus      ?? 0) > 0 ||
+          (effect.xpMultiplier      ?? 1) > 1  ||
+          (effect.harvestMultiplier ?? 1) > 1;
+
+        if (hasBuff && effect.duration) {
+          const buff: ActiveBuff = {
+            id:                `${itemId}_${now}`,
+            itemId,
+            attackBonus:       effect.attackBonus       ?? 0,
+            defenseBonus:      effect.defenseBonus      ?? 0,
+            hpRegenBonus:      effect.hpRegenBonus      ?? 0,
+            xpMultiplier:      effect.xpMultiplier      ?? 1.0,
+            harvestMultiplier: effect.harvestMultiplier ?? 1.0,
+            expiresAt:         now + effect.duration * 1000,
+          };
+          updates.activeBuffs = [
+            ...(state.activeBuffs ?? []).filter((b) => b.itemId !== itemId),
+            buff,
+          ];
+        }
+
+        set(updates);
+      },
+
       setSynergyState: (update) =>
         set((s) => ({ synergyState: { ...s.synergyState, ...update } })),
 
@@ -593,6 +647,7 @@ export const useGameStore = create<GameStore>()(
         lastDailyReset: s.lastDailyReset,
         lastWeeklyReset: s.lastWeeklyReset,
         activeCraft: s.activeCraft,
+        activeBuffs: s.activeBuffs,
         marketSales: s.marketSales,
         discoveredItems: s.discoveredItems,
         synergyState: s.synergyState,

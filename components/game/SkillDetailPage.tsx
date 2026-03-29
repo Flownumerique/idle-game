@@ -5,6 +5,7 @@ import { getActionDurationMs, getToolBonus, getSkillDef } from "@/engine/skill-e
 import { getRecipesForSkill } from "@/engine/craft-engine";
 import { GameData } from "@/engine/data-loader";
 import ForgePanel from "../craft/ForgePanel";
+import CookingPanel from "../craft/CookingPanel";
 import {
   getLevelForXp,
   getLevelProgress,
@@ -43,10 +44,9 @@ export default function SkillDetailPage({ skillId, skillName, skillIcon }: Props
   const toolBonus   = getToolBonus(equipment, skillId);
   const skillDef    = getSkillDef(skillId);
 
-  // Show ForgePanel for smithing instead of regular skill interface
-  if (skillId === "smithing") {
-    return <ForgePanel />;
-  }
+  // Craft-based panels replace the generic skill interface
+  if (skillId === "smithing") return <ForgePanel />;
+  if (skillId === "cooking")  return <CookingPanel />;
 
   function handleActionClick(actionId: string) {
     if (skillState.activeAction === actionId) {
