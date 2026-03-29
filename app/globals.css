@@ -234,11 +234,17 @@ body::after {
   from { opacity: 0; transform: translateY(3px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+@keyframes float-up-fade {
+  0%   { opacity: 1;   transform: translateY(0px) scale(1); }
+  20%  { opacity: 1;   transform: translateY(-8px) scale(1.05); }
+  100% { opacity: 0;   transform: translateY(-36px) scale(0.9); }
+}
 
-.xp-active     { animation: xp-pulse 2s ease-in-out infinite; }
-.pixel-blink   { animation: pixel-blink 1s steps(1) infinite; }
-.torch-glow    { animation: torch-glow 2.5s ease-in-out infinite; }
-.log-entry-new { animation: fade-in-up 0.15s ease-out; }
+.xp-active        { animation: xp-pulse 2s ease-in-out infinite; }
+.pixel-blink      { animation: pixel-blink 1s steps(1) infinite; }
+.torch-glow       { animation: torch-glow 2.5s ease-in-out infinite; }
+.log-entry-new    { animation: fade-in-up 0.15s ease-out; }
+.floating-reward  { animation: float-up-fade 1.5s ease-out forwards; pointer-events: none; }
 
 /* ── Navigation latérale ───────────────────────────────────────────────── */
 .nav-item {

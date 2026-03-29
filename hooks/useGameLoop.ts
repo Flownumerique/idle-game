@@ -150,12 +150,22 @@ export function useGameLoop() {
           // harvestMultiplier applies only to gathering (no inputs = no recipe)
           const isGathering = !getAction(skillId, skillState.activeAction ?? '')?.inputs?.length;
           const harvestMult = isGathering ? playerStatsForTick.harvestMultiplier : 1.0;
+          const finalLoot: Record<string, number> = {};
           for (const [itemId, qty] of Object.entries(result.loot)) {
             const finalQty = isGathering ? Math.max(1, Math.floor(qty * harvestMult)) : qty;
             newInventory[itemId] = (newInventory[itemId] ?? 0) + finalQty;
             markDiscovered(itemId);
+            finalLoot[itemId] = finalQty;
           }
-          
+          if (Object.keys(finalLoot).length > 0) {
+            bus.emit('SKILL_ACTION_DONE', {
+              skillId: skillId as import('@/types/game').SkillId,
+              actionId: skillState.activeAction ?? '',
+              xpGained: result.xpGained,
+              outputs: Object.entries(finalLoot).map(([itemId, qty]) => ({ itemId, qty })),
+            });
+          }
+
           // Consume inputs
           for (const [itemId, qty] of Object.entries(result.consumed)) {
             newInventory[itemId] = Math.max(0, (newInventory[itemId] ?? 0) - qty);

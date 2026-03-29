@@ -233,7 +233,8 @@ export const useGameStore = create<GameStore>()(
             actionStartedAt: Date.now(),
             actionProgress: 0,
           };
-          return { skills: updatedSkills };
+          // Also stop any active craft
+          return { skills: updatedSkills, activeCraft: null };
         }),
 
       stopAction: (skillId) =>
@@ -513,25 +514,30 @@ export const useGameStore = create<GameStore>()(
         if (!recipe) return false;
         const state = get();
         if (!canCraft(recipeId, state.inventory, state.skills)) return false;
-        // Stop any active profession action for this skill
-        set((s) => ({
-          activeCraft: {
-            skillId,
-            recipeId,
-            startedAt: Date.now(),
-            duration: craftDurationMs(recipe),
-            completedCount: 0,
-          },
-          skills: {
-            ...s.skills,
-            [skillId]: {
-              ...s.skills[skillId],
-              activeAction: null,
-              actionStartedAt: null,
-              actionProgress: 0,
+        // Stop all active profession actions
+        set((s) => {
+          const updatedSkills = { ...s.skills };
+          for (const id of PROFESSION_SKILL_IDS) {
+            if (updatedSkills[id].activeAction) {
+              updatedSkills[id] = {
+                ...updatedSkills[id],
+                activeAction: null,
+                actionStartedAt: null,
+                actionProgress: 0,
+              };
+            }
+          }
+          return {
+            activeCraft: {
+              skillId,
+              recipeId,
+              startedAt: Date.now(),
+              duration: craftDurationMs(recipe),
+              completedCount: 0,
             },
-          },
-        }));
+            skills: updatedSkills,
+          };
+        });
         return true;
       },
 

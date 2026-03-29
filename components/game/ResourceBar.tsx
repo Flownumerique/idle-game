@@ -18,7 +18,6 @@ export default function ResourceBar({ onNavigate }: Props) {
   }));
 
   const { totalLevel } = calculateGlobalLevels(skills);
-  const activeSkills = Object.values(skills).filter((s) => s.activeAction).length;
 
   // Quête active la plus avancée
   const activeQuest = Object.values(quests)
@@ -69,11 +68,6 @@ export default function ResourceBar({ onNavigate }: Props) {
             {formatNumber(gold)}
           </span>
         </div>
-        {activeSkills > 0 && (
-          <span className="font-cinzel pixel-blink hidden sm:block" style={{ fontSize: "0.45rem", color: "var(--gold)" }}>
-            ▶ {activeSkills} ACTIF{activeSkills > 1 ? "S" : ""}
-          </span>
-        )}
       </div>
 
       {/* ── Rappel quête active ────────────────────────────────────── */}

@@ -20,6 +20,7 @@ import FarmingPanel from "./FarmingPanel";
 import EncyclopediaPanel from "./EncyclopediaPanel";
 import QuestPanel from "./QuestPanel";
 import GameLogsPanel from "./GameLogsPanel";
+import FloatingReward from "./FloatingReward";
 import { PROFESSION_SKILL_IDS } from "@/types/game";
 import type { SkillId } from "@/types/game";
 import type { Tab } from "@/types/tabs";
@@ -429,6 +430,7 @@ export default function GameLayout() {
 
   return (
     <div className="flex flex-col h-[100dvh] bg-void text-text-primary overflow-hidden">
+      <FloatingReward />
       {/* ── Top Navigation Bar (Desktop) ────────────────────────────── */}
       <header className="hidden md:flex items-center h-14 border-b-2 border-border-subtle bg-black/80 backdrop-blur-sm z-50 px-6 gap-8">
         <div className="flex items-center gap-3 pr-6 border-r-2 border-border-subtle h-8">
